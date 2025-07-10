@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lodge Booking Calendar</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #calendar {
+            width: 90%;
+            margin: 20px auto;
+        }
+
+        #test-button, #book, #make-booking-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+            #test-button:hover, #book:hover, #make-booking-button:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body>
+    <h1>Lodge Booking Calendar</h1>
+
+    <button id="book">Get Bookings</button>
+    <button id="make-booking-button">Make Booking Test</button>
+    <button id="test-button">Test Airbnb Connection</button>
+
+    <div id="calendar"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+
+            if (!calendarEl) {
+                console.error("Calendar element not found.");
+                return;
+            }
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                selectable: true,
+                events: fetchBookings,
+                eventColor: '#FF0000'
+            });
+
+            calendar.render();
+
+            document.getElementById("test-button").addEventListener("click", syncAirbnb);
+            document.getElementById("book").addEventListener("click", bookTest);
+            document.getElementById("make-booking-button").addEventListener("click", makeBookingTest);
+
+            function bookTest() {
+                $.ajax({
+                    url: '/Recipe/GetBookings',
+                    success: function (data) {
+                        console.log("Get Bookings Success:", data);
+                        alert("Get Bookings Success! Check console.");
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Get Bookings Error:", error);
+                        alert("Get Bookings Error! Check console.");
+                    }
+                });
+            }
+
+            function makeBookingTest() {
+                $.ajax({
+                    url: '/Recipe/MakeBooking',
+                    success: function (data) {
+                        console.log("Make Booking Success:", data);
+                        alert(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Make Booking Error:", error);
+                        alert("Make Booking Error! Check console.");
+                    }
+                });
+            }
+
+            function fetchBookings(fetchInfo, successCallback, failureCallback) {
+                $.ajax({
+                    url: '/Recipe/GetBookings',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        start: fetchInfo.startStr,
+                        end: fetchInfo.endStr
+                    },
+                    success: function (data) {
+                        let events = data.map(booking => ({
+                            title: booking.title,
+                            start: booking.start,
+                            end: booking.end,
+                            color: booking.color,
+                            display: 'background'
+                        }));
+                        successCallback(events);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("❌ Error fetching bookings:", error);
+                        failureCallback(error);
+                    }
+                });
+            }
+
+            function syncAirbnb() {
+                $.ajax({
+                    url: '/Recipe/SyncAirbnb',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        alert("✅ Airbnb Sync Successful! Refreshing calendar...");
+                        window.location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("❌ Airbnb sync failed:", error);
+                        alert("❌ Failed to sync Airbnb. Check console.");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

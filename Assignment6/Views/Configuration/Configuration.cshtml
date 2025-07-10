@@ -1,0 +1,970 @@
+﻿@{
+    Layout = "";
+}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header h1 {
+        color: white;
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .header p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: clamp(0.9rem, 2vw, 1.1rem);
+    }
+
+    .container {
+        display: flex;
+        flex: 1;
+        gap: 20px;
+        padding: 20px;
+        flex-direction: row;
+    }
+
+    .sidebar {
+        width: 250px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        overflow-y: auto;
+        max-height: 100%;
+    }
+
+    .sidebar h3 {
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 1.2em;
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .element-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        margin: 8px 0;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 10px;
+        cursor: grab;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        touch-action: none;
+    }
+
+    .element-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .element-item:active {
+        cursor: grabbing;
+        transform: scale(0.98);
+    }
+
+    .element-icon {
+        font-size: 1.5em;
+        margin-right: 10px;
+    }
+
+    .design-area-container {
+        flex: 1;
+        overflow: auto;
+        position: relative;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .design-area {
+        position: absolute;
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        width: 800px;
+        height: 600px;
+        transform-origin: top left;
+    }
+
+    .grid-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px), 
+                          linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+        background-size: 20px 20px;
+        opacity: 0.5;
+        z-index: 1;
+    }
+
+    .room-element {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid #667eea;
+        border-radius: 10px;
+        cursor: move;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #333;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        z-index: 10;
+        backdrop-filter: blur(5px);
+        touch-action: none;
+        font-size: clamp(12px, 1.5vw, 16px);
+        text-align: center;
+        word-break: break-word;
+        padding: 5px;
+    }
+
+    .room-element:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .room-element.selected {
+        border-color: #ff6b6b;
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
+    }
+
+    .resize-handle {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: #667eea;
+        border-radius: 50%;
+        cursor: se-resize;
+        right: -6px;
+        bottom: -6px;
+        z-index: 20;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        touch-action: none;
+    }
+
+    .resize-handle:hover {
+        background: #ff6b6b;
+        transform: scale(1.2);
+    }
+
+    .delete-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 20px;
+        height: 20px;
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 12px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 21;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .room-element.selected .delete-btn {
+        display: flex;
+    }
+
+    .delete-btn:hover {
+        background: #ff5252;
+        transform: scale(1.1);
+    }
+
+    .controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 8px;
+        z-index: 30;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .control-btn {
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #333;
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        font-size: clamp(12px, 2vw, 14px);
+    }
+
+    .control-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .properties-panel {
+        position: fixed;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        width: min(250px, 90vw);
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        display: none;
+        z-index: 40;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .properties-panel.show {
+        display: block;
+    }
+
+    .properties-panel h4 {
+        margin-bottom: 15px;
+        color: #333;
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+        font-size: clamp(16px, 2vw, 18px);
+    }
+
+    .property-group {
+        margin-bottom: 12px;
+    }
+
+    .property-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+        font-size: clamp(12px, 1.5vw, 14px);
+    }
+
+    .property-group input {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: clamp(12px, 1.5vw, 14px);
+    }
+
+    @@media (max-width: 992px) {
+        .container {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar {
+            width: 100%;
+            max-height: 200px;
+            order: 2;
+            padding: 15px;
+        }
+
+        .design-area-container {
+            order: 1;
+            min-height: 50vh;
+        }
+
+        .properties-panel {
+            right: 10px;
+            width: min(220px, 90vw);
+            padding: 10px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .design-area {
+            transform: scale(calc(var(--mobile-scale, 1))) !important;
+            height: calc(600px * var(--mobile-scale, 1)) !important;
+        }
+        
+        .grid-overlay {
+            background-size: calc(20px * var(--mobile-scale, 1)) calc(20px * var(--mobile-scale, 1));
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .container {
+            padding: 10px;
+        }
+
+        .sidebar {
+            max-height: 180px;
+        }
+
+        .design-area-container {
+            min-height: 60vh;
+        }
+
+        .controls {
+            top: 5px;
+            right: 5px;
+            gap: 5px;
+        }
+
+        .control-btn {
+            padding: 6px 10px;
+        }
+
+        .element-item {
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .properties-panel {
+            width: 90vw;
+            right: 5px;
+            left: 5px;
+            margin: 0 auto;
+            top: auto;
+            bottom: 10px;
+            transform: none;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="sidebar">
+        <h3>Room Elements</h3>
+        <div class="element-item" draggable="true" data-type="bedroom">
+            <span class="element-icon">🛏️</span>
+            <span>Bedroom</span>
+        </div>
+        <div class="element-item" draggable="true" data-type="hall">
+            <span class="element-icon">🛏️</span>
+            <span>Hall</span>
+        </div>
+        <div class="element-item" draggable="true" data-type="bathroom">
+            <span class="element-icon">🛁</span>
+            <span>Bathroom</span>
+        </div>
+        <div class="element-item" draggable="true" data-type="kitchen">
+            <span class="element-icon">🍳</span>
+            <span>Kitchen</span>
+        </div>
+        <div class="element-item" draggable="true" data-type="living-room">
+            <span class="element-icon">🛋️</span>
+            <span>Living Room</span>
+        </div>
+        <div class="element-item" draggable="true" data-type="dining-room">
+            <span class="element-icon">🍽️</span>
+            <span>Dining Room</span>
+        </div>
+        <div class="element-item" draggable="true" data-type="balcony">
+            <span class="element-icon">🌿</span>
+            <span>Balcony</span>
+        </div>
+        <div class="element-item" draggable="true" data-type="garden">
+            <span class="element-icon">🌻</span>
+            <span>Garden</span>
+        </div>
+        <div class="element-item" draggable="true" data-type="parking">
+            <span class="element-icon">🚗</span>
+            <span>Parking</span>
+        </div>
+    </div>
+
+    <div class="design-area-container">
+        <div class="design-area" id="designArea">
+            <div class="grid-overlay"></div>
+            <div class="controls">
+                <button class="control-btn" onclick="clearAll()">Clear All</button>
+                <button class="control-btn" onclick="toggleGrid()">Toggle Grid</button>
+                <button class="control-btn" onclick="exportLayout()">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="properties-panel" id="propertiesPanel">
+    <h4>Element Properties</h4>
+    <div class="property-group">
+        <label>Width (px):</label>
+        <input type="number" id="widthInput" min="50" max="500">
+    </div>
+    <div class="property-group">
+        <label>Height (px):</label>
+        <input type="number" id="heightInput" min="50" max="500">
+    </div>
+    <div class="property-group">
+        <label>X Position:</label>
+        <input type="number" id="xInput" min="0">
+    </div>
+    <div class="property-group">
+        <label>Y Position:</label>
+        <input type="number" id="yInput" min="0">
+    </div>
+    <div class="property-group">
+        <label>Label:</label>
+        <input type="text" id="labelInput">
+    </div>
+</div>
+
+<script>
+    let selectedElement = null;
+    let isDragging = false;
+    let isResizing = false;
+    let dragOffset = { x: 0, y: 0 };
+    let elementCounter = 0;
+    let designAreaRect = null;
+    let currentScale = 1;
+
+    // Initialize the designer
+    function initDesigner() {
+        updateDesignAreaScale();
+
+        // Load any saved layout
+        loadLayout();
+
+        // Set up window resize handler
+        window.addEventListener('resize', handleWindowResize);
+
+        // Set up touch events for mobile
+        setupTouchEvents();
+
+        // Set up drag and drop
+        setupDragAndDrop();
+    }
+
+    // Handle window resize
+    function handleWindowResize() {
+        updateDesignAreaScale();
+    }
+
+    // Update design area scale based on container size
+    function updateDesignAreaScale() {
+        const designArea = document.getElementById('designArea');
+        const container = designArea.parentElement;
+        const containerWidth = container.clientWidth;
+
+        // Calculate scale to fit width
+        const scale = containerWidth / 800;
+        currentScale = scale;
+
+        // Apply the scale
+        designArea.style.transform = `scale(${scale})`;
+        designArea.style.height = `${600 * scale}px`;
+
+        // Store the scale for mobile
+        designArea.style.setProperty('--mobile-scale', scale);
+
+        designAreaRect = designArea.getBoundingClientRect();
+    }
+
+    // Set up drag and drop functionality
+    function setupDragAndDrop() {
+        document.querySelectorAll('.element-item').forEach(item => {
+            item.addEventListener('dragstart', handleDragStart);
+        });
+
+        const designArea = document.getElementById('designArea');
+        designArea.addEventListener('dragover', handleDragOver);
+        designArea.addEventListener('drop', handleDrop);
+    }
+
+    function handleDragStart(e) {
+        e.dataTransfer.setData('text/plain', e.target.dataset.type);
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const elementType = e.dataTransfer.getData('text/plain');
+        const rect = designArea.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / currentScale;
+        const y = (e.clientY - rect.top) / currentScale;
+
+        createRoomElement(elementType, x, y);
+    }
+
+    // Set up touch events for mobile
+    function setupTouchEvents() {
+        const designArea = document.getElementById('designArea');
+
+        // Touch events for design area
+        designArea.addEventListener('touchstart', handleTouchStart, { passive: false });
+        designArea.addEventListener('touchmove', handleTouchMove, { passive: false });
+        designArea.addEventListener('touchend', handleTouchEnd);
+
+        // Touch events for draggable elements
+        document.querySelectorAll('.element-item').forEach(item => {
+            item.addEventListener('touchstart', handleElementTouchStart, { passive: false });
+        });
+    }
+
+    // Touch event handlers
+    function handleElementTouchStart(e) {
+        const touch = e.touches[0];
+        const elementType = e.target.closest('.element-item').dataset.type;
+
+        // Create a ghost element that follows the touch
+        const ghost = document.createElement('div');
+        ghost.className = 'element-item';
+        ghost.style.position = 'fixed';
+        ghost.style.left = `${touch.clientX - 50}px`;
+        ghost.style.top = `${touch.clientY - 25}px`;
+        ghost.style.width = '100px';
+        ghost.style.height = '50px';
+        ghost.style.opacity = '0.8';
+        ghost.style.zIndex = '1000';
+        ghost.style.pointerEvents = 'none';
+        ghost.innerHTML = e.target.closest('.element-item').innerHTML;
+        document.body.appendChild(ghost);
+
+        // Store touch data
+        const touchData = {
+            elementType: elementType,
+            ghost: ghost,
+            startX: touch.clientX,
+            startY: touch.clientY
+        };
+
+        e.target.closest('.element-item').touchData = touchData;
+
+        // Prevent default to avoid scrolling
+        e.preventDefault();
+    }
+
+    function handleTouchStart(e) {
+        if (e.touches.length === 1) {
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            if (element && element.classList.contains('element-item')) {
+                // This is handled by handleElementTouchStart
+                return;
+            }
+
+            // Check if we're touching a room element
+            const roomElement = element.closest('.room-element');
+            if (roomElement) {
+                if (element.classList.contains('resize-handle')) {
+                    // Start resizing
+                    isResizing = true;
+                    selectedElement = roomElement;
+                    e.preventDefault();
+                } else if (element.classList.contains('delete-btn')) {
+                    // Delete the element
+                    deleteElement(roomElement.id);
+                    e.preventDefault();
+                } else {
+                    // Start dragging
+                    isDragging = true;
+                    selectedElement = roomElement;
+                    selectElement({ target: roomElement });
+
+                    const rect = selectedElement.getBoundingClientRect();
+                    dragOffset.x = touch.clientX - rect.left;
+                    dragOffset.y = touch.clientY - rect.top;
+
+                    e.preventDefault();
+                }
+            }
+        }
+    }
+
+    function handleTouchMove(e) {
+        if (e.touches.length === 1) {
+            const touch = e.touches[0];
+
+            // Check if we're moving a ghost element (dragging from sidebar)
+            const elementItem = document.querySelector('.element-item.touching');
+            if (elementItem && elementItem.touchData && elementItem.touchData.ghost) {
+                const ghost = elementItem.touchData.ghost;
+                ghost.style.left = `${touch.clientX - 50}px`;
+                ghost.style.top = `${touch.clientY - 25}px`;
+                e.preventDefault();
+                return;
+            }
+
+            if (isDragging && selectedElement) {
+                const x = (touch.clientX - designAreaRect.left - dragOffset.x) / currentScale;
+                const y = (touch.clientY - designAreaRect.top - dragOffset.y) / currentScale;
+
+                selectedElement.style.left = `${Math.max(0, x)}px`;
+                selectedElement.style.top = `${Math.max(0, y)}px`;
+
+                updatePropertiesPanel();
+                e.preventDefault();
+            } else if (isResizing && selectedElement) {
+                const rect = selectedElement.getBoundingClientRect();
+                const newWidth = Math.max(50, (touch.clientX - rect.left) / currentScale);
+                const newHeight = Math.max(50, (touch.clientY - rect.top) / currentScale);
+
+                selectedElement.style.width = `${newWidth}px`;
+                selectedElement.style.height = `${newHeight}px`;
+
+                updatePropertiesPanel();
+                e.preventDefault();
+            }
+        }
+    }
+
+    function handleTouchEnd(e) {
+        // Check if we were dragging a ghost element
+        const elementItems = document.querySelectorAll('.element-item');
+        elementItems.forEach(item => {
+            if (item.touchData && item.touchData.ghost) {
+                const touch = e.changedTouches[0];
+                const ghost = item.touchData.ghost;
+                const rect = designArea.getBoundingClientRect();
+
+                // Check if the touch ended in the design area
+                if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                    touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+
+                    const x = (touch.clientX - rect.left) / currentScale - 50;
+                    const y = (touch.clientY - rect.top) / currentScale - 25;
+
+                    createRoomElement(item.touchData.elementType, x, y);
+                }
+
+                // Remove the ghost element
+                ghost.remove();
+                delete item.touchData;
+            }
+        });
+
+        isDragging = false;
+        isResizing = false;
+    }
+
+    // Create room element with responsive default size
+    function createRoomElement(type, x, y) {
+        const element = document.createElement('div');
+        element.className = `room-element ${type}`;
+        element.style.left = `${Math.max(0, x)}px`;
+        element.style.top = `${Math.max(0, y)}px`;
+
+        // Set responsive default size
+        const baseSize = 800 * 0.15; // 15% of design area width
+        element.style.width = `${baseSize}px`;
+        element.style.height = `${baseSize * 0.7}px`;
+
+        element.id = `element-${++elementCounter}`;
+
+        const label = type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ');
+        element.innerHTML = `
+            <span>${label}</span>
+            <div class="resize-handle"></div>
+            <button class="delete-btn" onclick="deleteElement('${element.id}')">×</button>
+        `;
+
+        // Add event listeners
+        element.addEventListener('mousedown', handleMouseDown);
+        element.addEventListener('click', selectElement);
+        element.addEventListener('touchstart', handleTouchStart, { passive: false });
+
+        const resizeHandle = element.querySelector('.resize-handle');
+        resizeHandle.addEventListener('mousedown', handleResizeStart);
+        resizeHandle.addEventListener('touchstart', handleTouchStart, { passive: false });
+
+        designArea.appendChild(element);
+        selectElement({ target: element });
+
+        return element;
+    }
+
+    function handleMouseDown(e) {
+        if (e.target.classList.contains('resize-handle') || e.target.classList.contains('delete-btn')) {
+            return;
+        }
+
+        isDragging = true;
+        selectedElement = e.target.closest('.room-element');
+
+        const rect = selectedElement.getBoundingClientRect();
+        designAreaRect = designArea.getBoundingClientRect();
+
+        dragOffset.x = e.clientX - rect.left;
+        dragOffset.y = e.clientY - rect.top;
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        e.preventDefault();
+    }
+
+    function handleMouseMove(e) {
+        if (!isDragging || !selectedElement) return;
+
+        designAreaRect = designArea.getBoundingClientRect();
+        const x = (e.clientX - designAreaRect.left - dragOffset.x) / currentScale;
+        const y = (e.clientY - designAreaRect.top - dragOffset.y) / currentScale;
+
+        selectedElement.style.left = `${Math.max(0, x)}px`;
+        selectedElement.style.top = `${Math.max(0, y)}px`;
+
+        updatePropertiesPanel();
+    }
+
+    function handleMouseUp() {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+    }
+
+    function handleResizeStart(e) {
+        isResizing = true;
+        selectedElement = e.target.closest('.room-element');
+
+        document.addEventListener('mousemove', handleResizeMove);
+        document.addEventListener('mouseup', handleResizeUp);
+
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    function handleResizeMove(e) {
+        if (!isResizing || !selectedElement) return;
+
+        const elementRect = selectedElement.getBoundingClientRect();
+        const newWidth = Math.max(50, (e.clientX - elementRect.left) / currentScale);
+        const newHeight = Math.max(50, (e.clientY - elementRect.top) / currentScale);
+
+        selectedElement.style.width = `${newWidth}px`;
+        selectedElement.style.height = `${newHeight}px`;
+
+        updatePropertiesPanel();
+    }
+
+    function handleResizeUp() {
+        isResizing = false;
+        document.removeEventListener('mousemove', handleResizeMove);
+        document.removeEventListener('mouseup', handleResizeUp);
+    }
+
+    function selectElement(e) {
+        document.querySelectorAll('.room-element').forEach(el => {
+            el.classList.remove('selected');
+        });
+
+        const element = e.target.closest('.room-element');
+        if (element) {
+            element.classList.add('selected');
+            selectedElement = element;
+            showPropertiesPanel();
+        }
+    }
+
+    function deleteElement(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.remove();
+            hidePropertiesPanel();
+        }
+    }
+
+    function showPropertiesPanel() {
+        const panel = document.getElementById('propertiesPanel');
+        panel.classList.add('show');
+        updatePropertiesPanel();
+    }
+
+    function hidePropertiesPanel() {
+        const panel = document.getElementById('propertiesPanel');
+        panel.classList.remove('show');
+    }
+
+    function updatePropertiesPanel() {
+        if (!selectedElement) return;
+
+        document.getElementById('widthInput').value = parseInt(selectedElement.style.width);
+        document.getElementById('heightInput').value = parseInt(selectedElement.style.height);
+        document.getElementById('xInput').value = parseInt(selectedElement.style.left);
+        document.getElementById('yInput').value = parseInt(selectedElement.style.top);
+        document.getElementById('labelInput').value = selectedElement.querySelector('span').textContent;
+    }
+
+    // Properties panel inputs
+    document.getElementById('widthInput').addEventListener('input', (e) => {
+        if (selectedElement) {
+            selectedElement.style.width = `${e.target.value}px`;
+        }
+    });
+
+    document.getElementById('heightInput').addEventListener('input', (e) => {
+        if (selectedElement) {
+            selectedElement.style.height = `${e.target.value}px`;
+        }
+    });
+
+    document.getElementById('xInput').addEventListener('input', (e) => {
+        if (selectedElement) {
+            selectedElement.style.left = `${e.target.value}px`;
+        }
+    });
+
+    document.getElementById('yInput').addEventListener('input', (e) => {
+        if (selectedElement) {
+            selectedElement.style.top = `${e.target.value}px`;
+        }
+    });
+
+    document.getElementById('labelInput').addEventListener('input', (e) => {
+        if (selectedElement) {
+            selectedElement.querySelector('span').textContent = e.target.value;
+        }
+    });
+
+    // Control functions
+    function clearAll() {
+        document.querySelectorAll('.room-element').forEach(el => el.remove());
+        hidePropertiesPanel();
+    }
+
+    function toggleGrid() {
+        const grid = document.querySelector('.grid-overlay');
+        grid.style.display = grid.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function exportLayout() {
+        const designArea = document.getElementById('designArea');
+
+        const elements = Array.from(document.querySelectorAll('.room-element')).map(el => ({
+            type: el.className.split(' ')[1],
+            x: parseInt(el.style.left),
+            y: parseInt(el.style.top),
+            width: parseInt(el.style.width),
+            height: parseInt(el.style.height),
+            label: el.querySelector('span').textContent
+        }));
+
+        const layout = {
+            timestamp: new Date().toISOString(),
+            designWidth: 800,
+            designHeight: 600,
+            elements: elements
+        };
+
+        // Save to Local Storage
+        localStorage.setItem('homestayLayout', JSON.stringify(layout));
+
+        // Trigger download
+        const blob = new Blob([JSON.stringify(layout, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'homestay-layout.json';
+        a.click();
+        URL.revokeObjectURL(url);
+
+        alert('Layout exported and saved to local storage!');
+    }
+
+    function loadLayout() {
+        const savedLayout = localStorage.getItem('homestayLayout');
+        if (!savedLayout) return false;
+
+        try {
+            const layout = JSON.parse(savedLayout);
+            const designArea = document.getElementById('designArea');
+
+            // Clear existing elements
+            clearAll();
+
+            // Calculate scale factor
+            const originalWidth = layout.designWidth || 800;
+            const scale = designArea.parentElement.clientWidth / originalWidth;
+
+            // Create elements with scaled positions and sizes
+            layout.elements.forEach(el => {
+                const element = document.createElement('div');
+                element.className = `room-element ${el.type}`;
+
+                element.style.left = `${el.x}px`;
+                element.style.top = `${el.y}px`;
+                element.style.width = `${el.width}px`;
+                element.style.height = `${el.height}px`;
+
+                element.id = `element-${++elementCounter}`;
+                element.innerHTML = `
+                    <span>${el.label || el.type}</span>
+                    <div class="resize-handle"></div>
+                    <button class="delete-btn" onclick="deleteElement('${element.id}')">×</button>
+                `;
+
+                // Add event listeners
+                element.addEventListener('mousedown', handleMouseDown);
+                element.addEventListener('click', selectElement);
+                element.addEventListener('touchstart', handleTouchStart, { passive: false });
+
+                const resizeHandle = element.querySelector('.resize-handle');
+                resizeHandle.addEventListener('mousedown', handleResizeStart);
+                resizeHandle.addEventListener('touchstart', handleTouchStart, { passive: false });
+
+                designArea.appendChild(element);
+            });
+
+            return true;
+        } catch (e) {
+            console.error('Error loading layout:', e);
+            return false;
+        }
+    }
+
+    // Click outside to deselect
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.room-element') && !e.target.closest('.properties-panel')) {
+            document.querySelectorAll('.room-element').forEach(el => {
+                el.classList.remove('selected');
+            });
+            hidePropertiesPanel();
+            selectedElement = null;
+        }
+    });
+
+    // Touch outside to deselect
+    document.addEventListener('touchend', (e) => {
+        if (!e.target.closest('.room-element') && !e.target.closest('.properties-panel')) {
+            document.querySelectorAll('.room-element').forEach(el => {
+                el.classList.remove('selected');
+            });
+            hidePropertiesPanel();
+            selectedElement = null;
+        }
+    });
+
+    // Initialize the designer when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initDesigner);
+</script>

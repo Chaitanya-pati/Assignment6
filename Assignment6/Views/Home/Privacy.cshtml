@@ -1,0 +1,206 @@
+﻿<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .layout-area-wrapper {
+        width: 100%;
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .layout-area {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 75%; /* 4:3 aspect ratio (600/800) */
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        background: repeating-linear-gradient(0deg, #f0f0f0 0px, #f0f0f0 19px, #ccc 20px), 
+                    repeating-linear-gradient(90deg, #f0f0f0 0px, #f0f0f0 19px, #ccc 20px);
+        background-size: 20px 20px;
+        overflow: hidden;
+    }
+
+    .room {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid #667eea;
+        border-radius: 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #333;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        z-index: 10;
+        backdrop-filter: blur(5px);
+        font-size: clamp(12px, 1.5vw, 16px);
+        text-align: center;
+        word-break: break-word;
+        padding: 5px;
+    }
+
+    .room:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .room.booked {
+        background: rgba(255, 107, 107, 0.7);
+        border-color: #ff5252;
+    }
+
+    .no-layout-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+        color: red;
+        text-align: center;
+        width: 90%;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .layout-area {
+            padding-bottom: 100%; /* More square aspect ratio on mobile */
+        }
+        
+        .room {
+            font-size: 12px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .layout-area {
+            background-size: 15px 15px; /* Smaller grid on very small screens */
+        }
+    }
+</style>
+
+<div class="layout-area-wrapper">
+    <div class="layout-area" id="layoutArea"></div>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        const layoutArea = document.getElementById('layoutArea');
+        const saved = localStorage.getItem('homestayLayout');
+        
+        if (!saved) {
+            layoutArea.innerHTML = "<p class='no-layout-message'>No layout found. Please design layout first.</p>";
+            return;
+        }
+
+        try {
+            const layout = JSON.parse(saved);
+            renderLayout(layout);
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                renderLayout(layout);
+            });
+        } catch (e) {
+            layoutArea.innerHTML = `<p class='no-layout-message'>Error loading layout: ${e.message}</p>`;
+        }
+    });
+
+    function renderLayout(layout) {
+        const layoutArea = document.getElementById('layoutArea');
+        layoutArea.innerHTML = ''; // Clear previous rendering
+        
+        const designWidth = layout.designWidth || 800;
+        const designHeight = layout.designHeight || 600;
+
+        // Get actual rendered size
+        const actualWidth = layoutArea.clientWidth;
+        const actualHeight = layoutArea.clientHeight;
+
+        // Calculate scaling factors while maintaining aspect ratio
+        const widthRatio = actualWidth / designWidth;
+        const heightRatio = actualHeight / designHeight;
+        const scale = Math.min(widthRatio, heightRatio);
+
+        // Calculate centered position
+        const offsetX = (actualWidth - (designWidth * scale)) / 2;
+        const offsetY = (actualHeight - (designHeight * scale)) / 2;
+
+        layout.elements.forEach((el, i) => {
+            const room = document.createElement('div');
+            room.className = `room ${el.type}`;
+
+            // Apply scaled positions and dimensions
+            room.style.left = `${(el.x * scale) + offsetX}px`;
+            room.style.top = `${(el.y * scale) + offsetY}px`;
+            room.style.width = `${el.width * scale}px`;
+            room.style.height = `${el.height * scale}px`;
+
+            room.innerText = el.label;
+            room.dataset.index = i;
+
+            // Check if already booked (you might want to load this from backend)
+            if (localStorage.getItem(`booked_${i}`)) {
+                room.classList.add("booked");
+            }
+
+            room.addEventListener("click", function() {
+                handleRoomClick(room, el, i);
+            });
+
+            layoutArea.appendChild(room);
+        });
+    }
+
+    function handleRoomClick(room, roomData, index) {
+        if (room.classList.contains("booked")) {
+            alert(`"${roomData.label}" is already booked!`);
+            return;
+        }
+
+        const confirmBook = confirm(`Do you want to book "${roomData.label}"?`);
+        if (confirmBook) {
+            room.classList.add("booked");
+            localStorage.setItem(`booked_${index}`, 'true');
+            
+            // Here you would typically send to backend
+            alert(`Room "${roomData.label}" booked successfully!`);
+            
+            // Example of sending to backend (you'd need to implement this)
+            // sendBookingToBackend(roomData, index);
+        }
+    }
+
+    // Example function for sending booking to backend
+    function sendBookingToBackend(roomData, index) {
+        // This is just a placeholder - implement your actual API call here
+        fetch('/api/bookings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                roomId: index,
+                roomName: roomData.label,
+                type: roomData.type,
+                // Add other booking details as needed
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Booking successful:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Booking failed. Please try again.');
+            room.classList.remove("booked");
+            localStorage.removeItem(`booked_${index}`);
+        });
+    }
+</script>

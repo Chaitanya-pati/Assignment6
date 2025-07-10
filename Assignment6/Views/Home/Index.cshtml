@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f3f3f3;
+        padding: 20px;
+    }
+
+    .building {
+        display: grid;
+        grid-template-columns: repeat(4, 120px);
+        gap: 10px;
+        max-width: 520px;
+        margin: auto;
+    }
+
+    .room {
+        height: 100px;
+        background-color: #e0e0e0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .room.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .room.kitchen {
+            background-color: #FFD54F;
+        }
+
+        .room.hall {
+            background-color: #81D4FA;
+        }
+</style>
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<h2 style="text-align:center">Hotel Room Booking</h2>
+
+<div class="building">
+    <div class="room" onclick="toggleSelection(this)">Room 101</div>
+    <div class="room" onclick="toggleSelection(this)">Room 102</div>
+    <div class="room" onclick="toggleSelection(this)">Room 103</div>
+    <div class="room kitchen" onclick="toggleSelection(this)">Kitchen</div>
+
+    <div class="room" onclick="toggleSelection(this)">Room 104</div>
+    <div class="room hall" onclick="toggleSelection(this)">Hall</div>
+    <div class="room" onclick="toggleSelection(this)">Room 105</div>
+    <div class="room" onclick="toggleSelection(this)">Room 106</div>
+</div>
+
+<script>
+    function toggleSelection(el) {
+        el.classList.toggle('selected');
+    }
+</script>
