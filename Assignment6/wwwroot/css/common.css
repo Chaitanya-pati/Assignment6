@@ -1,0 +1,385 @@
+﻿:root {
+    --bg-primary: #41444b;
+    --bg-secondary: #f5f7ff;
+    --bg-active: #fddb3a;
+    --bg-dark: #ffb380;
+    --cl-text: black;
+    --primary-color: #3c48a7;
+    --primary-dark: #27317d;
+    --secondary-color: #f5f7ff;
+    --border-color: #d9dff9;
+    --text-color: #1e1e2f;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.table > :not(caption) > * > * {
+    padding: .1rem .3rem !important;
+}
+ol, ul {
+    padding-left: 0.3rem !important;
+}
+.table{
+    border:1px solid black !important;
+}
+    .table th, .table td {
+        border: 1px solid black !important;
+    }
+
+    .contentEnd{
+        display:flex;
+        justify-content:end;
+    }
+    .contentCenter{
+        display:flex;
+        justify-content:center;
+    }
+
+.dataTables_wrapper {
+    border: 1px solid;
+    border-color: #a89cc9 !important;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f7f6fa
+}
+
+.customBtn {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    border-color: var(--border-color);
+    box-shadow: none !important;
+    padding: 3px 10px 3px 10px;
+}
+.select2-dropdown {
+    z-index: 999999 !important;
+}
+.select2-container {
+    z-index: 999999 !important;
+}
+
+.select2-container--open {
+    z-index: 999999 !important;
+}
+.dataTable {
+    margin-top: 10px !important;
+}
+table.dataTable thead th, table.dataTable thead td {
+    border: 1px solid rgba(0, 0, 0, 0.3) !important;
+}
+
+table.dataTable{
+    border-collapse:collapse !important;
+}
+.multiselect-container {
+    width: 100% !important; 
+    box-sizing: border-box; 
+    max-height:200px;
+    overflow-y:scroll;
+}
+.error-message-field {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+.nav-tabs {
+    --bs-nav-tabs-border-width: 0;
+    --bs-nav-tabs-border-color: transparent;
+    --bs-nav-tabs-border-radius: 12px;
+    --bs-nav-tabs-link-hover-border-color: transparent;
+    --bs-nav-tabs-link-active-color: #6750a4;
+    --bs-nav-tabs-link-active-bg: rgba(103, 80, 164, 0.08);
+    --bs-nav-tabs-link-active-border-color: transparent;
+    border-bottom: none;
+    background: rgba(248, 250, 252, 0.5);
+    backdrop-filter: blur(10px);
+    padding: 4px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.nav {
+    --bs-nav-link-font-weight: 500;
+    --bs-nav-link-color: #64748b;
+    --bs-nav-link-padding-x: 1.5rem;
+    --bs-nav-link-padding-y: 0.75rem;
+    gap: 4px;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    color: #64748b;
+    background: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+    .nav-tabs .nav-link:hover {
+        background: rgba(103, 80, 164, 0.04);
+        color: #6750a4;
+        border-color: transparent;
+        transform: translateY(-1px);
+    }
+
+    .nav-tabs .nav-link.active {
+        background: rgba(103, 80, 164, 0.08);
+        color: #6750a4;
+        border: none;
+        border-bottom: none;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(103, 80, 164, 0.15);
+    }
+
+        .nav-tabs .nav-link.active::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 2px;
+            background: #6750a4;
+            border-radius: 1px;
+        }
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .nav-tabs {
+        background: rgba(30, 41, 59, 0.5);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav {
+        --bs-nav-link-color: #94a3b8;
+    }
+
+    .nav-tabs .nav-link {
+        color: #94a3b8;
+    }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(103, 80, 164, 0.08);
+            color: #a78bfa;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: rgba(103, 80, 164, 0.12);
+            color: #a78bfa;
+            box-shadow: 0 2px 8px rgba(103, 80, 164, 0.25);
+        }
+
+            .nav-tabs .nav-link.active::before {
+                background: #a78bfa;
+            }
+}
+
+/* Optional: Animated background pill */
+.nav-tabs {
+    position: relative;
+}
+
+    .nav-tabs::after {
+        content: '';
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        height: calc(100% - 8px);
+        background: rgba(103, 80, 164, 0.08);
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 0;
+        box-shadow: 0 2px 8px rgba(103, 80, 164, 0.15);
+    }
+
+    .nav-tabs .nav-link {
+        position: relative;
+        z-index: 1;
+    }
+
+.signatureContainer, .signatureContainerImage {
+    background-color: #f2f2f2;
+    width: 80%;
+    height: 60%
+}
+
+.signature-box canvas {
+    border-bottom: 1px solid #000;
+    cursor: crosshair;
+}
+
+@media (min-width: 350px) and (max-width: 660px) {
+    .custom-modal-dialog {
+        width: 95%;
+        margin: 2rem auto;
+    }
+}
+
+@media (min-width: 660px) and (max-width: 768px) {
+    .custom-modal-dialog {
+        width: 80%;
+        margin: 2rem auto;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 900px) {
+    .custom-modal-dialog {
+        width: 75%;
+        margin: 2rem auto;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+    .custom-modal-dialog {
+        width: 65%;
+        margin: 2rem auto;
+    }
+}
+
+@media (min-width: 1101px)and (max-width: 1300px) {
+    .custom-modal-dialog {
+        width: 55%;
+        margin: 2rem auto;
+    }
+}
+
+@media (min-width: 1301px) {
+    .custom-modal-dialog {
+        width: 40%;
+        margin: 2rem auto;
+    }
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+    table thead {
+        background-color: var(--border-color) !important;
+        color: black !important;
+        text-align: left !important;
+    }
+
+    table th, table td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    table tbody tr:hover {
+        background-color: var(--bg-secondary);
+    }
+
+    table th {
+        position: relative;
+    }
+
+        table th::after {
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            margin-left: 5px;
+            font-size: 12px;
+            color: black;
+            cursor: pointer;
+        }
+
+/* Scrollbar Track */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/* Scrollbar Thumb */
+::-webkit-scrollbar-thumb {
+    background-color: var(--border-color); /* Purple thumb */
+    border-radius: 6px;
+}
+
+    /* On Hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--border-color);
+    }
+
+/* Scrollbar Track Background */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 6px;
+}
+
+/*Popup Styling*/
+/* Modal Header */
+.modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-bottom: none;
+    padding: 1rem 1.5rem;
+    min-height: auto;
+}
+
+.modal-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Close Button */
+.btn-close {
+    
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    color:white;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+    .btn-close:hover {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+/* Modal Footer */
+.modal-footer {
+    background: rgba(249, 250, 251, 0.8);
+    border-top: 1px solid rgba(229, 231, 235, 0.3);
+    padding: 1rem 1.5rem;
+    min-height: auto;
+}
+
+/* Button Styles */
+.btn {
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.2s ease;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #6750a4 0%, #7c3aed 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(103, 80, 164, 0.25);
+}
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(103, 80, 164, 0.35);
+        background: linear-gradient(135deg, #5a47a0 0%, #6d28d9 100%);
+    }
+
+.btn-secondary {
+    background: rgba(107, 114, 128, 0.1);
+    color: #4b5563;
+    border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+    .btn-secondary:hover {
+        background: rgba(107, 114, 128, 0.15);
+        color: #374151;
+        transform: translateY(-1px);
+    }

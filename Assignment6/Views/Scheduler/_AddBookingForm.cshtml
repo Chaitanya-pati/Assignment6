@@ -1,0 +1,604 @@
+﻿@model BookingViewModel
+
+<style>
+    :root {
+        --primary-color: #667eea;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --light-bg: #f8f9fa;
+        --border-color: #dee2e6;
+        --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid var(--border-color);
+        transition: border-color 0.3s ease;
+        padding: 12px;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+
+    .btn-custom {
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, var(--primary-color), #764ba2);
+        color: white;
+    }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            color: white;
+        }
+
+    .btn-success-custom {
+        background: linear-gradient(135deg, var(--success-color), #20c997);
+        color: white;
+    }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            color: white;
+        }
+
+    .selection-summary {
+        background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        border-left: 4px solid var(--primary-color);
+        box-shadow: var(--shadow);
+    }
+
+    .room-selection-btn {
+        position: relative;
+        overflow: visible;
+    }
+
+    .room-selection-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: var(--warning-color);
+        color: #000;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .modal-footer {
+        padding: 1.5rem 2rem;
+        border-top: 2px solid var(--border-color);
+        background: var(--light-bg);
+    }
+
+    .input-group-text {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+    }
+
+    .price-display {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+        border-left: 4px solid var(--success-color);
+    }
+
+    .validation-summary {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        color: #721c24;
+    }
+
+    @@media (max-width: 768px) {
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .btn-custom {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .room-selection-badge {
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+        }
+    }
+</style>
+
+<div class="modal-body">
+    <div id="bookingForm">
+        <!-- Customer Information Section -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <h6 class="text-muted text-uppercase mb-3">
+                    <i class="fas fa-user-circle me-2"></i>Customer Information
+                </h6>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="CustomerName" class="form-label">
+                    <i class="fas fa-user me-1 text-primary"></i>Customer Name *
+                </label>
+                <input type="text" class="form-control" id="CustomerName" name="CustomerName"
+                       placeholder="Enter full name" value="@Model?.CustomerName" required>
+                <div class="invalid-feedback">Please enter customer name.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="CustomerEmail" class="form-label">
+                    <i class="fas fa-envelope me-1 text-primary"></i>Email Address *
+                </label>
+                <input type="email" class="form-control" id="CustomerEmail" name="CustomerEmail"
+                       placeholder="Enter email address" value="@Model?.CustomerEmail" required>
+                <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="CustomerPhone" class="form-label">
+                    <i class="fas fa-phone me-1 text-primary"></i>Phone Number *
+                </label>
+                <input type="tel" class="form-control" id="CustomerPhone" name="CustomerPhone"
+                       placeholder="Enter phone number" value="@Model?.CustomerPhone" required>
+                <div class="invalid-feedback">Please enter phone number.</div>
+            </div>
+            <div class="row col-md-6 mb-3">
+                <label for="BookingRange" class="form-label">
+                    <i class="fas fa-calendar me-1 text-primary"></i>Booking Date Range *
+                </label>
+                <div class="col-6">
+                    <input type="datetime-local" class="form-control" id="BookingDateFrom" name="BookingDateFrom"
+                           value="" />
+                </div>
+                <div class="col-6">
+                    <input type="datetime-local" class="form-control" id="BookingDateTo" name="BookingDateTo"
+                           value="" />
+                </div>
+                <div class="invalid-feedback">Please select booking dates.</div>
+            </div>
+        </div>
+
+        <!-- Property Selection Section -->
+        <div class="row">
+            <div class="col-12 mb-4 mt-4">
+                <h6 class="text-muted text-uppercase mb-3">
+                    <i class="fas fa-home me-2"></i>Property & Room Selection
+                </h6>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="HomeId" class="form-label">
+                    <i class="fas fa-building me-1 text-primary"></i>Select Property *
+                </label>
+                <select class="form-select" id="HomeId" name="HomeId" required>
+                    <option value="">-- Choose a Property --</option>
+                    @if (Model?.AvailableHomes != null)
+                    {
+                        foreach (var home in Model.AvailableHomes)
+                        {
+                            <option value="@home.Id"
+                                    data-price="@home.PricePerDay"
+                                    data-location="@home.Location">
+                                @home.Name - @home.Location ($@home.PricePerDay/day)
+                            </option>
+                        }
+                    }
+                </select>
+                <div class="invalid-feedback">Please select a property.</div>
+            </div>
+            <div class="col-md-6 mb-3 d-flex align-items-end">
+                <button type="button" class="btn btn-primary-custom btn-custom w-100 room-selection-btn"
+                        data-bs-toggle="modal" data-bs-target="#homeDrawingModal" id="selectRoomsBtn" disabled>
+                    <i class="fas fa-map me-2"></i>Select Rooms
+                    <span id="roomSelectionBadge" class="room-selection-badge d-none">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Special Requests Section -->
+        <div class="row">
+            <div class="col-12 mb-3">
+                <label for="Message" class="form-label">
+                    <i class="fas fa-comment-dots me-1 text-primary"></i>Special Requests
+                </label>
+                <textarea class="form-control" id="Message" name="Message" rows="4"
+                          placeholder="Any special requests, dietary requirements, or additional notes...">@Model?.Message</textarea>
+                <small class="form-text text-muted">Optional: Let us know about any special requirements</small>
+            </div>
+        </div>
+
+        <!-- Selected Rooms Summary -->
+        <div id="selectedRoomsSummary" class="selection-summary d-none">
+            <h6 class="mb-3">
+                <i class="fas fa-check-circle me-2 text-success"></i>Selected Rooms & Pricing
+            </h6>
+            <div id="selectedRoomsDisplay"></div>
+            <div id="totalPriceDisplay" class="price-display mt-3"></div>
+        </div>
+
+        <!-- Hidden fields for form submission -->
+        <input type="hidden" id="SelectedRoomIds" name="SelectedRoomIds" />
+        <input type="hidden" id="SelectedRoomData" name="SelectedRoomData" />
+        <input type="hidden" id="TotalPrice" name="TotalPrice" />
+        <input type="hidden" id="DailyRate" name="DailyRate" />
+        <input type="hidden" id="TotalDays" name="TotalDays" />
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary btn-custom" data-bs-dismiss="modal">
+        <i class="fas fa-times me-2"></i>Cancel
+    </button>
+    <button onclick="SaveBookingData()" class="btn btn-success-custom btn-custom" id="saveBookingBtn">
+        <i class="fas fa-save me-2"></i>Save Booking
+    </button>
+</div>
+
+<!-- Include Litepicker for date selection -->
+<script src="https://cdn.jsdelivr.net/npm/litepicker/dist/bundle.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Initialize date picker
+        const picker = new Litepicker({
+            element: document.getElementById('BookingRange'),
+            singleMode: false,
+            format: 'DD/MM/YYYY',
+            minDate: new Date(),
+            numberOfMonths: 2,
+            numberOfColumns: 2,
+            splitView: true,
+            showWeekNumbers: true,
+            showTooltip: true
+            // onSelect: function (start, end) {
+            //     document.getElementById('BookingDateFrom').value = start.format('YYYY-MM-DD');
+            //     document.getElementById('BookingDateTo').value = end.format('YYYY-MM-DD');
+            //     updateBookingSummary();
+            // }
+
+        });
+
+        // Store picker reference globally for calendar integration
+        window.currentDatePicker = picker;
+        // Initialize summary on page load
+        updateBookingSummary();
+    });
+    // Set initial date range if model has data
+
+
+    // Update room selection badge
+    function updateRoomSelectionBadge() {
+        const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
+        const badge = $('#roomSelectionBadge');
+
+        if (selectedRooms.length > 0) {
+            badge.text(selectedRooms.length).removeClass('d-none');
+        } else {
+            badge.addClass('d-none');
+        }
+    }
+
+    // Calculate total booking price
+    function calculateTotalPrice() {
+        const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
+        const homeSelect = $('#HomeId');
+        const selectedHome = homeSelect.find(':selected');
+        const homePricePerDay = parseFloat(selectedHome.data('price')) || 0;
+
+        const startDate = $('#BookingDateFrom').val();
+        const endDate = $('#BookingDateTo').val();
+
+        let totalDays = 1;
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            totalDays = totalDays > 0 ? totalDays : 1;
+        }
+
+        // Calculate room-specific pricing if available
+        let roomTotal = 0;
+        selectedRooms.forEach(room => {
+            roomTotal += parseFloat(room.price) || 0;
+        });
+
+        // If no room-specific pricing, use home base price
+        const dailyRate = roomTotal > 0 ? roomTotal : homePricePerDay;
+        const totalPrice = dailyRate * totalDays;
+
+        return {
+            dailyRate: dailyRate,
+            totalDays: totalDays,
+            totalPrice: totalPrice,
+            homePricePerDay: homePricePerDay
+        };
+    }
+
+    // Update booking form summary when rooms are selected
+    function updateBookingSummary() {
+        const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
+        const pricing = calculateTotalPrice();
+        const homeSelect = $('#HomeId');
+        const selectedHome = homeSelect.find(':selected');
+
+        if (selectedRooms.length > 0) {
+            const roomNames = selectedRooms.map(room => room.label).join(', ');
+
+            $('#selectedRoomsDisplay').html(`
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <h6 class="mb-2">Rooms Selected:</h6>
+                                                <p class="mb-0">${roomNames}</p>
+                                                <small class="text-muted">${selectedRooms.length} room(s) at ${selectedHome.data('location') || 'Selected Property'}</small>
+                                            </div>
+                                            <div class="col-md-4 text-end">
+                                                <span class="badge bg-info fs-6">${pricing.dailyRate}/night</span>
+                                            </div>
+                                        </div>
+                                    `);
+
+            $('#totalPriceDisplay').html(`
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <h6 class="mb-1">
+                                                    <i class="fas fa-calculator me-2"></i>Total Booking Cost
+                                                </h6>
+                                                <p class="mb-0">${pricing.dailyRate} × ${pricing.totalDays} day(s)</p>
+                                            </div>
+                                            <div class="col-md-4 text-end">
+                                                <h4 class="mb-0 text-success">${pricing.totalPrice}</h4>
+                                            </div>
+                                        </div>
+                                    `);
+
+            $('#selectedRoomsSummary').removeClass('d-none');
+            $('#SelectedRoomIds').val(selectedRooms.map(room => room.id).join(','));
+            $('#SelectedRoomData').val(JSON.stringify(selectedRooms));
+            $('#TotalPrice').val(pricing.totalPrice);
+            $('#DailyRate').val(pricing.dailyRate);
+            $('#TotalDays').val(pricing.totalDays);
+        } else {
+            $('#selectedRoomsSummary').addClass('d-none');
+            $('#SelectedRoomIds').val('');
+            $('#SelectedRoomData').val('');
+            $('#TotalPrice').val('');
+            $('#DailyRate').val('');
+            $('#TotalDays').val('');
+        }
+
+        updateRoomSelectionBadge();
+    }
+
+    // Listen for room selection updates from home drawing modal
+    $(window).on('roomsUpdated', function () {
+        updateBookingSummary();
+    });
+
+    // Update pricing when dates or home change
+    $('#BookingRange, #HomeId').on('change', function () {
+        updateBookingSummary();
+    });
+
+    // Handle home selection changes
+    $('#HomeId').on('change', function () {
+        const homeId = $(this).val();
+        const roomBtn = $('#selectRoomsBtn');
+
+        if (homeId) {
+            roomBtn.prop('disabled', false);
+            roomBtn.attr('data-home-id', homeId);
+
+            // Clear previous room selections when home changes
+            const savedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
+            const filteredRooms = savedRooms.filter(room => room.homeId == homeId);
+
+            if (filteredRooms.length !== savedRooms.length) {
+                localStorage.setItem('selectedRoomData', JSON.stringify(filteredRooms));
+            }
+        } else {
+            roomBtn.prop('disabled', true);
+            roomBtn.removeAttr('data-home-id');
+            localStorage.removeItem('selectedRoomData');
+        }
+
+        updateBookingSummary();
+    });
+
+    // Form validation
+    function validateForm() {
+        debugger
+        let isValid = true;
+        const form = document.getElementById('bookingForm');
+
+        // Clear previous validation states
+        form.querySelectorAll('.form-control, .form-select').forEach(field => {
+            field.classList.remove('is-invalid');
+        });
+
+        // Validate required fields
+        const requiredFields = [
+            'CustomerName', 'CustomerEmail', 'CustomerPhone',
+            'BookingDateFrom', 'BookingDateTo', 'HomeId'
+        ];
+
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            }
+        });
+
+
+
+        // Validate date range
+        const startDate = new Date(document.getElementById('BookingDateFrom').value);
+        const endDate = new Date(document.getElementById('BookingDateTo').value);
+        if (startDate >= endDate) {
+            document.getElementById('BookingRange').classList.add('is-invalid');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+
+
+    // Form submission
+    function SaveBookingData() {
+        debugger
+        // Validate form
+        // if (!validateForm()) {
+        //     // Show validation error notification
+        //     if (window.showNotification) {
+        //         window.showNotification('Please fill in all required fields correctly.', 'error');
+        //     } else {
+        //         alert('Please fill in all required fields correctly.');
+        //     }
+        //     return;
+        // }
+
+        const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
+        const pricing = calculateTotalPrice();
+
+        // Prepare booking data
+        const bookingData = {
+            CustomerName: $('#CustomerName').val().trim(),
+            CustomerEmail: $('#CustomerEmail').val().trim(),
+            CustomerPhone: $('#CustomerPhone').val().trim(),
+            Message: $('#Message').val().trim(),
+            BookingDateFrom: $('#BookingDateFrom').val(),
+            BookingDateTo: $('#BookingDateTo').val(),
+            HomeId: parseInt($('#HomeId').val()),
+            PaymentStatus : "pending",
+            CreatedAt : new Date(),
+            Price: pricing.totalPrice,
+        };
+
+        // Disable submit button to prevent double submission
+        const submitBtn = $('#saveBookingBtn');
+        const originalText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
+
+        // Save to localStorage for persistence
+        var bookingSaveModel = {
+            BookingData: bookingData,
+            Rooms: selectedRooms
+        };
+
+        
+        // Submit to server
+        $.ajax({
+            url: '/Scheduler/SaveBooking',
+            type: 'POST',
+            data: bookingSaveModel,
+            success: function (bookingData) {
+                // Show success message
+                const message = `Booking Created Successfully!\n\nDetails:\n` +
+                    `Customer: ${bookingData.CustomerName}\n` +
+                    `Property: ${$('#HomeId option:selected').text()}\n` +
+                    `Rooms: ${selectedRooms.length}\n` +
+                    `Dates: ${bookingData.BookingDateFrom} to ${bookingData.BookingDateTo}\n` +
+                    `Total: ${bookingData.TotalPrice}`;
+
+                if (window.showNotification) {
+                    window.showNotification('Booking saved successfully!', 'success');
+                } else {
+                    alert(message);
+                }
+
+                // Close modal
+                $('#bookingModal').modal('hide');
+
+                // Clear form and selections
+                resetForm();
+
+                // Trigger custom event for calendar refresh
+                $(window).trigger('bookingSaved', [bookingData]);
+            },
+            error: function (xhr, status, error) {
+                console.error('Booking submission error:', error);
+                let errorMessage = 'Error saving booking. Please try again.';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    errorMessage = xhr.responseText;
+                }
+
+                if (window.showNotification) {
+                    window.showNotification(errorMessage, 'error');
+                } else {
+                    alert(errorMessage);
+                }
+            },
+            complete: function () {
+                // Re-enable submit button
+                submitBtn.prop('disabled', false).html(originalText);
+            }
+        });
+    }
+
+    // Reset form function
+    function resetForm() {
+        //$('#bookingForm')[0].reset();
+        localStorage.removeItem('selectedRoomData');
+        localStorage.removeItem('bookingData');
+        updateBookingSummary();
+
+        // Clear validation states
+        document.querySelectorAll('.form-control, .form-select').forEach(field => {
+            field.classList.remove('is-invalid');
+        });
+
+        // Reset date picker
+        picker.clearSelection();
+    }
+
+    // Initialize home selection state
+    $('#HomeId').trigger('change');
+
+</script>

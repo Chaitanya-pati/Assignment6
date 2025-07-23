@@ -1,0 +1,405 @@
+﻿@model List<Home>
+
+@{
+    ViewData["Title"] = "Home Master";
+}
+<style> 
+
+    #layoutPreview div {
+        transition: all 0.3s ease;
+    }
+
+</style>
+<h2>Home Master</h2>
+
+<a id="addHomeBtn" class="btn btn-success mb-2">+ Add Home</a>
+
+<div class="card">
+    <div class="card-body">
+        <table id="homeTable" class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                    <th>Price Per Day</th>
+                    <th>Created At</th>
+                    <th>Submitted User</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var home in Model)
+                {
+                    <tr>
+                        <td>@home.Name</td>
+                        <td>@home.Location</td>
+                        <td>@home.Description</td>
+                        <td>@home.PricePerDay?.ToString("C")</td>
+                        <td>@home.CreatedAt?.ToString("dd-MM-yyyy")</td>
+                        <td>@home.SUser</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary edit-home-btn"
+                                    data-home='@Html.Raw(Json.Serialize(home))' data-id="@home.Id">
+                                Edit
+                            </button>
+                            <a href="/YourController/DeleteHome/@home.Id"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure?');">
+                                Delete
+                            </a>
+                            
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Offcanvas Drawer for Add/Edit Home -->
+<div id="homeDrawer" class="offcanvas offcanvas-end text-bg-light shadow-lg border-end rounded-end" tabindex="-1" aria-labelledby="homeDrawerLabel" style="width: 420px;">
+    <div class="offcanvas-header bg-primary text-white">
+        <h5 class="offcanvas-title" id="homeDrawerLabel">🏠 Home Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <input type="hidden" id="homeId" />
+        <div class="mb-3">
+            <label class="form-label fw-bold">Name</label>
+            <input type="text" id="homeName" class="form-control shadow-sm" placeholder="Enter home name" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Location</label>
+            <input type="text" id="homeLocation" class="form-control shadow-sm" placeholder="City / Area" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Description</label>
+            <textarea id="homeDescription" class="form-control shadow-sm" rows="3" placeholder="Describe the home"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Price Per Day</label>
+            <input type="number" id="homePrice" class="form-control shadow-sm" placeholder="₹ per day" />
+        </div>
+
+        <div class="d-grid gap-2">
+            <button id="saveHomeBtn" class="btn btn-success shadow-sm">💾 Save </button>
+            <a id="addLayout" class="btn btn-warning shadow-sm" href="/Configuration/Configuration" target="_blank"> + Add Layout </a>
+            <a id="viewLayoutBtn" class="btn btn-danger" onclick="checkForLayoutUpdate('')">📐 View Layout</a>
+
+            <div id="layoutPreview" class="mt-3 border p-2 rounded shadow-sm bg-light"
+                 style="width: 100%; height: 300px; overflow: hidden; position: relative;"></div>
+
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const homeDrawer = new bootstrap.Offcanvas('#homeDrawer');
+
+            $('#homeTable').DataTable({
+                responsive: true,
+                autoWidth: false,
+                ordering: true,
+                pageLength: 5,
+                lengthMenu: [5, 10, 20, 50],
+                columnDefs: [
+                    { orderable: false, targets: -1 } // Disable ordering on "Actions" column
+                ]
+            });
+
+
+            // Open drawer on Add Home
+            $('#addHomeBtn').on('click', function () {
+                resetHomeModal();
+                $('#homeDrawerLabel').text('🏠 Add New Home');
+               
+                //$('#viewLayoutBtn').addClass('d-none');
+                homeDrawer.show();
+                $('#addLayout').show();
+                $('#viewLayoutBtn').show();
+            });
+
+            // Edit Home Button Click
+            $('.edit-home-btn').on('click', function () {
+                const home = $(this).data('home');
+
+                // Fill form fields
+                $('#homeId').val(home.id);
+                $('#homeName').val(home.name);
+                $('#homeLocation').val(home.location);
+                $('#homeDescription').val(home.description);
+                $('#homePrice').val(home.pricePerDay);
+                $('#homeSUser').val(home.sUser);
+
+                $('#homeDrawerLabel').text('✏️ Edit Home');
+                $('#addLayout').hide();
+                $('#viewLayoutBtn').hide();
+                // 🔧 Bind click to View Layout button for on-demand check
+                // $('#viewLayoutBtn').off('click').on('click', function () {
+                //     checkForLayoutUpdate(home.id);
+                // });
+
+                // 🔧 Bind layout preview immediately with current layout
+                checkForLayoutUpdate(home.id);
+
+                homeDrawer.show();
+            });
+
+
+            $('#saveHomeBtn').on('click', function () {
+                const homeData = {
+                    Id: parseInt($('#homeId').val()) || 0,
+                    Name: $('#homeName').val(),
+                    Location: $('#homeLocation').val(),
+                    Description: $('#homeDescription').val(),
+                    PricePerDay: parseFloat($('#homePrice').val()) || 0,
+                    SUser: "admin"
+                };
+
+                const layoutData = localStorage.getItem('homestayLayout');
+                if (!layoutData) {
+                    alert("⚠️ No layout found in localStorage.");
+                    return;
+                }
+
+                const layoutObj = JSON.parse(layoutData);
+
+                // Step 1: Save Home
+                $.ajax({
+                    url: homeData.Id > 0 ? '/Configuration/UpdateHome' : '/Configuration/SaveHome',
+                    type: 'POST',
+                    data: homeData,
+                    success: function (savedHomeId) {
+                        // Step 2: Save Rooms
+                        const roomIds = layoutObj.roomsData;
+                        const roomSaveRequests = roomIds.map(roomId => {
+                            const element = layoutObj.elements.find(e => e.roomId === roomId);
+
+                            return {
+                                HomeId: savedHomeId,
+                                Id: 0, // or roomId if editing
+                                Name: element.label,
+                                Width: element.width,
+                                Height: element.height,
+                                PositionX: element.x,
+                                PositionY: element.y,
+                                Type: element.label, // or get from somewhere else
+                                PricePerDay: 0,
+                                AllowIndividualBooking: true,
+                                CreatedAt: new Date().toISOString(),
+                                SUser: "admin"
+                            };
+                        });
+
+                        // Save all rooms
+                        $.ajax({
+                            url: '/Configuration/SaveRooms',
+                            type: 'POST',
+                            data: { roomSaveRequests: roomSaveRequests },
+                            success: function (savedRooms) {
+                                debugger
+                                const layoutElements = layoutObj.elements.map(el => {
+                                    const matchedRoom = savedRooms.find(r => r.id === el.roomId);
+                                    return {
+                                        HomeId: savedHomeId,
+                                        RoomId: matchedRoom ? matchedRoom.id : null,
+                                        Label: el.label,
+                                        X: el.x,
+                                        Y: el.y,
+                                        Width: el.width,
+                                        Height: el.height,
+                                        SUser: "admin"
+                                    };
+                                });
+
+                                $.ajax({
+                                    url: '/Configuration/SaveLayoutElements',
+                                    type: 'POST',
+                                    data: { layoutElements: layoutElements },
+                                    success: function (response) {
+                                        debugger
+                                        if (response == true) {
+                                            // alert("Home added!!!");
+                                            localStorage.removeItem('homestayLayout');
+                                            window.location.href = `/Configuration/GetMaster`;
+                                        }
+                                    },
+                                    error: function () {
+                                        alert('❌ Error saving layout elements.');
+                                    }
+                                });
+                            },
+                            error: function () {
+                                alert('❌ Error saving rooms.');
+                            }
+                        });
+                    },
+                    error: function () {
+                        alert('❌ Error saving home.');
+                    }
+                });
+            });
+
+
+
+            function resetHomeModal() {
+                $('#homeId').val('');
+                $('#homeName').val('');
+                $('#homeLocation').val('');
+                $('#homeDescription').val('');
+                $('#homePrice').val('');
+                $('#homeSUser').val('');
+                $('#layoutPreview').html('');
+                localStorage.removeItem('homestayLayout');
+            }
+
+            // Cache max room/home IDs
+            const homeModel = @Html.Raw(Json.Serialize(Model));
+            localStorage.setItem('maxHomeId', homeModel.length);
+            const allRooms = homeModel.flatMap(h => h.rooms || []);
+            const maxRoomId = allRooms.length > 0 ? Math.max(...allRooms.map(r => r.id)) : 0;
+            localStorage.setItem('maxRoomId', maxRoomId);
+        });
+
+        // let lastLayoutTimestamp = null;
+
+        // function checkForLayoutUpdate(homeId) {
+        //     debugger
+        //     var layoutData = localStorage.getItem('homestayLayout');
+        //     var newLayout = {};
+        //     if (!layoutData) {
+        //         $.ajax({
+        //             url: '/Configuration/GetLayoutByhomeId',
+        //             type: 'GET',
+        //             data: { homeId: homeId },
+        //             success: function (response) {
+        //                 debugger
+        //                 if (response) {
+        //                      newLayout = {
+        //                         timestamp: new Date().toISOString(),
+        //                         designWidth: 800,
+        //                         designHeight: 600,
+        //                         elements: response
+        //                     };
+        //                     localStorage.setItem('homestayLayout', JSON.stringify(newLayout));
+        //                     layoutData = newLayout;
+        //                 }
+        //             },
+        //             error: function () {
+        //                 //alert('❌ Error saving layout elements.');
+        //             }
+        //         });
+        //         alert("please create layout first");
+        //     }
+
+        //     const parsed = JSON.parse(layoutData);
+
+        //     if (parsed.timestamp !== lastLayoutTimestamp) {
+        //         lastLayoutTimestamp = parsed.timestamp;
+        //         renderLayoutPreview(parsed);
+        //     }
+        // }
+
+        function renderLayoutPreview(layout) {
+            debugger
+            const container = document.getElementById('layoutPreview');
+            container.innerHTML = '';
+
+            // Get container dimensions
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+
+            // Calculate scale factor
+            const scaleX = containerWidth / layout.designWidth;
+            const scaleY = containerHeight / layout.designHeight;
+            const scale = Math.min(scaleX, scaleY); // Keep aspect ratio
+
+            // Optional: Center the layout inside the preview
+            const offsetX = (containerWidth - layout.designWidth * scale) / 2;
+            const offsetY = (containerHeight - layout.designWidth * scale) / 2;
+
+            layout.elements.forEach(el => {
+                const box = document.createElement('div');
+                box.textContent = el.label;
+
+                // Position & size with scaling
+                box.style.position = 'absolute';
+                box.style.left = (el.x * scale + offsetX) + 'px';
+                box.style.top = (el.y * scale + offsetY) + 'px';
+                box.style.width = (el.width * scale) + 'px';
+                box.style.height = (el.height * scale) + 'px';
+
+                // Styles
+                box.style.backgroundColor = '#e6f2ff';
+                box.style.border = '1px solid #007bff';
+                box.style.borderRadius = '6px';
+                box.style.textAlign = 'center';
+                box.style.lineHeight = (el.height * scale) + 'px';
+                box.style.fontSize = Math.max(10, 12 * scale) + 'px';
+                box.style.boxShadow = '2px 2px 5px rgba(0,0,0,0.1)';
+                box.style.overflow = 'hidden';
+                box.style.whiteSpace = 'nowrap';
+                box.style.textOverflow = 'ellipsis';
+
+                container.appendChild(box);
+            });
+        }
+
+        let lastLayoutTimestamp = null;
+
+        function checkForLayoutUpdate(homeId) {
+            const layoutData = localStorage.getItem('homestayLayout');
+
+            // Step 1: If layout exists in localStorage, render it immediately
+            if (layoutData) {
+                const parsed = JSON.parse(layoutData);
+                lastLayoutTimestamp = parsed.timestamp;
+                renderLayoutPreview(parsed);
+            }
+
+            // Step 2: If homeId is provided, fetch layout from DB
+            if (homeId) {
+                $.ajax({
+                    url: '/Configuration/GetLayoutByhomeId',
+                    type: 'GET',
+                    data: { homeId: homeId },
+                    success: function (response) {
+                        if (response && Array.isArray(response)) {
+                            // Construct layout object with fallback defaults
+                            const newLayout = {
+                                timestamp: new Date().toISOString(),
+                                designWidth: 800,
+                                designHeight: 600,
+                                elements: response,
+                                roomsData: response.map(e => e.roomId).filter((v, i, a) => v != null && a.indexOf(v) === i) // unique valid roomIds
+                            };
+
+                            // Save to localStorage
+                            localStorage.setItem('homestayLayout', JSON.stringify(newLayout));
+
+                            // Only render if it's a new layout
+                            if (newLayout.timestamp !== lastLayoutTimestamp) {
+                                lastLayoutTimestamp = newLayout.timestamp;
+                                renderLayoutPreview(newLayout);
+                            }
+                        } else {
+                            alert("⚠️ No layout data found for this home.");
+                        }
+                    },
+                    error: function () {
+                        alert('❌ Error fetching layout from server.');
+                    }
+                });
+            } else if (!layoutData) {
+                alert("⚠️ Please create layout first.");
+            }
+        }
+
+    </script>
+}
+

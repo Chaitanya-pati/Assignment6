@@ -1,143 +1,747 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lodge Booking Calendar</title>
+﻿@model HomeMasterViewModel
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+    :root {
+        --primary-color: #667eea;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --light-bg: #f8f9fa;
+        --border-color: #dee2e6;
+        --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    #modalBody {
+        overflow: auto;
+    }
+
+    .main-header {
+        background: linear-gradient(135deg, var(--primary-color), #764ba2);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+    }
+
+        .main-header h1 {
+            margin: 0;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+    .action-buttons {
+        margin-bottom: 2rem;
+    }
+
+    .btn-custom {
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        margin: 0 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, var(--primary-color), #764ba2);
+        color: white;
+    }
+
+    .btn-success-custom {
+        background: linear-gradient(135deg, var(--success-color), #20c997);
+        color: white;
+    }
+
+    .btn-warning-custom {
+        background: linear-gradient(135deg, var(--warning-color), #fd7e14);
+        color: #000;
+    }
+
+    .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .calendar-container {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        margin: 0 auto;
+        max-width: 95%;
+    }
+
+    #calendar {
+        margin: 0;
+    }
+
+    /* Calendar Customization */
+    .fc-header-toolbar {
+        margin-bottom: 1.5rem !important;
+        padding: 1rem;
+        background: var(--light-bg);
+        border-radius: 10px;
+    }
+
+    .fc-button-primary {
+        background: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        border-radius: 8px !important;
+    }
+
+        .fc-button-primary:hover {
+            background: #5a6fd8 !important;
+            border-color: #5a6fd8 !important;
+        }
+
+    .fc-day-today {
+        background: rgba(102, 126, 234, 0.1) !important;
+    }
+
+    .fc-daygrid-day:hover {
+        background: rgba(102, 126, 234, 0.05);
+        cursor: pointer;
+    }
+
+    /* Modal Customizations */
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-color), #764ba2);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        border-bottom: none;
+    }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: var(--shadow);
+    }
+
+    /* Notification Styles */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .main-header {
+            padding: 1rem 0;
+        }
+
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+
+        .calendar-container {
+            padding: 1rem;
+            margin: 0 1rem;
+        }
+
+        .btn-custom {
+            padding: 10px 20px;
+            margin: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
             text-align: center;
         }
+    }
+</style>
 
-        #calendar {
-            width: 90%;
-            margin: 20px auto;
+<!-- Main Header -->
+<div class="main-header">
+    <div class="container">
+        <div class="text-center">
+            <h1><i class="fas fa-calendar-alt me-3"></i>Schedular</h1>
+            <p class="lead mb-0"></p>
+        </div>
+    </div>
+</div>
+
+<!-- Container -->
+<div class="container mt-4">
+
+    <!-- Top Row: Home Dropdown + Date Range Picker -->
+    <div class="row align-items-end mb-4">
+        <div class="action-buttons text-center">
+            <button id="book" class="btn btn-success-custom btn-custom">
+                <i class="fas fa-download me-2"></i>Get Bookings
+            </button>
+            <button id="make-booking-button" class="btn btn-primary-custom btn-custom">
+                <i class="fas fa-plus me-2"></i>Make Booking
+            </button>
+            <button id="test-button" class="btn btn-warning-custom btn-custom">
+                <i class="fab fa-airbnb me-2"></i>Sync Airbnb
+            </button>
+        </div>
+        <!-- Home Selector -->
+        <div class="col-md-3">
+            <label for="homeSelector" class="form-label">🏠 Select a Home</label>
+            <select id="homeSelector" class="form-select form-select-lg">
+                <option value="">Select a Home</option>
+                @foreach (var home in Model.Homes)
+                {
+                    <option value="@home.Id">@home.Name</option>
+                }
+            </select>
+        </div>
+
+        <!-- Start Date -->
+        <div class="col-md-3">
+            <label for="startDate" class="form-label">Start Date</label>
+            <input type="date" class="form-control form-control-lg" id="startBookDate">
+        </div>
+
+        <!-- End Date -->
+        <div class="col-md-3">
+            <label for="endDate" class="form-label">End Date</label>
+            <input type="date" class="form-control form-control-lg" id="endBookDate">
+        </div>
+
+        <!-- Search Button -->
+        <div class="col-md-3">
+            <button id="searchBookingBtn"  class="btn btn-primary btn-lg w-100">
+                🔍 Check Booking
+            </button>
+        </div>
+    </div>
+
+    <!-- Calendar Scheduler -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div id="calendar" style="min-height: 600px;"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Loading Spinner -->
+<div class="loading-spinner" id="loadingSpinner">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 mb-0">Loading...</p>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingModalLabel">
+                    <i class="fas fa-calendar-plus me-2"></i>Add New Booking
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="modalBody">
+                <!-- Booking form partial will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Container for Home Drawing Modal -->
+<div id="homeDrawingContainer"></div>
+
+<!-- Scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar;
+
+        if (!calendarEl) {
+            console.error("Calendar element not found.");
+            return;
         }
 
-        #test-button, #book, #make-booking-button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
+        // Initialize Calendar
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            selectMirror: true,
+            eventColor: '#FF6B6B',
+            eventDidMount: function (info) {
+                $(info.el).tooltip({
+                    title: info.event.title,
+                    placement: 'top',
+                    trigger: 'hover',
+                    container: 'body'
+                });
+            },
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            dateClick: function (info) {
 
-            #test-button:hover, #book:hover, #make-booking-button:hover {
-                background-color: #0056b3;
+            },
+            eventClick: function (info) {
+                showEventDetails(info.event);
+            },
+            loading: function (bool) {
+                if (bool) {
+                    showLoading();
+                } else {
+                    hideLoading();
+                }
             }
-    </style>
-</head>
-<body>
-    <h1>Lodge Booking Calendar</h1>
+        });
 
-    <button id="book">Get Bookings</button>
-    <button id="make-booking-button">Make Booking Test</button>
-    <button id="test-button">Test Airbnb Connection</button>
+        calendar.render();
 
-    <div id="calendar"></div>
+        // Event Listeners
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
+     document.getElementById("test-button").addEventListener("click", syncAirbnb);
+     // document.getElementById("book").addEventListener("click", bookTest);
+        document.getElementById("book").addEventListener("click", fetchAndDisplayBookings);
+        document.getElementById("make-booking-button").addEventListener("click", function () {
+            handleDateClick(new Date().toISOString());
+        });
+        // makeBookingTest);
 
-            if (!calendarEl) {
-                console.error("Calendar element not found.");
+        // Utility Functions
+        function showLoading() {
+            $('#loadingSpinner').show();
+        }
+
+        function hideLoading() {
+            $('#loadingSpinner').hide();
+        }
+
+        function showNotification(message, type = 'info', duration = 5000) {
+            const alertClass = type === 'success' ? 'alert-success' :
+                type === 'error' ? 'alert-danger' : 'alert-info';
+            const iconClass = type === 'success' ? 'fa-check-circle' :
+                type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+
+            const notification = $(`
+                            <div class="alert ${alertClass} alert-dismissible fade show notification" role="alert">
+                                <i class="fas ${iconClass} me-2"></i>
+                                ${message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `);
+
+            $('body').append(notification);
+
+            if (duration > 0) {
+                setTimeout(() => {
+                    notification.alert('close');
+                }, duration);
+            }
+        }
+
+        // Handle Date Click
+        function handleDateClick(dateStr) {
+            debugger
+            showLoading();
+            $.get('/Scheduler/AddBookingForm', { date: dateStr })
+                .done(function (html) {
+                    $('#modalBody').html(html);
+                    $('#bookingModal').modal('show');
+
+                    // Set the selected date in the form
+                    const picker = window.currentDatePicker;
+                    if (picker) {
+                        picker.setDate(dateStr);
+                    }
+                })
+                .fail(function (xhr, status, error) {
+                    console.error('Error loading booking form:', error);
+                    showNotification('Error loading booking form. Please try again.', 'error');
+                })
+                .always(function () {
+                    hideLoading();
+                });
+        }
+
+        // Show Event Details
+        // Enhanced Show Event Details
+        function showEventDetails(event) {
+            const props = event.extendedProps;
+            const startDate = event.start.toLocaleDateString();
+            const endDate = event.end ? event.end.toLocaleDateString() : 'N/A';
+
+            // Build room details if available
+            let roomDetails = '';
+            if (props.bookingRooms && props.bookingRooms.length > 0) {
+                roomDetails = '<div class="mt-2"><strong>Booked Rooms:</strong><ul class="mb-0">';
+                props.bookingRooms.forEach(room => {
+                    roomDetails += `<li>Room ID: ${room.roomId}</li>`;
+                });
+                roomDetails += '</ul></div>';
+            }
+
+            const eventInfo = `
+            <div class="event-details" style="max-width: 350px;">
+                <h6 class="mb-3"><i class="fas fa-calendar-check me-2"></i>${event.title}</h6>
+                <div class="row">
+                    <div class="col-6"><strong>Customer:</strong></div>
+                    <div class="col-6">${props.customerName || 'N/A'}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Email:</strong></div>
+                    <div class="col-6">${props.customerEmail || 'N/A'}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Phone:</strong></div>
+                    <div class="col-6">${props.customerPhone || 'N/A'}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Check-in:</strong></div>
+                    <div class="col-6">${startDate}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Check-out:</strong></div>
+                    <div class="col-6">${endDate}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Home:</strong></div>
+                    <div class="col-6">${props.homeName || 'N/A'}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Rooms:</strong></div>
+                    <div class="col-6">${props.roomCount || 0}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Price:</strong></div>
+                    <div class="col-6">₹${props.price || 0}</div>
+                </div>
+                <div class="row">
+                    <div class="col-6"><strong>Status:</strong></div>
+                    <div class="col-6">
+                        <span class="badge ${getStatusBadgeClass(props.paymentStatus)}">${props.paymentStatus || 'Unknown'}</span>
+                    </div>
+                </div>
+                ${props.message ? `<div class="mt-2"><strong>Message:</strong><br><small>${props.message}</small></div>` : ''}
+                ${roomDetails}
+            </div>
+        `;
+
+            showNotification(eventInfo, 'info', 0);
+        }
+
+        // Helper function for status badge classes
+        function getStatusBadgeClass(status) {
+            switch (status?.toLowerCase()) {
+                case 'paid':
+                case 'completed':
+                    return 'bg-success';
+                case 'pending':
+                    return 'bg-warning text-dark';
+                case 'cancelled':
+                    return 'bg-danger';
+                default:
+                    return 'bg-secondary';
+            }
+        }
+
+        function fetchAndDisplayBookings() {
+            showLoading();
+            $.ajax({
+                url: '/Scheduler/GetBookings',
+                type: 'GET',
+                success: function (data) {
+                    console.log("Get Bookings Success:", data);
+
+                    // Clear existing events
+                    calendar.removeAllEvents();
+
+                    // Transform booking data to calendar events
+                    const events = data.map(booking => {
+                        // Get home name for display
+                        const homeName = getHomeName(booking.homeId);
+
+                        // Count booked rooms
+                        const roomCount = booking.bookingRooms ? booking.bookingRooms.length : 0;
+
+                        return {
+                            id: booking.id,
+                            title: `${homeName} - ${roomCount} room(s) - ${booking.customerName}`,
+                            start: booking.bookingDateFrom,
+                            end: booking.bookingDateTo,
+                            color: getBookingColor(booking.paymentStatus),
+                            extendedProps: {
+                                customerName: booking.customerName,
+                                customerEmail: booking.customerEmail,
+                                customerPhone: booking.customerPhone,
+                                message: booking.message,
+                                price: booking.price,
+                                paymentStatus: booking.paymentStatus,
+                                homeId: booking.homeId,
+                                homeName: homeName,
+                                roomCount: roomCount,
+                                bookingRooms: booking.bookingRooms
+                            }
+                        };
+                    });
+
+                    // Add events to calendar
+                    calendar.addEventSource(events);
+
+                    showNotification(`${events.length} bookings loaded successfully!`, 'success');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Get Bookings Error:", error);
+                    showNotification("Error retrieving bookings. Check console for details.", 'error');
+                },
+                complete: function () {
+                    hideLoading();
+                }
+            });
+        }
+
+        // Helper function to get home name by ID
+        function getHomeName(homeId) {
+            const homeSelector = document.getElementById('homeSelector');
+            for (let option of homeSelector.options) {
+                if (parseInt(option.value) === homeId) {
+                    return option.text;
+                }
+            }
+            return `Home ${homeId}`;
+        }
+
+        // Helper function to get color based on payment status
+        function getBookingColor(paymentStatus) {
+            switch (paymentStatus?.toLowerCase()) {
+                case 'paid':
+                case 'completed':
+                    return '#28a745'; // Green
+                case 'pending':
+                    return '#ffc107'; // Yellow
+                case 'cancelled':
+                    return '#dc3545'; // Red
+                default:
+                    return '#FF6B6B'; // Default pink
+            }
+        }
+
+        // jQuery Ready Function
+        $(document).ready(function () {
+           // fetchBookings()
+            // Handle Home dropdown change
+            $(document).on('change', '#HomeId', function () {
+                const homeId = $(this).val();
+                if (!homeId) return;
+
+                // Hide the booking modal temporarily
+                $('#bookingModal').modal('hide');
+
+                // Load and show the Home Drawing modal
+                showLoading();
+                $.get(`/Scheduler/GetHomeDrawing?homeId=${homeId}`)
+                    .done(function (html) {
+                        $('#homeDrawingContainer').html(html);
+
+                        // Show the home drawing modal
+                        const homeDrawingModal = new bootstrap.Modal(document.getElementById('homeDrawingModal'));
+                        homeDrawingModal.show();
+
+                        // When drawing modal closes, show booking modal again
+                        $('#homeDrawingModal').on('hidden.bs.modal', function () {
+                            setTimeout(() => {
+                                $('#bookingModal').modal('show');
+                            }, 300);
+                        });
+                    })
+                    .fail(function (xhr, status, error) {
+                        console.error('Error loading home drawing:', error);
+                        showNotification('Error loading room layout. Please try again.', 'error');
+                        // Show booking modal again on error
+                        $('#bookingModal').modal('show');
+                    })
+                    .always(function () {
+                        hideLoading();
+                    });
+            });
+
+            $("#searchBookingBtn").on("click", searchBooking);
+
+            // Listen for successful booking saves
+            $(window).on('bookingSaved', function (event, bookingData) {
+                calendar.refetchEvents();
+                showNotification('Booking saved successfully!', 'success');
+            });
+
+            // Listen for room selection updates
+            $(window).on('roomsUpdated', function () {
+                showNotification('Room selection updated!', 'info', 3000);
+            });
+        });
+
+        // API Functions
+        // function bookTest() {
+        //     showLoading();
+        //     $.ajax({
+        //         url: '/Scheduler/GetBookings',
+        //         type: 'GET',
+        //         success: function (data) {
+        //             console.log("Get Bookings Success:", data);
+        //             showNotification("Bookings retrieved successfully!", 'success');
+        //             calendar.refetchEvents();
+        //         },
+        //         error: function (xhr, status, error) {
+        //             console.error("Get Bookings Error:", error);
+        //             showNotification("Error retrieving bookings. Check console for details.", 'error');
+        //         },
+        //         complete: function () {
+        //             hideLoading();
+        //         }
+        //     });
+        // }
+
+        function makeBookingTest() {
+            showLoading();
+            $.ajax({
+                url: '/Scheduler/MakeBooking',
+                type: 'POST',
+                success: function (data) {
+                    console.log("Make Booking Success:", data);
+                    showNotification(data, 'success');
+                    calendar.refetchEvents();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Make Booking Error:", error);
+                    showNotification("Error making booking. Check console for details.", 'error');
+                },
+                complete: function () {
+                    hideLoading();
+                }
+            });
+        }
+       
+        function fetchBookings(fetchInfo, successCallback, failureCallback) {
+            const selectedHomeId = parseInt($("#homeSelector").val());
+
+            $.ajax({
+                url: '/Scheduler/GetBookings',
+                type: 'GET',
+                data: {
+                    startDate: fetchInfo.startStr,
+                    endDate: fetchInfo.endStr
+                },
+                success: function (data) {
+                    const filteredEvents = data.filter(b => b.homeId === selectedHomeId);
+                    const events = filteredEvents.map(booking => ({
+                        id: booking.id,
+                        title: booking.title,
+                        start: booking.start,
+                        end: booking.end,
+                        color: booking.color || '#FF6B6B',
+                        display: 'block'
+                    }));
+                   // successCallback(events);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching bookings:", error);
+                    failureCallback(error);
+                }
+            });
+        }
+
+        function syncAirbnb() {
+            showLoading();
+            $.ajax({
+                url: '/Scheduler/SyncAirbnb',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    showNotification("✅ Airbnb Sync Successful! Calendar refreshed.", 'success');
+                    calendar.refetchEvents();
+                },
+                error: function (xhr, status, error) {
+                    console.error("❌ Airbnb sync failed:", error);
+                    showNotification("❌ Failed to sync Airbnb. Check console for details.", 'error');
+                },
+                complete: function () {
+                    hideLoading();
+                }
+            });
+        }
+
+        function searchBooking() {
+            showLoading();
+
+            const startDate = $("#startBookDate").val();
+            const endDate = $("#endBookDate").val();
+            const homeId = parseInt($("#homeSelector").val());
+
+            if (!startDate || !endDate || isNaN(homeId)) {
+                showNotification("Please select all search criteria.", "error");
+                hideLoading();
                 return;
             }
 
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                selectable: true,
-                events: fetchBookings,
-                eventColor: '#FF0000'
+            $.ajax({
+                url: '/Scheduler/CheckBookings',
+                type: 'GET',
+                data: {
+                    startDate: startDate,
+                    endDate: endDate,
+                    homeId: homeId
+                },
+                success: function (data) {
+                    if (data) {
+                        showNotification("Home is booked for the searched date", "error");
+                    }
+                    else{
+                        showNotification("Home is available, You can proceed with booking", "success");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching bookings:", error);
+                    showNotification("Error fetching bookings", "error");
+                },
+                complete: function () {
+                    hideLoading();
+                }
             });
+        }
 
-            calendar.render();
 
-            document.getElementById("test-button").addEventListener("click", syncAirbnb);
-            document.getElementById("book").addEventListener("click", bookTest);
-            document.getElementById("make-booking-button").addEventListener("click", makeBookingTest);
+    });
 
-            function bookTest() {
-                $.ajax({
-                    url: '/Recipe/GetBookings',
-                    success: function (data) {
-                        console.log("Get Bookings Success:", data);
-                        alert("Get Bookings Success! Check console.");
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Get Bookings Error:", error);
-                        alert("Get Bookings Error! Check console.");
-                    }
-                });
-            }
-
-            function makeBookingTest() {
-                $.ajax({
-                    url: '/Recipe/MakeBooking',
-                    success: function (data) {
-                        console.log("Make Booking Success:", data);
-                        alert(data);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Make Booking Error:", error);
-                        alert("Make Booking Error! Check console.");
-                    }
-                });
-            }
-
-            function fetchBookings(fetchInfo, successCallback, failureCallback) {
-                $.ajax({
-                    url: '/Recipe/GetBookings',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        start: fetchInfo.startStr,
-                        end: fetchInfo.endStr
-                    },
-                    success: function (data) {
-                        let events = data.map(booking => ({
-                            title: booking.title,
-                            start: booking.start,
-                            end: booking.end,
-                            color: booking.color,
-                            display: 'background'
-                        }));
-                        successCallback(events);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("❌ Error fetching bookings:", error);
-                        failureCallback(error);
-                    }
-                });
-            }
-
-            function syncAirbnb() {
-                $.ajax({
-                    url: '/Recipe/SyncAirbnb',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        alert("✅ Airbnb Sync Successful! Refreshing calendar...");
-                        window.location.reload();
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("❌ Airbnb sync failed:", error);
-                        alert("❌ Failed to sync Airbnb. Check console.");
-                    }
-                });
-            }
-        });
-    </script>
-</body>
-</html>
+    
+</script>

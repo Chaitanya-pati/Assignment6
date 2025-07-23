@@ -407,7 +407,7 @@
             <div class="controls">
                 <button class="control-btn" onclick="clearAll()">Clear All</button>
                 <button class="control-btn" onclick="toggleGrid()">Toggle Grid</button>
-                <button class="control-btn" onclick="exportLayout()">Export</button>
+                <button class="control-btn" onclick="saveLayout()">Save</button>
             </div>
         </div>
     </div>
@@ -671,26 +671,31 @@
 
     // Create room element with responsive default size
     function createRoomElement(type, x, y) {
+        const maxRoomId = localStorage.getItem('maxRoomId') || 0;
         const element = document.createElement('div');
+
         element.className = `room-element ${type}`;
+        element.setAttribute('data-type', type); // ✅ store type for layout
         element.style.left = `${Math.max(0, x)}px`;
         element.style.top = `${Math.max(0, y)}px`;
 
-        // Set responsive default size
-        const baseSize = 800 * 0.15; // 15% of design area width
+        // Set default size
+        const baseSize = 800 * 0.15;
         element.style.width = `${baseSize}px`;
         element.style.height = `${baseSize * 0.7}px`;
 
-        element.id = `element-${++elementCounter}`;
+        // Assign a new room ID
+        const roomId = parseInt(maxRoomId) + (++elementCounter);
+        element.id = roomId;
 
         const label = type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ');
         element.innerHTML = `
             <span>${label}</span>
             <div class="resize-handle"></div>
-            <button class="delete-btn" onclick="deleteElement('${element.id}')">×</button>
+            <button class="delete-btn" onclick="deleteElement('${roomId}')">×</button>
         `;
 
-        // Add event listeners
+        // Event listeners
         element.addEventListener('mousedown', handleMouseDown);
         element.addEventListener('click', selectElement);
         element.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -699,11 +704,13 @@
         resizeHandle.addEventListener('mousedown', handleResizeStart);
         resizeHandle.addEventListener('touchstart', handleTouchStart, { passive: false });
 
-        designArea.appendChild(element);
+        document.getElementById('designArea').appendChild(element);
         selectElement({ target: element });
 
         return element;
     }
+
+
 
     function handleMouseDown(e) {
         if (e.target.classList.contains('resize-handle') || e.target.classList.contains('delete-btn')) {
@@ -858,41 +865,46 @@
         grid.style.display = grid.style.display === 'none' ? 'block' : 'none';
     }
 
-    function exportLayout() {
+    function saveLayout() {
+        debugger
         const designArea = document.getElementById('designArea');
+        const rooms = [];
 
-        const elements = Array.from(document.querySelectorAll('.room-element')).map(el => ({
-            type: el.className.split(' ')[1],
-            x: parseInt(el.style.left),
-            y: parseInt(el.style.top),
-            width: parseInt(el.style.width),
-            height: parseInt(el.style.height),
-            label: el.querySelector('span').textContent
-        }));
+        const elements = Array.from(document.querySelectorAll('.room-element')).map(el => {
+            const roomId = parseInt(el.id);
+            const type = el.getAttribute('data-type');
+
+            rooms.push(roomId); // ✅ push only roomId here
+
+            return {
+                x: parseInt(el.style.left),
+                y: parseInt(el.style.top),
+                width: parseInt(el.style.width),
+                height: parseInt(el.style.height),
+                label: el.querySelector('span').textContent,
+                type: type, // ✅ correctly captured
+                roomId: roomId,
+                homeId: localStorage.getItem('maxHomeId')
+            };
+        });
 
         const layout = {
             timestamp: new Date().toISOString(),
             designWidth: 800,
             designHeight: 600,
-            elements: elements
+            elements: elements,
+            roomsData: rooms
         };
 
-        // Save to Local Storage
         localStorage.setItem('homestayLayout', JSON.stringify(layout));
-
-        // Trigger download
-        const blob = new Blob([JSON.stringify(layout, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'homestay-layout.json';
-        a.click();
-        URL.revokeObjectURL(url);
-
-        alert('Layout exported and saved to local storage!');
+       // msgPopup('success', 'Layout exported successfully');
+        window.close();
     }
 
+
+
     function loadLayout() {
+        debugger
         const savedLayout = localStorage.getItem('homestayLayout');
         if (!savedLayout) return false;
 
@@ -900,31 +912,26 @@
             const layout = JSON.parse(savedLayout);
             const designArea = document.getElementById('designArea');
 
-            // Clear existing elements
             clearAll();
 
-            // Calculate scale factor
-            const originalWidth = layout.designWidth || 800;
-            const scale = designArea.parentElement.clientWidth / originalWidth;
-
-            // Create elements with scaled positions and sizes
             layout.elements.forEach(el => {
                 const element = document.createElement('div');
-                element.className = `room-element ${el.type}`;
+                const type = el.type;
 
+                element.className = `room-element ${type}`;
+                element.setAttribute('data-type', type);
                 element.style.left = `${el.x}px`;
                 element.style.top = `${el.y}px`;
                 element.style.width = `${el.width}px`;
                 element.style.height = `${el.height}px`;
+                element.id = el.roomId;
 
-                element.id = `element-${++elementCounter}`;
                 element.innerHTML = `
-                    <span>${el.label || el.type}</span>
+                    <span>${el.label}</span>
                     <div class="resize-handle"></div>
                     <button class="delete-btn" onclick="deleteElement('${element.id}')">×</button>
                 `;
 
-                // Add event listeners
                 element.addEventListener('mousedown', handleMouseDown);
                 element.addEventListener('click', selectElement);
                 element.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -942,6 +949,7 @@
             return false;
         }
     }
+
 
     // Click outside to deselect
     document.addEventListener('click', (e) => {
