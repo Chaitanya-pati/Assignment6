@@ -2,6 +2,21 @@
     Layout = "";
 }
 <style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #34495e;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --danger-color: #e74c3c;
+        --info-color: #3498db;
+        --light-gray: #f8f9fa;
+        --border-color: #ddd;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --white: #ffffff;
+        --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
     * {
         margin: 0;
         padding: 0;
@@ -10,77 +25,83 @@
 
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-color: var(--light-gray);
+        color: var(--text-dark);
         min-height: 100vh;
         display: flex;
         flex-direction: column;
     }
 
     .header {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        padding: 20px;
+        background-color: var(--primary-color);
+        color: var(--white);
+        padding: 1.5rem 0;
         text-align: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: var(--box-shadow);
     }
 
     .header h1 {
-        color: white;
-        font-size: clamp(1.5rem, 4vw, 2.5rem);
-        margin-bottom: 10px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
     }
 
     .header p {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: clamp(0.9rem, 2vw, 1.1rem);
+        opacity: 0.9;
+        font-size: 1rem;
     }
 
     .container {
         display: flex;
         flex: 1;
-        gap: 20px;
-        padding: 20px;
+        gap: 1.5rem;
+        padding: 1.5rem;
         flex-direction: row;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
     }
 
     .sidebar {
-        width: 250px;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(10px);
+        width: 280px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
         overflow-y: auto;
-        max-height: 100%;
+        max-height: calc(100vh - 200px);
     }
 
     .sidebar h3 {
-        margin-bottom: 15px;
-        color: #333;
-        font-size: 1.2em;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+        font-size: 1.2rem;
         text-align: center;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #667eea;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--primary-color);
+        font-weight: 600;
     }
 
     .element-item {
         display: flex;
         align-items: center;
-        padding: 12px;
-        margin: 8px 0;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        border-radius: 10px;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        background: var(--primary-color);
+        color: var(--white);
+        border-radius: 6px;
         cursor: grab;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         touch-action: none;
+        font-weight: 500;
     }
 
     .element-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        background-color: var(--secondary-color);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .element-item:active {
@@ -89,23 +110,24 @@
     }
 
     .element-icon {
-        font-size: 1.5em;
-        margin-right: 10px;
+        font-size: 1.3rem;
+        margin-right: 0.75rem;
     }
 
     .design-area-container {
         flex: 1;
         overflow: auto;
         position: relative;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: var(--box-shadow);
     }
 
     .design-area {
         position: absolute;
-        background: white;
-        border-radius: 15px;
+        background: var(--white);
+        border-radius: 8px;
         overflow: hidden;
         width: 800px;
         height: 600px;
@@ -118,28 +140,28 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px), 
-                          linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+        background-image: 
+            linear-gradient(to right, #e0e0e0 1px, transparent 1px), 
+            linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
         background-size: 20px 20px;
-        opacity: 0.5;
+        opacity: 0.3;
         z-index: 1;
     }
 
     .room-element {
         position: absolute;
-        background: rgba(255, 255, 255, 0.9);
-        border: 2px solid #667eea;
-        border-radius: 10px;
+        background: var(--white);
+        border: 2px solid var(--primary-color);
+        border-radius: 6px;
         cursor: move;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: bold;
-        color: #333;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        font-weight: 500;
+        color: var(--text-dark);
+        box-shadow: var(--box-shadow);
         transition: all 0.2s ease;
         z-index: 10;
-        backdrop-filter: blur(5px);
         touch-action: none;
         font-size: clamp(12px, 1.5vw, 16px);
         text-align: center;
@@ -149,31 +171,33 @@
 
     .room-element:hover {
         transform: scale(1.02);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        border-color: var(--success-color);
     }
 
     .room-element.selected {
-        border-color: #ff6b6b;
-        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
+        border-color: var(--warning-color);
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
+        background-color: #fef9e7;
     }
 
     .resize-handle {
         position: absolute;
         width: 12px;
         height: 12px;
-        background: #667eea;
+        background: var(--primary-color);
         border-radius: 50%;
         cursor: se-resize;
         right: -6px;
         bottom: -6px;
         z-index: 20;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         touch-action: none;
     }
 
     .resize-handle:hover {
-        background: #ff6b6b;
-        transform: scale(1.2);
+        background: var(--warning-color);
+        transform: scale(1.1);
     }
 
     .delete-btn {
@@ -182,8 +206,8 @@
         right: -8px;
         width: 20px;
         height: 20px;
-        background: #ff6b6b;
-        color: white;
+        background: var(--danger-color);
+        color: var(--white);
         border: none;
         border-radius: 50%;
         cursor: pointer;
@@ -192,7 +216,7 @@
         align-items: center;
         justify-content: center;
         z-index: 21;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
     .room-element.selected .delete-btn {
@@ -200,7 +224,7 @@
     }
 
     .delete-btn:hover {
-        background: #ff5252;
+        background: #c0392b;
         transform: scale(1.1);
     }
 
@@ -209,29 +233,40 @@
         top: 10px;
         right: 10px;
         display: flex;
-        gap: 8px;
+        gap: 0.5rem;
         z-index: 30;
         flex-wrap: wrap;
         justify-content: flex-end;
     }
 
     .control-btn {
-        padding: 8px 12px;
-        background: rgba(255, 255, 255, 0.9);
-        border: none;
-        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
         cursor: pointer;
-        font-weight: bold;
-        color: #333;
-        backdrop-filter: blur(10px);
+        font-weight: 500;
+        color: var(--text-dark);
         transition: all 0.2s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        font-size: clamp(12px, 2vw, 14px);
+        box-shadow: var(--box-shadow);
+        font-size: 0.875rem;
     }
 
     .control-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        background-color: var(--primary-color);
+        color: var(--white);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .control-btn.save {
+        background-color: var(--success-color);
+        color: var(--white);
+        border-color: var(--success-color);
+    }
+
+    .control-btn.save:hover {
+        background-color: #229954;
     }
 
     .properties-panel {
@@ -239,15 +274,15 @@
         top: 50%;
         right: 20px;
         transform: translateY(-50%);
-        width: min(250px, 90vw);
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
-        padding: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(10px);
+        width: 280px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
         display: none;
         z-index: 40;
-        max-height: 90vh;
+        max-height: 80vh;
         overflow-y: auto;
     }
 
@@ -256,45 +291,57 @@
     }
 
     .properties-panel h4 {
-        margin-bottom: 15px;
-        color: #333;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
         text-align: center;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #667eea;
-        font-size: clamp(16px, 2vw, 18px);
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--primary-color);
+        font-size: 1.1rem;
+        font-weight: 600;
     }
 
     .property-group {
-        margin-bottom: 12px;
+        margin-bottom: 1rem;
     }
 
     .property-group label {
         display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        color: #555;
-        font-size: clamp(12px, 1.5vw, 14px);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-dark);
+        font-size: 0.9rem;
     }
 
     .property-group input {
         width: 100%;
-        padding: 6px 8px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: clamp(12px, 1.5vw, 14px);
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        background: var(--white);
+        transition: border-color 0.2s ease;
     }
 
+    .property-group input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.1);
+    }
+
+    /* Responsive Design */
     @@media (max-width: 992px) {
         .container {
             flex-direction: column;
-            gap: 15px;
+            gap: 1rem;
+            padding: 1rem;
         }
 
         .sidebar {
             width: 100%;
             max-height: 200px;
             order: 2;
-            padding: 15px;
+            padding: 1rem;
         }
 
         .design-area-container {
@@ -304,12 +351,16 @@
 
         .properties-panel {
             right: 10px;
-            width: min(220px, 90vw);
-            padding: 10px;
+            width: 250px;
+            padding: 1rem;
         }
     }
 
     @@media (max-width: 768px) {
+        .header h1 {
+            font-size: 1.5rem;
+        }
+
         .design-area {
             transform: scale(calc(var(--mobile-scale, 1))) !important;
             height: calc(600px * var(--mobile-scale, 1)) !important;
@@ -317,12 +368,6 @@
         
         .grid-overlay {
             background-size: calc(20px * var(--mobile-scale, 1)) calc(20px * var(--mobile-scale, 1));
-        }
-    }
-
-    @@media (max-width: 576px) {
-        .container {
-            padding: 10px;
         }
 
         .sidebar {
@@ -336,29 +381,64 @@
         .controls {
             top: 5px;
             right: 5px;
-            gap: 5px;
+            gap: 0.25rem;
         }
 
         .control-btn {
-            padding: 6px 10px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
         }
 
         .element-item {
-            padding: 10px;
-            font-size: 14px;
+            padding: 0.6rem;
+            font-size: 0.875rem;
         }
 
         .properties-panel {
-            width: 90vw;
-            right: 5px;
-            left: 5px;
-            margin: 0 auto;
+            width: calc(100% - 20px);
+            right: 10px;
+            left: 10px;
             top: auto;
             bottom: 10px;
             transform: none;
+            max-height: 60vh;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .container {
+            padding: 0.5rem;
+        }
+
+        .header {
+            padding: 1rem 0;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+        }
+
+        .sidebar {
+            padding: 1rem;
+            max-height: 160px;
+        }
+
+        .element-item {
+            padding: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .element-icon {
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
         }
     }
 </style>
+
+<div class="header">
+    <h1><i class="fas fa-cogs me-2"></i>Room Layout Designer</h1>
+    <p>Create and manage property room layouts</p>
+</div>
 
 <div class="container">
     <div class="sidebar">
@@ -368,7 +448,7 @@
             <span>Bedroom</span>
         </div>
         <div class="element-item" draggable="true" data-type="hall">
-            <span class="element-icon">🛏️</span>
+            <span class="element-icon">🏛️</span>
             <span>Hall</span>
         </div>
         <div class="element-item" draggable="true" data-type="bathroom">
@@ -405,38 +485,45 @@
         <div class="design-area" id="designArea">
             <div class="grid-overlay"></div>
             <div class="controls">
-                <button class="control-btn" onclick="clearAll()">Clear All</button>
-                <button class="control-btn" onclick="toggleGrid()">Toggle Grid</button>
-                <button class="control-btn" onclick="saveLayout()">Save</button>
+                <button class="control-btn" onclick="clearAll()">
+                    <i class="fas fa-trash me-1"></i>Clear All
+                </button>
+                <button class="control-btn" onclick="toggleGrid()">
+                    <i class="fas fa-grid-3x3 me-1"></i>Toggle Grid
+                </button>
+                <button class="control-btn save" onclick="saveLayout()">
+                    <i class="fas fa-save me-1"></i>Save Layout
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <div class="properties-panel" id="propertiesPanel">
-    <h4>Element Properties</h4>
+    <h4><i class="fas fa-cog me-2"></i>Element Properties</h4>
     <div class="property-group">
-        <label>Width (px):</label>
+        <label><i class="fas fa-arrows-alt-h me-1"></i>Width (px):</label>
         <input type="number" id="widthInput" min="50" max="500">
     </div>
     <div class="property-group">
-        <label>Height (px):</label>
+        <label><i class="fas fa-arrows-alt-v me-1"></i>Height (px):</label>
         <input type="number" id="heightInput" min="50" max="500">
     </div>
     <div class="property-group">
-        <label>X Position:</label>
+        <label><i class="fas fa-arrow-right me-1"></i>X Position:</label>
         <input type="number" id="xInput" min="0">
     </div>
     <div class="property-group">
-        <label>Y Position:</label>
+        <label><i class="fas fa-arrow-down me-1"></i>Y Position:</label>
         <input type="number" id="yInput" min="0">
     </div>
     <div class="property-group">
-        <label>Label:</label>
+        <label><i class="fas fa-tag me-1"></i>Label:</label>
         <input type="text" id="labelInput">
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 <script>
     let selectedElement = null;
     let isDragging = false;
@@ -449,17 +536,9 @@
     // Initialize the designer
     function initDesigner() {
         updateDesignAreaScale();
-
-        // Load any saved layout
         loadLayout();
-
-        // Set up window resize handler
         window.addEventListener('resize', handleWindowResize);
-
-        // Set up touch events for mobile
         setupTouchEvents();
-
-        // Set up drag and drop
         setupDragAndDrop();
     }
 
@@ -571,7 +650,6 @@
             const element = document.elementFromPoint(touch.clientX, touch.clientY);
 
             if (element && element.classList.contains('element-item')) {
-                // This is handled by handleElementTouchStart
                 return;
             }
 
@@ -579,16 +657,13 @@
             const roomElement = element.closest('.room-element');
             if (roomElement) {
                 if (element.classList.contains('resize-handle')) {
-                    // Start resizing
                     isResizing = true;
                     selectedElement = roomElement;
                     e.preventDefault();
                 } else if (element.classList.contains('delete-btn')) {
-                    // Delete the element
                     deleteElement(roomElement.id);
                     e.preventDefault();
                 } else {
-                    // Start dragging
                     isDragging = true;
                     selectedElement = roomElement;
                     selectElement({ target: roomElement });
@@ -675,7 +750,7 @@
         const element = document.createElement('div');
 
         element.className = `room-element ${type}`;
-        element.setAttribute('data-type', type); // ✅ store type for layout
+        element.setAttribute('data-type', type);
         element.style.left = `${Math.max(0, x)}px`;
         element.style.top = `${Math.max(0, y)}px`;
 
@@ -709,8 +784,6 @@
 
         return element;
     }
-
-
 
     function handleMouseDown(e) {
         if (e.target.classList.contains('resize-handle') || e.target.classList.contains('delete-btn')) {
@@ -856,8 +929,10 @@
 
     // Control functions
     function clearAll() {
-        document.querySelectorAll('.room-element').forEach(el => el.remove());
-        hidePropertiesPanel();
+        if (confirm('Are you sure you want to clear all elements?')) {
+            document.querySelectorAll('.room-element').forEach(el => el.remove());
+            hidePropertiesPanel();
+        }
     }
 
     function toggleGrid() {
@@ -866,7 +941,6 @@
     }
 
     function saveLayout() {
-        debugger
         const designArea = document.getElementById('designArea');
         const rooms = [];
 
@@ -874,7 +948,7 @@
             const roomId = parseInt(el.id);
             const type = el.getAttribute('data-type');
 
-            rooms.push(roomId); // ✅ push only roomId here
+            rooms.push(roomId);
 
             return {
                 x: parseInt(el.style.left),
@@ -882,7 +956,7 @@
                 width: parseInt(el.style.width),
                 height: parseInt(el.style.height),
                 label: el.querySelector('span').textContent,
-                type: type, // ✅ correctly captured
+                type: type,
                 roomId: roomId,
                 homeId: localStorage.getItem('maxHomeId')
             };
@@ -897,14 +971,32 @@
         };
 
         localStorage.setItem('homestayLayout', JSON.stringify(layout));
-       // msgPopup('success', 'Layout exported successfully');
-        window.close();
+        
+        // Show success message
+        const successMsg = document.createElement('div');
+        successMsg.className = 'alert alert-success';
+        successMsg.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 1rem;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        `;
+        successMsg.innerHTML = '<i class="fas fa-check-circle me-2"></i>Layout saved successfully!';
+        document.body.appendChild(successMsg);
+        
+        setTimeout(() => {
+            successMsg.remove();
+            window.close();
+        }, 2000);
     }
 
-
-
     function loadLayout() {
-        debugger
         const savedLayout = localStorage.getItem('homestayLayout');
         if (!savedLayout) return false;
 
@@ -949,7 +1041,6 @@
             return false;
         }
     }
-
 
     // Click outside to deselect
     document.addEventListener('click', (e) => {

@@ -2,34 +2,180 @@
 
 <style>
     :root {
-        --primary-color: #667eea;
-        --success-color: #28a745;
-        --warning-color: #ffc107;
-        --light-bg: #f8f9fa;
-        --border-color: #dee2e6;
-        --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.15);
+        --primary-color: #2c3e50;
+        --secondary-color: #34495e;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --danger-color: #e74c3c;
+        --light-gray: #f8f9fa;
+        --border-color: #ddd;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --white: #ffffff;
+        --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-content {
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        background: var(--white);
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+    .home-info {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--box-shadow);
+    }
+
+    .home-info h6 {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .home-info p {
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+
+    .price-badge {
+        background-color: var(--success-color);
+        color: var(--white);
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .selection-options {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--box-shadow);
+    }
+
+    .form-check-input {
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .form-check-input:checked {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-left: 0.5rem;
+    }
+
+    .btn-professional {
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        border: 1px solid;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+        background: var(--white);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+
+    .btn-outline-info {
+        color: #17a2b8;
+        border-color: #17a2b8;
+        background: var(--white);
+    }
+
+    .btn-outline-info:hover {
+        background-color: #17a2b8;
+        color: var(--white);
+    }
+
+    .btn-success-professional {
+        background-color: var(--success-color);
+        color: var(--white);
+        border-color: var(--success-color);
+    }
+
+    .btn-success-professional:hover {
+        background-color: #229954;
+        color: var(--white);
+    }
+
+    .btn-secondary-professional {
+        background-color: var(--text-muted);
+        color: var(--white);
+        border-color: var(--text-muted);
+    }
+
+    .btn-secondary-professional:hover {
+        background-color: #5a6268;
+        color: var(--white);
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+        border-radius: 4px;
+        padding: 1rem;
+        margin-top: 1rem;
     }
 
     .layout-area-wrapper {
-        width: 100%;
-        max-width: 100%;
-        margin: 20px auto;
-        padding: 20px;
-        background: var(--light-bg);
-        border-radius: 12px;
-        box-shadow: var(--shadow);
-        position: relative;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--box-shadow);
     }
 
     .layout-area {
         position: relative;
-        border: 3px dashed var(--border-color);
-        border-radius: 15px;
-        background: 
-            repeating-linear-gradient(0deg, #ffffff 0px, #ffffff 19px, #f0f0f0 20px),
-            repeating-linear-gradient(90deg, #ffffff 0px, #ffffff 19px, #f0f0f0 20px);
-        background-size: 20px 20px;
+        border: 2px dashed var(--border-color);
+        border-radius: 4px;
+        background: var(--white);
         width: 100%;
         padding-top: 60%;
         min-height: 400px;
@@ -47,20 +193,18 @@
 
     .room-block {
         position: absolute;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.9));
+        background: var(--white);
         border: 2px solid var(--primary-color);
-        border-radius: 12px;
+        border-radius: 4px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 600;
-        color: #333;
-        box-shadow: var(--shadow);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 10;
-        backdrop-filter: blur(8px);
-        font-size: clamp(10px, 1.5vw, 16px);
+        font-weight: 500;
+        color: var(--text-dark);
+        box-shadow: var(--box-shadow);
+        transition: all 0.2s ease;
+        font-size: clamp(10px, 1.5vw, 14px);
         text-align: center;
         padding: 8px;
         overflow: hidden;
@@ -72,17 +216,14 @@
     }
 
     .room-block:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: var(--shadow-hover);
+        background-color: var(--light-gray);
         border-color: var(--success-color);
     }
 
     .room-block.selected {
-        background: linear-gradient(135deg, rgba(255, 193, 7, 0.9), rgba(255, 193, 7, 0.7));
+        background-color: var(--warning-color);
         border-color: var(--warning-color);
-        color: #000;
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-hover);
+        color: var(--white);
     }
 
     .room-block.selected::after {
@@ -90,71 +231,62 @@
         position: absolute;
         top: 4px;
         right: 6px;
-        font-size: 14px;
-        color: #000;
+        font-size: 12px;
+        color: var(--white);
         font-weight: bold;
-        text-shadow: 0 1px 2px rgba(255,255,255,0.8);
-    }
-
-    .selection-options {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: var(--shadow);
-        border: 2px solid var(--border-color);
     }
 
     .selection-summary {
-        background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 20px;
-        border-left: 4px solid var(--primary-color);
-        box-shadow: var(--shadow);
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
     }
 
-    .home-info {
-        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border: 2px solid var(--border-color);
-        box-shadow: var(--shadow);
+    .stats-card {
+        background: var(--light-gray);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 1rem;
+        text-align: center;
+        margin-bottom: 1rem;
     }
 
-    .btn-custom {
-        border-radius: 25px;
-        padding: 12px 30px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+        color: var(--text-dark);
+    }
+
+    .stats-label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
         text-transform: uppercase;
+        font-weight: 500;
         letter-spacing: 0.5px;
     }
 
-    .btn-success-custom {
-        background: linear-gradient(135deg, var(--success-color), #20c997);
-        color: white;
+    .room-details {
+        background: var(--light-gray);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 1rem;
+        margin-top: 1rem;
     }
 
-    .btn-success-custom:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-hover);
-        color: white;
+    .room-details h6 {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 0.75rem;
     }
 
-    .form-check-input:checked {
-        background-color: var(--success-color);
-        border-color: var(--success-color);
-    }
-
-    .alert-info-custom {
-        background: linear-gradient(135deg, #d1ecf1, #bee5eb);
-        border: 1px solid #b6d7ff;
-        border-radius: 10px;
-        color: #0c5460;
-        border-left: 4px solid #17a2b8;
+    .room-list {
+        color: var(--text-muted);
+        min-height: 50px;
+        display: flex;
+        align-items: center;
     }
 
     .loading-overlay {
@@ -163,66 +295,61 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.9);
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 12px;
+        border-radius: 4px;
         z-index: 1000;
     }
 
-    .stats-card {
-        background: white;
-        border-radius: 10px;
-        padding: 15px;
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        background: var(--light-gray);
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-muted);
         text-align: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border: 1px solid var(--border-color);
+        padding: 2rem;
     }
 
-    .stats-number {
-        font-size: 2rem;
-        font-weight: bold;
-        margin-bottom: 5px;
+    .empty-state i {
+        font-size: 3rem;
+        opacity: 0.5;
+        margin-bottom: 1rem;
     }
 
-    .stats-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    .empty-state h5 {
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
     }
 
-    /* Animation for room selection */
-    @@keyframes selectRoom {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+    .empty-state p {
+        margin-bottom: 0.5rem;
     }
 
-    .room-block.selecting {
-        animation: selectRoom 0.3s ease;
-    }
-
-    @@keyframes pulseGlow {
-        0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
-        70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
-    }
-
-    .room-block.highlight {
-        animation: pulseGlow 1s infinite;
-    }
-
-    /* Mobile Optimizations */
+    /* Mobile Responsiveness */
     @@media (max-width: 768px) {
-        .layout-area-wrapper {
-            padding: 15px;
-            margin: 10px auto;
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .home-info, .selection-options, .layout-area-wrapper, .selection-summary {
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
 
         .layout-area {
-            background-size: 15px 15px;
             padding-top: 80%;
             min-height: 300px;
         }
@@ -232,26 +359,17 @@
             padding: 4px;
             min-width: 40px;
             min-height: 30px;
-            border-radius: 8px;
         }
 
-        .room-block.selected::after {
-            font-size: 10px;
-            top: 2px;
-            right: 4px;
+        .btn-professional {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            width: 100%;
+            margin-bottom: 0.5rem;
         }
 
-        .selection-options, .home-info, .selection-summary {
-            padding: 15px;
-        }
-
-        .btn-custom {
-            padding: 10px 20px;
-            font-size: 14px;
-        }
-
-        .modal-dialog {
-            margin: 0.5rem;
+        .stats-number {
+            font-size: 1.5rem;
         }
     }
 
@@ -273,9 +391,9 @@
 <div class="modal fade" id="homeDrawingModal" tabindex="-1" aria-labelledby="homeDrawingModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header">
                 <h5 class="modal-title" id="homeDrawingModalLabel">
-                    <i class="fas fa-home me-2"></i>Select Room(s) for Your Stay
+                    <i class="fas fa-home me-2"></i>Select Rooms for Your Stay
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -286,10 +404,10 @@
                     <div class="home-info">
                         <div class="row align-items-center">
                             <div class="col-md-8">
-                                <h6 class="mb-2">
+                                <h6>
                                     <i class="fas fa-building me-2"></i>@Model.Home.Name
                                 </h6>
-                                <p class="mb-1 text-muted">
+                                <p class="mb-1">
                                     <i class="fas fa-map-marker-alt me-1"></i>@Model.Home.Location
                                 </p>
                                 @if (!string.IsNullOrEmpty(Model.Home.Description))
@@ -298,10 +416,9 @@
                                 }
                             </div>
                             <div class="col-md-4 text-md-end">
-                                <div class="fw-bold text-success fs-5">
+                                <div class="price-badge">
                                     <i class="fas fa-dollar-sign me-1"></i>@Model.Home.PricePerDay/day
                                 </div>
-                                <small class="text-muted">Base rate</small>
                             </div>
                         </div>
                     </div>
@@ -309,26 +426,26 @@
 
                 <!-- Selection Options -->
                 <div class="selection-options">
-                    <div class="row align-items-center">
+                    <div class="row align-items-center mb-3">
                         <div class="col-md-6">
-                            <div class="form-check form-switch">
+                            <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="selectAllRooms" />
-                                <label class="form-check-label fw-bold" for="selectAllRooms">
+                                <label class="form-check-label" for="selectAllRooms">
                                     <i class="fas fa-building me-2"></i>Book Entire Property
                                 </label>
                             </div>
                         </div>
-                        <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                            <button type="button" class="btn btn-outline-primary btn-sm me-2" id="clearSelection">
+                        <div class="col-md-6 text-md-end">
+                            <button type="button" class="btn btn-outline-primary btn-professional me-2" id="clearSelection">
                                 <i class="fas fa-eraser me-1"></i>Clear All
                             </button>
-                            <button type="button" class="btn btn-outline-info btn-sm" id="highlightRooms">
+                            <button type="button" class="btn btn-outline-info btn-professional" id="highlightRooms">
                                 <i class="fas fa-lightbulb me-1"></i>Highlight All
                             </button>
                         </div>
                     </div>
                     
-                    <div class="alert alert-info-custom mt-3 mb-0" role="alert">
+                    <div class="alert alert-info" role="alert">
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>How to select:</strong> Click individual rooms to select them, or use "Book Entire Property" to select all rooms. Hover over rooms to see details.
                     </div>
@@ -336,6 +453,9 @@
 
                 <!-- Home Layout Drawing Area -->
                 <div class="layout-area-wrapper">
+                    <h6 class="mb-3">
+                        <i class="fas fa-map me-2"></i>Room Layout
+                    </h6>
                     <div class="layout-area">
                         <div class="layout-area-inner" id="layoutArea" data-design-width="800" data-design-height="600">
                             @if (Model?.Layouts != null && Model.Layouts.Any())
@@ -361,13 +481,11 @@
                             }
                             else
                             {
-                                <div class="d-flex align-items-center justify-content-center h-100">
-                                    <div class="text-center text-muted">
-                                        <i class="fas fa-home fa-4x mb-3 opacity-50"></i>
-                                        <h5>No Room Layout Available</h5>
-                                        <p>This property doesn't have a room layout configured.</p>
-                                        <p class="small">You can still book the entire property using the booking form.</p>
-                                    </div>
+                                <div class="empty-state">
+                                    <i class="fas fa-home"></i>
+                                    <h5>No Room Layout Available</h5>
+                                    <p>This property doesn't have a room layout configured.</p>
+                                    <p class="small">You can still book the entire property using the booking form.</p>
                                 </div>
                             }
                         </div>
@@ -386,32 +504,32 @@
 
                 <!-- Selection Summary -->
                 <div class="selection-summary">
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-md-4">
                             <div class="stats-card">
-                                <div class="stats-number text-primary" id="selectedCount">0</div>
+                                <div class="stats-number" id="selectedCount">0</div>
                                 <div class="stats-label">Rooms Selected</div>
                             </div>
                         </div>
-                        <div class="col-md-4 mt-3 mt-md-0">
+                        <div class="col-md-4">
                             <div class="stats-card">
-                                <div class="stats-number text-success" id="totalRooms">@(Model?.Layouts?.Count ?? 0)</div>
+                                <div class="stats-number" id="totalRooms">@(Model?.Layouts?.Count ?? 0)</div>
                                 <div class="stats-label">Total Available</div>
                             </div>
                         </div>
-                        <div class="col-md-4 mt-3 mt-md-0">
+                        <div class="col-md-4">
                             <div class="stats-card">
-                                <div class="stats-number text-warning" id="estimatedPrice">$0</div>
+                                <div class="stats-number" id="estimatedPrice">$0</div>
                                 <div class="stats-label">Per Night</div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="mt-3" id="roomDetails">
-                        <h6 class="mb-2">
+                    <div class="room-details">
+                        <h6>
                             <i class="fas fa-list-check me-2"></i>Selected Rooms:
                         </h6>
-                        <div id="selectedRoomsList" class="text-muted">
+                        <div class="room-list" id="selectedRoomsList">
                             <em>No rooms selected</em>
                         </div>
                     </div>
@@ -421,10 +539,10 @@
                 <input type="hidden" id="SelectedRoomIds" name="SelectedRoomIds" />
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-custom" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-secondary-professional btn-professional" data-bs-dismiss="modal">
                     <i class="fas fa-times me-2"></i>Cancel
                 </button>
-                <button type="button" id="saveDrawing" class="btn btn-success-custom btn-custom">
+                <button type="button" id="saveDrawing" class="btn btn-success-professional btn-professional">
                     <i class="fas fa-check me-2"></i>Confirm Selection
                 </button>
             </div>
@@ -472,7 +590,7 @@ $(document).ready(function () {
         });
     }
 
-    // Load room layout for selected home (for dynamic loading)
+    // Load room layout for selected home
     function loadHomeLayout(homeId) {
         if (!homeId) return;
         
@@ -528,13 +646,11 @@ $(document).ready(function () {
                 $('#layoutLoading').addClass('d-none');
                 
                 $('#layoutArea').html(`
-                    <div class="d-flex align-items-center justify-content-center h-100">
-                        <div class="text-center text-danger">
-                            <i class="fas fa-exclamation-triangle fa-4x mb-3"></i>
-                            <h5>Error Loading Layout</h5>
-                            <p>Unable to load room layout for this property.</p>
-                            <p class="small">Please try again or contact support.</p>
-                        </div>
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h5>Error Loading Layout</h5>
+                        <p>Unable to load room layout for this property.</p>
+                        <p class="small">Please try again or contact support.</p>
                     </div>
                 `);
             }
@@ -547,19 +663,18 @@ $(document).ready(function () {
             <div class="home-info">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h6 class="mb-2">
+                        <h6>
                             <i class="fas fa-building me-2"></i>${home.name}
                         </h6>
-                        <p class="mb-1 text-muted">
+                        <p class="mb-1">
                             <i class="fas fa-map-marker-alt me-1"></i>${home.location}
                         </p>
                         ${home.description ? `<p class="mb-0 small">${home.description}</p>` : ''}
                     </div>
                     <div class="col-md-4 text-md-end">
-                        <div class="fw-bold text-success fs-5">
+                        <div class="price-badge">
                             <i class="fas fa-dollar-sign me-1"></i>${home.pricePerDay}/day
                         </div>
-                        <small class="text-muted">Base rate</small>
                     </div>
                 </div>
             </div>
@@ -572,23 +687,17 @@ $(document).ready(function () {
     $('#homeDrawingModal').on('shown.bs.modal', function () {
         const homeId = getCurrentHomeId();
         if (homeId) {
-            // If we need to load layout dynamically, uncomment next line:
-            // loadHomeLayout(homeId);
-            
-            // For static rendering (current implementation):
             setTimeout(() => {
                 renderScaledRooms();
                 loadSavedSelections();
             }, 100);
         } else {
             $('#layoutArea').html(`
-                <div class="d-flex align-items-center justify-content-center h-100">
-                    <div class="text-center text-warning">
-                        <i class="fas fa-exclamation-circle fa-4x mb-3"></i>
-                        <h5>No Property Selected</h5>
-                        <p>Please select a property first.</p>
-                        <p class="small">Go back and choose a property from the dropdown.</p>
-                    </div>
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h5>No Property Selected</h5>
+                    <p>Please select a property first.</p>
+                    <p class="small">Go back and choose a property from the dropdown.</p>
                 </div>
             `);
         }
@@ -666,43 +775,31 @@ $(document).ready(function () {
         e.preventDefault();
         
         const $room = $(this);
-        $room.addClass('selecting');
+        $room.toggleClass('selected');
         
-        setTimeout(() => {
-            $room.removeClass('selecting');
-            $room.toggleClass('selected');
-            
-            const checkbox = $room.find('input[type="checkbox"]');
-            checkbox.prop('checked', $room.hasClass('selected'));
+        const checkbox = $room.find('input[type="checkbox"]');
+        checkbox.prop('checked', $room.hasClass('selected'));
 
-            updateSelectAllCheckbox();
-            updateSelectionSummary();
-        }, 150);
+        updateSelectAllCheckbox();
+        updateSelectionSummary();
     });
 
     // Select all rooms toggle
     $('#selectAllRooms').change(function () {
         const checked = $(this).is(':checked');
         
-        $('.room-block').each(function(index) {
+        $('.room-block').each(function() {
             const $room = $(this);
-            setTimeout(() => {
-                $room.toggleClass('selected', checked);
-                $room.find('input[type="checkbox"]').prop('checked', checked);
-                
-                if (checked) {
-                    $room.addClass('selecting');
-                    setTimeout(() => $room.removeClass('selecting'), 300);
-                }
-            }, index * 50);
+            $room.toggleClass('selected', checked);
+            $room.find('input[type="checkbox"]').prop('checked', checked);
         });
         
-        setTimeout(updateSelectionSummary, $('.room-block').length * 50 + 100);
+        updateSelectionSummary();
     });
 
     // Clear all selections
     $('#clearSelection').click(function() {
-        $('.room-block').removeClass('selected highlight');
+        $('.room-block').removeClass('selected');
         $('.room-block input[type="checkbox"]').prop('checked', false);
         $('#selectAllRooms').prop('checked', false).prop('indeterminate', false);
         updateSelectionSummary();
@@ -712,9 +809,9 @@ $(document).ready(function () {
 
     // Highlight all rooms
     $('#highlightRooms').click(function() {
-        $('.room-block').addClass('highlight');
+        $('.room-block').css('background-color', '#fff3cd');
         setTimeout(() => {
-            $('.room-block').removeClass('highlight');
+            $('.room-block').css('background-color', '');
         }, 2000);
         
         showNotification('All rooms highlighted', 'info', 2000);
@@ -750,7 +847,7 @@ $(document).ready(function () {
         showNotification(`${selectedRooms.length} room(s) selected successfully!`, 'success');
     });
 
-    // Utility function for notifications (fallback if not available globally)
+    // Utility function for notifications
     function showNotification(message, type = 'info', duration = 5000) {
         if (window.showNotification) {
             window.showNotification(message, type, duration);
@@ -764,7 +861,7 @@ $(document).ready(function () {
         
         const notification = $(`
             <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
-                 style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+                 style="top: 20px; right: 20px; z-index: 9999; min-width: 300px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" role="alert">
                 <i class="fas ${iconClass} me-2"></i>
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -786,17 +883,6 @@ $(document).ready(function () {
             loadHomeLayout(homeId);
         }
     });
-
-    // Initialize tooltips and load initial state
-    if ($('#homeDrawingModal').hasClass('show')) {
-        const homeId = getCurrentHomeId();
-        if (homeId) {
-            setTimeout(() => {
-                renderScaledRooms();
-                loadSavedSelections();
-            }, 100);
-        }
-    }
 
     // Initialize selection summary
     updateSelectionSummary();

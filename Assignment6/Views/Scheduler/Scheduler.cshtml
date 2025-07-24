@@ -2,81 +2,187 @@
 
 <style>
     :root {
-        --primary-color: #667eea;
-        --success-color: #28a745;
-        --warning-color: #ffc107;
-        --light-bg: #f8f9fa;
-        --border-color: #dee2e6;
-        --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.15);
+        --primary-color: #2c3e50;
+        --secondary-color: #34495e;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --danger-color: #e74c3c;
+        --info-color: #3498db;
+        --light-gray: #f8f9fa;
+        --border-color: #ddd;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --white: #ffffff;
+        --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        min-height: 100vh;
-    }
-
-    #modalBody {
-        overflow: auto;
+        background-color: var(--light-gray);
+        color: var(--text-dark);
+        line-height: 1.6;
     }
 
     .main-header {
-        background: linear-gradient(135deg, var(--primary-color), #764ba2);
-        color: white;
+        background-color: var(--primary-color);
+        color: var(--white);
         padding: 2rem 0;
         margin-bottom: 2rem;
-        box-shadow: var(--shadow);
+        box-shadow: var(--box-shadow);
     }
 
-        .main-header h1 {
-            margin: 0;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
+    .main-header h1 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 2.5rem;
+    }
+
+    .main-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+
+    .controls-container {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+    }
 
     .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-professional {
+        border-radius: 4px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 150px;
+    }
+
+    .btn-success-professional {
+        background-color: var(--success-color);
+        color: var(--white);
+    }
+
+    .btn-success-professional:hover {
+        background-color: #229954;
+        color: var(--white);
+    }
+
+    .btn-primary-professional {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+
+    .btn-primary-professional:hover {
+        background-color: var(--secondary-color);
+        color: var(--white);
+    }
+
+    .btn-warning-professional {
+        background-color: var(--warning-color);
+        color: var(--white);
+    }
+
+    .btn-warning-professional:hover {
+        background-color: #e67e22;
+        color: var(--white);
+    }
+
+    .btn-info-professional {
+        background-color: var(--info-color);
+        color: var(--white);
+    }
+
+    .btn-info-professional:hover {
+        background-color: #2980b9;
+        color: var(--white);
+    }
+
+    .search-section {
+        background: var(--light-gray);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
         margin-bottom: 2rem;
     }
 
-    .btn-custom {
-        border-radius: 25px;
-        padding: 12px 30px;
+    .search-title {
+        color: var(--text-dark);
         font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
-        margin: 0 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
     }
 
-    .btn-primary-custom {
-        background: linear-gradient(135deg, var(--primary-color), #764ba2);
-        color: white;
+    .form-control, .form-select {
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        color: var(--text-dark);
+        background: var(--white);
+        transition: border-color 0.2s ease;
     }
 
-    .btn-success-custom {
-        background: linear-gradient(135deg, var(--success-color), #20c997);
-        color: white;
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.1);
+        outline: none;
+        background: var(--white);
+        color: var(--text-dark);
     }
 
-    .btn-warning-custom {
-        background: linear-gradient(135deg, var(--warning-color), #fd7e14);
-        color: #000;
+    .form-label {
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
     }
 
-    .btn-custom:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-hover);
+    .form-label i {
+        color: var(--primary-color);
+        margin-right: 0.25rem;
+        width: 14px;
     }
 
     .calendar-container {
-        background: white;
-        border-radius: 15px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
         padding: 2rem;
-        box-shadow: var(--shadow);
+        box-shadow: var(--box-shadow);
         margin: 0 auto;
-        max-width: 95%;
+        max-width: 100%;
+    }
+
+    .calendar-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .calendar-title {
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 1.3rem;
+        margin: 0;
     }
 
     #calendar {
@@ -86,97 +192,260 @@
     /* Calendar Customization */
     .fc-header-toolbar {
         margin-bottom: 1.5rem !important;
-        padding: 1rem;
-        background: var(--light-bg);
-        border-radius: 10px;
+        padding: 1rem !important;
+        background: var(--light-gray) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 4px !important;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        color: var(--text-dark) !important;
     }
 
     .fc-button-primary {
         background: var(--primary-color) !important;
         border-color: var(--primary-color) !important;
-        border-radius: 8px !important;
+        border-radius: 4px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 500 !important;
+        color: var(--white) !important;
     }
 
-        .fc-button-primary:hover {
-            background: #5a6fd8 !important;
-            border-color: #5a6fd8 !important;
-        }
+    .fc-button-primary:hover {
+        background: var(--secondary-color) !important;
+        border-color: var(--secondary-color) !important;
+        color: var(--white) !important;
+    }
+
+    .fc-button-primary:disabled {
+        background: var(--text-muted) !important;
+        border-color: var(--text-muted) !important;
+    }
 
     .fc-day-today {
-        background: rgba(102, 126, 234, 0.1) !important;
+        background: rgba(44, 62, 80, 0.1) !important;
     }
 
     .fc-daygrid-day:hover {
-        background: rgba(102, 126, 234, 0.05);
-        cursor: pointer;
+        background: rgba(44, 62, 80, 0.05) !important;
+        cursor: pointer !important;
     }
 
-    /* Modal Customizations */
-    .modal-content {
-        border-radius: 15px;
-        border: none;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    .fc-event {
+        border-radius: 4px !important;
+        border: none !important;
+        font-weight: 500 !important;
+        padding: 2px 4px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
     }
 
-    .modal-header {
-        background: linear-gradient(135deg, var(--primary-color), #764ba2);
-        color: white;
-        border-radius: 15px 15px 0 0;
-        border-bottom: none;
+    .fc-event:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
     }
-
-        .modal-header .btn-close {
-            filter: invert(1);
-        }
 
     /* Loading Spinner */
     .loading-spinner {
-        display: none;
         position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         background: rgba(255, 255, 255, 0.9);
-        padding: 2rem;
-        border-radius: 15px;
-        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
     }
 
-    /* Notification Styles */
+    .loading-content {
+        text-align: center;
+        background: var(--white);
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: var(--box-shadow);
+        border: 1px solid var(--border-color);
+    }
+
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3rem;
+        color: var(--primary-color);
+    }
+
+    .loading-text {
+        margin-top: 1rem;
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    /* Notifications */
     .notification {
         position: fixed;
         top: 20px;
         right: 20px;
         z-index: 9999;
         min-width: 300px;
-        border-radius: 10px;
-        box-shadow: var(--shadow);
+        max-width: 400px;
+        border-radius: 4px;
+        box-shadow: var(--box-shadow);
+        border: 1px solid;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    /* Modal Enhancements */
+    .modal-content {
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border-bottom: 1px solid var(--border-color);
+        border-radius: 8px 8px 0 0;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        background: var(--light-gray);
+        border-top: 1px solid var(--border-color);
+    }
+
+    /* Event Details Styling */
+    .event-details {
+        background: var(--white);
+        padding: 1rem;
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+        max-width: 350px;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-paid {
+        background-color: var(--success-color);
+        color: var(--white);
+    }
+
+    .status-pending {
+        background-color: var(--warning-color);
+        color: var(--white);
+    }
+
+    .status-cancelled {
+        background-color: var(--danger-color);
+        color: var(--white);
     }
 
     /* Responsive Design */
+    @@media (max-width: 1200px) {
+        .container {
+            max-width: 100%;
+            padding: 0 1rem;
+        }
+    }
+
     @@media (max-width: 768px) {
         .main-header {
-            padding: 1rem 0;
+            padding: 1.5rem 0;
         }
 
-            .main-header h1 {
-                font-size: 1.8rem;
-            }
+        .main-header h1 {
+            font-size: 2rem;
+        }
+
+        .controls-container {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
 
         .calendar-container {
-            padding: 1rem;
-            margin: 0 1rem;
-        }
-
-        .btn-custom {
-            padding: 10px 20px;
-            margin: 0.25rem;
-            font-size: 0.9rem;
+            padding: 1.5rem;
         }
 
         .action-buttons {
-            text-align: center;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-professional {
+            width: 100%;
+            max-width: 250px;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-section {
+            padding: 1rem;
+        }
+
+        .fc-header-toolbar {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+
+        .fc-toolbar-chunk {
+            display: flex !important;
+            justify-content: center !important;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .main-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .controls-container {
+            padding: 1rem;
+        }
+
+        .calendar-container {
+            padding: 1rem;
+        }
+
+        .btn-professional {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.2rem !important;
         }
     }
 </style>
@@ -185,76 +454,90 @@
 <div class="main-header">
     <div class="container">
         <div class="text-center">
-            <h1><i class="fas fa-calendar-alt me-3"></i>Schedular</h1>
-            <p class="lead mb-0"></p>
+            <h1><i class="fas fa-calendar-alt me-3"></i>Property Scheduler</h1>
+            <p class="mb-0">Professional Booking Management System</p>
         </div>
     </div>
 </div>
 
 <!-- Container -->
-<div class="container mt-4">
-
-    <!-- Top Row: Home Dropdown + Date Range Picker -->
-    <div class="row align-items-end mb-4">
-        <div class="action-buttons text-center">
-            <button id="book" class="btn btn-success-custom btn-custom">
-                <i class="fas fa-download me-2"></i>Get Bookings
+<div class="container">
+    <!-- Controls Section -->
+    <div class="controls-container">
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button id="book" class="btn btn-success-professional btn-professional">
+                <i class="fas fa-download me-2"></i>Load Bookings
             </button>
-            <button id="make-booking-button" class="btn btn-primary-custom btn-custom">
-                <i class="fas fa-plus me-2"></i>Make Booking
+            <button id="make-booking-button" class="btn btn-primary-professional btn-professional">
+                <i class="fas fa-plus me-2"></i>New Booking
             </button>
-            <button id="test-button" class="btn btn-warning-custom btn-custom">
+            <button id="test-button" class="btn btn-warning-professional btn-professional">
                 <i class="fab fa-airbnb me-2"></i>Sync Airbnb
             </button>
         </div>
-        <!-- Home Selector -->
-        <div class="col-md-3">
-            <label for="homeSelector" class="form-label">🏠 Select a Home</label>
-            <select id="homeSelector" class="form-select form-select-lg">
-                <option value="">Select a Home</option>
-                @foreach (var home in Model.Homes)
-                {
-                    <option value="@home.Id">@home.Name</option>
-                }
-            </select>
-        </div>
 
-        <!-- Start Date -->
-        <div class="col-md-3">
-            <label for="startDate" class="form-label">Start Date</label>
-            <input type="date" class="form-control form-control-lg" id="startBookDate">
-        </div>
+        <!-- Search Section -->
+        <div class="search-section">
+            <h5 class="search-title">
+                <i class="fas fa-search me-2"></i>Quick Availability Check
+            </h5>
+            <div class="row g-3">
+                <div class="col-lg-3 col-md-6">
+                    <label for="homeSelector" class="form-label">
+                        <i class="fas fa-home"></i>Select Property
+                    </label>
+                    <select id="homeSelector" class="form-select">
+                        <option value="">Select a Property</option>
+                        @foreach (var home in Model.Homes)
+                        {
+                            <option value="@home.Id">@home.Name</option>
+                        }
+                    </select>
+                </div>
 
-        <!-- End Date -->
-        <div class="col-md-3">
-            <label for="endDate" class="form-label">End Date</label>
-            <input type="date" class="form-control form-control-lg" id="endBookDate">
-        </div>
+                <div class="col-lg-3 col-md-6">
+                    <label for="startBookDate" class="form-label">
+                        <i class="fas fa-calendar-day"></i>Check-in Date
+                    </label>
+                    <input type="date" class="form-control" id="startBookDate">
+                </div>
 
-        <!-- Search Button -->
-        <div class="col-md-3">
-            <button id="searchBookingBtn"  class="btn btn-primary btn-lg w-100">
-                🔍 Check Booking
-            </button>
+                <div class="col-lg-3 col-md-6">
+                    <label for="endBookDate" class="form-label">
+                        <i class="fas fa-calendar-check"></i>Check-out Date
+                    </label>
+                    <input type="date" class="form-control" id="endBookDate">
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label" style="visibility: hidden;">Search</label>
+                    <button id="searchBookingBtn" class="btn btn-info-professional btn-professional w-100">
+                        <i class="fas fa-search me-2"></i>Check Availability
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Calendar Scheduler -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <div id="calendar" style="min-height: 600px;"></div>
+    <!-- Calendar Container -->
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <h3 class="calendar-title">
+                <i class="fas fa-calendar-week me-2"></i>Booking Calendar
+            </h3>
         </div>
+        <div id="calendar"></div>
     </div>
 </div>
 
-
 <!-- Loading Spinner -->
-<div class="loading-spinner" id="loadingSpinner">
-    <div class="text-center">
-        <div class="spinner-border text-primary" role="status">
+<div class="loading-spinner d-none" id="loadingSpinner">
+    <div class="loading-content">
+        <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="mt-2 mb-0">Loading...</p>
+        <p class="loading-text">Loading...</p>
     </div>
 </div>
 
@@ -264,9 +547,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="bookingModalLabel">
-                    <i class="fas fa-calendar-plus me-2"></i>Add New Booking
+                    <i class="fas fa-calendar-plus me-2"></i>Create New Booking
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="modalBody">
                 <!-- Booking form partial will be loaded here -->
@@ -299,7 +582,8 @@
             initialView: 'dayGridMonth',
             selectable: true,
             selectMirror: true,
-            eventColor: '#FF6B6B',
+            eventColor: '#2c3e50',
+            height: 'auto',
             eventDidMount: function (info) {
                 $(info.el).tooltip({
                     title: info.event.title,
@@ -314,7 +598,7 @@
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
             dateClick: function (info) {
-
+                handleDateClick(info.dateStr);
             },
             eventClick: function (info) {
                 showEventDetails(info.event);
@@ -331,22 +615,21 @@
         calendar.render();
 
         // Event Listeners
-
-     document.getElementById("test-button").addEventListener("click", syncAirbnb);
-     // document.getElementById("book").addEventListener("click", bookTest);
+        document.getElementById("test-button").addEventListener("click", syncAirbnb);
         document.getElementById("book").addEventListener("click", fetchAndDisplayBookings);
         document.getElementById("make-booking-button").addEventListener("click", function () {
             handleDateClick(new Date().toISOString());
         });
-        // makeBookingTest);
 
         // Utility Functions
-        function showLoading() {
-            $('#loadingSpinner').show();
+        function showLoading(message = 'Loading...') {
+            const spinner = $('#loadingSpinner');
+            spinner.find('.loading-text').text(message);
+            spinner.removeClass('d-none');
         }
 
         function hideLoading() {
-            $('#loadingSpinner').hide();
+            $('#loadingSpinner').addClass('d-none');
         }
 
         function showNotification(message, type = 'info', duration = 5000) {
@@ -356,13 +639,15 @@
                 type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
 
             const notification = $(`
-                            <div class="alert ${alertClass} alert-dismissible fade show notification" role="alert">
-                                <i class="fas ${iconClass} me-2"></i>
-                                ${message}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        `);
+                <div class="alert ${alertClass} alert-dismissible fade show notification" role="alert">
+                    <i class="fas ${iconClass} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `);
 
+            // Remove existing notifications
+            $('.notification').remove();
             $('body').append(notification);
 
             if (duration > 0) {
@@ -372,10 +657,12 @@
             }
         }
 
+        // Make showNotification globally available
+        window.showNotification = showNotification;
+
         // Handle Date Click
         function handleDateClick(dateStr) {
-            debugger
-            showLoading();
+            showLoading('Loading booking form...');
             $.get('/Scheduler/AddBookingForm', { date: dateStr })
                 .done(function (html) {
                     $('#modalBody').html(html);
@@ -397,7 +684,6 @@
         }
 
         // Show Event Details
-        // Enhanced Show Event Details
         function showEventDetails(event) {
             const props = event.extendedProps;
             const startDate = event.start.toLocaleDateString();
@@ -406,7 +692,7 @@
             // Build room details if available
             let roomDetails = '';
             if (props.bookingRooms && props.bookingRooms.length > 0) {
-                roomDetails = '<div class="mt-2"><strong>Booked Rooms:</strong><ul class="mb-0">';
+                roomDetails = '<div class="mt-2"><strong>Booked Rooms:</strong><ul class="mb-0 mt-1">';
                 props.bookingRooms.forEach(room => {
                     roomDetails += `<li>Room ID: ${room.roomId}</li>`;
                 });
@@ -414,50 +700,52 @@
             }
 
             const eventInfo = `
-            <div class="event-details" style="max-width: 350px;">
-                <h6 class="mb-3"><i class="fas fa-calendar-check me-2"></i>${event.title}</h6>
-                <div class="row">
-                    <div class="col-6"><strong>Customer:</strong></div>
-                    <div class="col-6">${props.customerName || 'N/A'}</div>
-                </div>
-                <div class="row">
-                    <div class="col-6"><strong>Email:</strong></div>
-                    <div class="col-6">${props.customerEmail || 'N/A'}</div>
-                </div>
-                <div class="row">
-                    <div class="col-6"><strong>Phone:</strong></div>
-                    <div class="col-6">${props.customerPhone || 'N/A'}</div>
-                </div>
-                <div class="row">
-                    <div class="col-6"><strong>Check-in:</strong></div>
-                    <div class="col-6">${startDate}</div>
-                </div>
-                <div class="row">
-                    <div class="col-6"><strong>Check-out:</strong></div>
-                    <div class="col-6">${endDate}</div>
-                </div>
-                <div class="row">
-                    <div class="col-6"><strong>Home:</strong></div>
-                    <div class="col-6">${props.homeName || 'N/A'}</div>
-                </div>
-                <div class="row">
-                    <div class="col-6"><strong>Rooms:</strong></div>
-                    <div class="col-6">${props.roomCount || 0}</div>
-                </div>
-                <div class="row">
-                    <div class="col-6"><strong>Price:</strong></div>
-                    <div class="col-6">₹${props.price || 0}</div>
-                </div>
-                <div class="row">
-                    <div class="col-6"><strong>Status:</strong></div>
-                    <div class="col-6">
-                        <span class="badge ${getStatusBadgeClass(props.paymentStatus)}">${props.paymentStatus || 'Unknown'}</span>
+                <div class="event-details">
+                    <h6 class="mb-2 text-center">
+                        <i class="fas fa-calendar-check me-2"></i>${event.title}
+                    </h6>
+                    <div class="text-center mb-3">
+                        <span class="status-badge ${getStatusBadgeClass(props.paymentStatus)}">
+                            ${props.paymentStatus || 'Unknown'}
+                        </span>
                     </div>
+                    
+                    <div class="row g-1 small">
+                        <div class="col-5"><strong>Customer:</strong></div>
+                        <div class="col-7">${props.customerName || 'N/A'}</div>
+                        
+                        <div class="col-5"><strong>Email:</strong></div>
+                        <div class="col-7">${props.customerEmail || 'N/A'}</div>
+                        
+                        <div class="col-5"><strong>Phone:</strong></div>
+                        <div class="col-7">${props.customerPhone || 'N/A'}</div>
+                        
+                        <div class="col-5"><strong>Check-in:</strong></div>
+                        <div class="col-7">${startDate}</div>
+                        
+                        <div class="col-5"><strong>Check-out:</strong></div>
+                        <div class="col-7">${endDate}</div>
+                        
+                        <div class="col-5"><strong>Property:</strong></div>
+                        <div class="col-7">${props.homeName || 'N/A'}</div>
+                        
+                        <div class="col-5"><strong>Rooms:</strong></div>
+                        <div class="col-7">${props.roomCount || 0}</div>
+                        
+                        <div class="col-5"><strong>Total:</strong></div>
+                        <div class="col-7"><strong>${props.price || 0}</strong></div>
+                    </div>
+                    
+                    ${props.message ? `
+                        <div class="mt-2 p-2 bg-light rounded">
+                            <strong class="d-block mb-1">Notes:</strong>
+                            <small>${props.message}</small>
+                        </div>
+                    ` : ''}
+                    
+                    ${roomDetails}
                 </div>
-                ${props.message ? `<div class="mt-2"><strong>Message:</strong><br><small>${props.message}</small></div>` : ''}
-                ${roomDetails}
-            </div>
-        `;
+            `;
 
             showNotification(eventInfo, 'info', 0);
         }
@@ -467,18 +755,19 @@
             switch (status?.toLowerCase()) {
                 case 'paid':
                 case 'completed':
-                    return 'bg-success';
+                    return 'status-paid';
                 case 'pending':
-                    return 'bg-warning text-dark';
+                    return 'status-pending';
                 case 'cancelled':
-                    return 'bg-danger';
+                    return 'status-cancelled';
                 default:
-                    return 'bg-secondary';
+                    return 'status-pending';
             }
         }
 
+        // Fetch and Display Bookings
         function fetchAndDisplayBookings() {
-            showLoading();
+            showLoading('Loading bookings...');
             $.ajax({
                 url: '/Scheduler/GetBookings',
                 type: 'GET',
@@ -490,10 +779,7 @@
 
                     // Transform booking data to calendar events
                     const events = data.map(booking => {
-                        // Get home name for display
                         const homeName = getHomeName(booking.homeId);
-
-                        // Count booked rooms
                         const roomCount = booking.bookingRooms ? booking.bookingRooms.length : 0;
 
                         return {
@@ -524,7 +810,7 @@
                 },
                 error: function (xhr, status, error) {
                     console.error("Get Bookings Error:", error);
-                    showNotification("Error retrieving bookings. Check console for details.", 'error');
+                    showNotification("Error retrieving bookings. Please try again.", 'error');
                 },
                 complete: function () {
                     hideLoading();
@@ -540,7 +826,7 @@
                     return option.text;
                 }
             }
-            return `Home ${homeId}`;
+            return `Property ${homeId}`;
         }
 
         // Helper function to get color based on payment status
@@ -548,19 +834,18 @@
             switch (paymentStatus?.toLowerCase()) {
                 case 'paid':
                 case 'completed':
-                    return '#28a745'; // Green
+                    return '#27ae60'; // Green
                 case 'pending':
-                    return '#ffc107'; // Yellow
+                    return '#f39c12'; // Orange
                 case 'cancelled':
-                    return '#dc3545'; // Red
+                    return '#e74c3c'; // Red
                 default:
-                    return '#FF6B6B'; // Default pink
+                    return '#2c3e50'; // Dark blue
             }
         }
 
         // jQuery Ready Function
         $(document).ready(function () {
-           // fetchBookings()
             // Handle Home dropdown change
             $(document).on('change', '#HomeId', function () {
                 const homeId = $(this).val();
@@ -570,7 +855,7 @@
                 $('#bookingModal').modal('hide');
 
                 // Load and show the Home Drawing modal
-                showLoading();
+                showLoading('Loading room layout...');
                 $.get(`/Scheduler/GetHomeDrawing?homeId=${homeId}`)
                     .done(function (html) {
                         $('#homeDrawingContainer').html(html);
@@ -597,6 +882,7 @@
                     });
             });
 
+            // Search booking functionality
             $("#searchBookingBtn").on("click", searchBooking);
 
             // Listen for successful booking saves
@@ -611,89 +897,20 @@
             });
         });
 
-        // API Functions
-        // function bookTest() {
-        //     showLoading();
-        //     $.ajax({
-        //         url: '/Scheduler/GetBookings',
-        //         type: 'GET',
-        //         success: function (data) {
-        //             console.log("Get Bookings Success:", data);
-        //             showNotification("Bookings retrieved successfully!", 'success');
-        //             calendar.refetchEvents();
-        //         },
-        //         error: function (xhr, status, error) {
-        //             console.error("Get Bookings Error:", error);
-        //             showNotification("Error retrieving bookings. Check console for details.", 'error');
-        //         },
-        //         complete: function () {
-        //             hideLoading();
-        //         }
-        //     });
-        // }
-
-        function makeBookingTest() {
-            showLoading();
-            $.ajax({
-                url: '/Scheduler/MakeBooking',
-                type: 'POST',
-                success: function (data) {
-                    console.log("Make Booking Success:", data);
-                    showNotification(data, 'success');
-                    calendar.refetchEvents();
-                },
-                error: function (xhr, status, error) {
-                    console.error("Make Booking Error:", error);
-                    showNotification("Error making booking. Check console for details.", 'error');
-                },
-                complete: function () {
-                    hideLoading();
-                }
-            });
-        }
-       
-        function fetchBookings(fetchInfo, successCallback, failureCallback) {
-            const selectedHomeId = parseInt($("#homeSelector").val());
-
-            $.ajax({
-                url: '/Scheduler/GetBookings',
-                type: 'GET',
-                data: {
-                    startDate: fetchInfo.startStr,
-                    endDate: fetchInfo.endStr
-                },
-                success: function (data) {
-                    const filteredEvents = data.filter(b => b.homeId === selectedHomeId);
-                    const events = filteredEvents.map(booking => ({
-                        id: booking.id,
-                        title: booking.title,
-                        start: booking.start,
-                        end: booking.end,
-                        color: booking.color || '#FF6B6B',
-                        display: 'block'
-                    }));
-                   // successCallback(events);
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error fetching bookings:", error);
-                    failureCallback(error);
-                }
-            });
-        }
-
+        // Sync Airbnb function
         function syncAirbnb() {
-            showLoading();
+            showLoading('Syncing with Airbnb...');
             $.ajax({
                 url: '/Scheduler/SyncAirbnb',
                 type: 'GET',
                 dataType: 'json',
                 success: function (data) {
-                    showNotification("✅ Airbnb Sync Successful! Calendar refreshed.", 'success');
+                    showNotification("Airbnb sync completed successfully!", 'success');
                     calendar.refetchEvents();
                 },
                 error: function (xhr, status, error) {
-                    console.error("❌ Airbnb sync failed:", error);
-                    showNotification("❌ Failed to sync Airbnb. Check console for details.", 'error');
+                    console.error("Airbnb sync failed:", error);
+                    showNotification("Failed to sync with Airbnb. Please try again.", 'error');
                 },
                 complete: function () {
                     hideLoading();
@@ -701,18 +918,18 @@
             });
         }
 
+        // Search booking function
         function searchBooking() {
-            showLoading();
-
             const startDate = $("#startBookDate").val();
             const endDate = $("#endBookDate").val();
             const homeId = parseInt($("#homeSelector").val());
 
             if (!startDate || !endDate || isNaN(homeId)) {
                 showNotification("Please select all search criteria.", "error");
-                hideLoading();
                 return;
             }
+
+            showLoading('Checking availability...');
 
             $.ajax({
                 url: '/Scheduler/CheckBookings',
@@ -723,16 +940,24 @@
                     homeId: homeId
                 },
                 success: function (data) {
+                    const homeName = getHomeName(homeId);
+                    const dateRange = `${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`;
+                    
                     if (data) {
-                        showNotification("Home is booked for the searched date", "error");
-                    }
-                    else{
-                        showNotification("Home is available, You can proceed with booking", "success");
+                        showNotification(
+                            `${homeName} is already booked for ${dateRange}. Please select different dates.`, 
+                            "error"
+                        );
+                    } else {
+                        showNotification(
+                            `${homeName} is available for ${dateRange}! You can proceed with booking.`, 
+                            "success"
+                        );
                     }
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error fetching bookings:", error);
-                    showNotification("Error fetching bookings", "error");
+                    console.error("Error checking availability:", error);
+                    showNotification("Error checking availability. Please try again.", "error");
                 },
                 complete: function () {
                     hideLoading();
@@ -740,8 +965,21 @@
             });
         }
 
-
+        // Set minimum dates for date inputs
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startBookDate').setAttribute('min', today);
+        document.getElementById('endBookDate').setAttribute('min', today);
+        
+        // Update end date minimum when start date changes
+        document.getElementById('startBookDate').addEventListener('change', function() {
+            const startDate = this.value;
+            const endDateInput = document.getElementById('endBookDate');
+            endDateInput.setAttribute('min', startDate);
+            
+            // Clear end date if it's before the new start date
+            if (endDateInput.value && endDateInput.value < startDate) {
+                endDateInput.value = '';
+            }
+        });
     });
-
-    
 </script>

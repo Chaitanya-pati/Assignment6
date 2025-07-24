@@ -2,143 +2,235 @@
 
 <style>
     :root {
-        --primary-color: #667eea;
-        --success-color: #28a745;
-        --warning-color: #ffc107;
-        --light-bg: #f8f9fa;
-        --border-color: #dee2e6;
-        --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.15);
+        --primary-color: #2c3e50;
+        --secondary-color: #34495e;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --danger-color: #e74c3c;
+        --light-gray: #f8f9fa;
+        --border-color: #ddd;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --white: #ffffff;
+        --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        background: var(--white);
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .form-section {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--box-shadow);
+    }
+
+    .section-title {
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--light-gray);
+        display: flex;
+        align-items: center;
+    }
+
+    .section-title i {
+        color: var(--primary-color);
+        margin-right: 0.5rem;
     }
 
     .form-control, .form-select {
-        border-radius: 10px;
-        border: 2px solid var(--border-color);
-        transition: border-color 0.3s ease;
-        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        color: var(--text-dark);
+        background: var(--white);
+        transition: border-color 0.2s ease;
     }
 
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.1);
+        outline: none;
+        background: var(--white);
+        color: var(--text-dark);
+    }
 
     .form-label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
     }
 
-    .btn-custom {
-        border-radius: 25px;
-        padding: 12px 30px;
-        font-weight: 600;
-        transition: all 0.3s ease;
+    .form-label i {
+        color: var(--primary-color);
+        margin-right: 0.25rem;
+        width: 14px;
+    }
+
+    .btn-professional {
+        border-radius: 4px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
         border: none;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .btn-primary-custom {
-        background: linear-gradient(135deg, var(--primary-color), #764ba2);
-        color: white;
+    .btn-primary-professional {
+        background-color: var(--primary-color);
+        color: var(--white);
     }
 
-        .btn-primary-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-            color: white;
-        }
-
-    .btn-success-custom {
-        background: linear-gradient(135deg, var(--success-color), #20c997);
-        color: white;
+    .btn-primary-professional:hover {
+        background-color: var(--secondary-color);
+        color: var(--white);
     }
 
-        .btn-success-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-            color: white;
-        }
+    .btn-success-professional {
+        background-color: var(--success-color);
+        color: var(--white);
+    }
 
-    .selection-summary {
-        background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 20px;
-        border-left: 4px solid var(--primary-color);
-        box-shadow: var(--shadow);
+    .btn-success-professional:hover {
+        background-color: #229954;
+        color: var(--white);
+    }
+
+    .btn-secondary-professional {
+        background-color: var(--text-muted);
+        color: var(--white);
+    }
+
+    .btn-secondary-professional:hover {
+        background-color: #5a6268;
+        color: var(--white);
+    }
+
+    .room-selection-container {
+        background: var(--light-gray);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 1rem;
+        text-align: center;
     }
 
     .room-selection-btn {
         position: relative;
-        overflow: visible;
+        width: 100%;
     }
 
-    .room-selection-badge {
+    .room-badge {
         position: absolute;
         top: -8px;
         right: -8px;
         background: var(--warning-color);
-        color: #000;
+        color: var(--white);
         border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        font-size: 12px;
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: bold;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        border: 2px solid var(--white);
     }
 
-    .modal-body {
-        padding: 2rem;
+    .booking-summary {
+        background: #e8f5e8;
+        border: 1px solid #c3e6c3;
+        border-left: 4px solid var(--success-color);
+        border-radius: 4px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
     }
 
-    .modal-footer {
-        padding: 1.5rem 2rem;
-        border-top: 2px solid var(--border-color);
-        background: var(--light-bg);
-    }
-
-    .input-group-text {
-        background: var(--primary-color);
-        color: white;
-        border: none;
+    .booking-summary h6 {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 1rem;
     }
 
     .price-display {
-        background: linear-gradient(135deg, #d4edda, #c3e6cb);
-        border-radius: 10px;
-        padding: 15px;
-        margin-top: 15px;
-        border-left: 4px solid var(--success-color);
+        background: var(--light-gray);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 1rem;
+        margin-top: 1rem;
+        text-align: center;
     }
 
-    .validation-summary {
+    .price-display h4 {
+        color: var(--success-color);
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .invalid-feedback {
+        display: block;
         background: #f8d7da;
-        border: 1px solid #f5c6cb;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
         color: #721c24;
+        padding: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid #f5c6cb;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
     }
 
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        background: var(--light-gray);
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+    }
+
+    .date-input-wrapper {
+        position: relative;
+    }
+
+    .textarea-professional {
+        min-height: 100px;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    /* Mobile Responsiveness */
     @@media (max-width: 768px) {
         .modal-body {
             padding: 1rem;
         }
 
-        .btn-custom {
-            padding: 10px 20px;
-            font-size: 14px;
+        .form-section {
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
 
-        .room-selection-badge {
-            width: 20px;
-            height: 20px;
+        .btn-professional {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+        }
+
+        .room-badge {
+            width: 18px;
+            height: 18px;
             font-size: 10px;
         }
     }
@@ -147,116 +239,119 @@
 <div class="modal-body">
     <div id="bookingForm">
         <!-- Customer Information Section -->
-        <div class="row">
-            <div class="col-12 mb-4">
-                <h6 class="text-muted text-uppercase mb-3">
-                    <i class="fas fa-user-circle me-2"></i>Customer Information
-                </h6>
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-user"></i>Customer Information
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="CustomerName" class="form-label">
-                    <i class="fas fa-user me-1 text-primary"></i>Customer Name *
-                </label>
-                <input type="text" class="form-control" id="CustomerName" name="CustomerName"
-                       placeholder="Enter full name" value="@Model?.CustomerName" required>
-                <div class="invalid-feedback">Please enter customer name.</div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="CustomerEmail" class="form-label">
-                    <i class="fas fa-envelope me-1 text-primary"></i>Email Address *
-                </label>
-                <input type="email" class="form-control" id="CustomerEmail" name="CustomerEmail"
-                       placeholder="Enter email address" value="@Model?.CustomerEmail" required>
-                <div class="invalid-feedback">Please enter a valid email address.</div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="CustomerPhone" class="form-label">
-                    <i class="fas fa-phone me-1 text-primary"></i>Phone Number *
-                </label>
-                <input type="tel" class="form-control" id="CustomerPhone" name="CustomerPhone"
-                       placeholder="Enter phone number" value="@Model?.CustomerPhone" required>
-                <div class="invalid-feedback">Please enter phone number.</div>
-            </div>
-            <div class="row col-md-6 mb-3">
-                <label for="BookingRange" class="form-label">
-                    <i class="fas fa-calendar me-1 text-primary"></i>Booking Date Range *
-                </label>
-                <div class="col-6">
-                    <input type="datetime-local" class="form-control" id="BookingDateFrom" name="BookingDateFrom"
-                           value="" />
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="CustomerName" class="form-label">
+                        <i class="fas fa-user"></i>Customer Name *
+                    </label>
+                    <input type="text" class="form-control" id="CustomerName" name="CustomerName"
+                           placeholder="Enter full name" value="@Model?.CustomerName" required>
+                    <div class="invalid-feedback">Please enter customer name.</div>
                 </div>
-                <div class="col-6">
-                    <input type="datetime-local" class="form-control" id="BookingDateTo" name="BookingDateTo"
-                           value="" />
+                <div class="col-md-6 mb-3">
+                    <label for="CustomerEmail" class="form-label">
+                        <i class="fas fa-envelope"></i>Email Address *
+                    </label>
+                    <input type="email" class="form-control" id="CustomerEmail" name="CustomerEmail"
+                           placeholder="Enter email address" value="@Model?.CustomerEmail" required>
+                    <div class="invalid-feedback">Please enter a valid email address.</div>
                 </div>
-                <div class="invalid-feedback">Please select booking dates.</div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="CustomerPhone" class="form-label">
+                        <i class="fas fa-phone"></i>Phone Number *
+                    </label>
+                    <input type="tel" class="form-control" id="CustomerPhone" name="CustomerPhone"
+                           placeholder="Enter phone number" value="@Model?.CustomerPhone" required>
+                    <div class="invalid-feedback">Please enter phone number.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="BookingRange" class="form-label">
+                        <i class="fas fa-calendar"></i>Booking Date Range *
+                    </label>
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="datetime-local" class="form-control" id="BookingDateFrom" name="BookingDateFrom" value="" />
+                        </div>
+                        <div class="col-6">
+                            <input type="datetime-local" class="form-control" id="BookingDateTo" name="BookingDateTo" value="" />
+                        </div>
+                    </div>
+                    <div class="invalid-feedback">Please select booking dates.</div>
+                </div>
             </div>
         </div>
 
-        <!-- Property Selection Section -->
-        <div class="row">
-            <div class="col-12 mb-4 mt-4">
-                <h6 class="text-muted text-uppercase mb-3">
-                    <i class="fas fa-home me-2"></i>Property & Room Selection
-                </h6>
+        <!-- Property & Room Selection Section -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-home"></i>Property & Room Selection
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="HomeId" class="form-label">
-                    <i class="fas fa-building me-1 text-primary"></i>Select Property *
-                </label>
-                <select class="form-select" id="HomeId" name="HomeId" required>
-                    <option value="">-- Choose a Property --</option>
-                    @if (Model?.AvailableHomes != null)
-                    {
-                        foreach (var home in Model.AvailableHomes)
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label for="HomeId" class="form-label">
+                        <i class="fas fa-building"></i>Select Property *
+                    </label>
+                    <select class="form-select" id="HomeId" name="HomeId" required>
+                        <option value="">-- Choose a Property --</option>
+                        @if (Model?.AvailableHomes != null)
                         {
-                            <option value="@home.Id"
-                                    data-price="@home.PricePerDay"
-                                    data-location="@home.Location">
-                                @home.Name - @home.Location ($@home.PricePerDay/day)
-                            </option>
+                            foreach (var home in Model.AvailableHomes)
+                            {
+                                <option value="@home.Id"
+                                        data-price="@home.PricePerDay"
+                                        data-location="@home.Location">
+                                    @home.Name - @home.Location ($@home.PricePerDay/day)
+                                </option>
+                            }
                         }
-                    }
-                </select>
-                <div class="invalid-feedback">Please select a property.</div>
-            </div>
-            <div class="col-md-6 mb-3 d-flex align-items-end">
-                <button type="button" class="btn btn-primary-custom btn-custom w-100 room-selection-btn"
-                        data-bs-toggle="modal" data-bs-target="#homeDrawingModal" id="selectRoomsBtn" disabled>
-                    <i class="fas fa-map me-2"></i>Select Rooms
-                    <span id="roomSelectionBadge" class="room-selection-badge d-none">0</span>
-                </button>
+                    </select>
+                    <div class="invalid-feedback">Please select a property.</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Room Selection</label>
+                    <div class="room-selection-container">
+                        <button type="button" class="btn btn-primary-professional btn-professional room-selection-btn"
+                                data-bs-toggle="modal" data-bs-target="#homeDrawingModal" id="selectRoomsBtn" disabled>
+                            <i class="fas fa-map me-2"></i>Select Rooms
+                            <span id="roomSelectionBadge" class="room-badge d-none">0</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Special Requests Section -->
-        <div class="row">
-            <div class="col-12 mb-3">
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-comment"></i>Special Requests
+            </div>
+            
+            <div class="mb-3">
                 <label for="Message" class="form-label">
-                    <i class="fas fa-comment-dots me-1 text-primary"></i>Special Requests
+                    <i class="fas fa-sticky-note"></i>Additional Notes
                 </label>
-                <textarea class="form-control" id="Message" name="Message" rows="4"
+                <textarea class="form-control textarea-professional" id="Message" name="Message" rows="4"
                           placeholder="Any special requests, dietary requirements, or additional notes...">@Model?.Message</textarea>
-                <small class="form-text text-muted">Optional: Let us know about any special requirements</small>
+                <small class="text-muted">Optional: Let us know about any special requirements</small>
             </div>
         </div>
 
         <!-- Selected Rooms Summary -->
-        <div id="selectedRoomsSummary" class="selection-summary d-none">
-            <h6 class="mb-3">
-                <i class="fas fa-check-circle me-2 text-success"></i>Selected Rooms & Pricing
+        <div id="selectedRoomsSummary" class="booking-summary d-none">
+            <h6>
+                <i class="fas fa-check-circle me-2"></i>Booking Summary
             </h6>
             <div id="selectedRoomsDisplay"></div>
-            <div id="totalPriceDisplay" class="price-display mt-3"></div>
+            <div id="totalPriceDisplay" class="price-display"></div>
         </div>
 
         <!-- Hidden fields for form submission -->
@@ -269,10 +364,10 @@
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary btn-custom" data-bs-dismiss="modal">
+    <button type="button" class="btn btn-secondary-professional btn-professional" data-bs-dismiss="modal">
         <i class="fas fa-times me-2"></i>Cancel
     </button>
-    <button onclick="SaveBookingData()" class="btn btn-success-custom btn-custom" id="saveBookingBtn">
+    <button onclick="SaveBookingData()" class="btn btn-success-professional btn-professional" id="saveBookingBtn">
         <i class="fas fa-save me-2"></i>Save Booking
     </button>
 </div>
@@ -293,21 +388,14 @@
             splitView: true,
             showWeekNumbers: true,
             showTooltip: true
-            // onSelect: function (start, end) {
-            //     document.getElementById('BookingDateFrom').value = start.format('YYYY-MM-DD');
-            //     document.getElementById('BookingDateTo').value = end.format('YYYY-MM-DD');
-            //     updateBookingSummary();
-            // }
-
         });
 
         // Store picker reference globally for calendar integration
         window.currentDatePicker = picker;
+        
         // Initialize summary on page load
         updateBookingSummary();
     });
-    // Set initial date range if model has data
-
 
     // Update room selection badge
     function updateRoomSelectionBadge() {
@@ -368,31 +456,29 @@
             const roomNames = selectedRooms.map(room => room.label).join(', ');
 
             $('#selectedRoomsDisplay').html(`
-                                        <div class="row">
-                                            <div class="col-md-8">
-                                                <h6 class="mb-2">Rooms Selected:</h6>
-                                                <p class="mb-0">${roomNames}</p>
-                                                <small class="text-muted">${selectedRooms.length} room(s) at ${selectedHome.data('location') || 'Selected Property'}</small>
-                                            </div>
-                                            <div class="col-md-4 text-end">
-                                                <span class="badge bg-info fs-6">${pricing.dailyRate}/night</span>
-                                            </div>
-                                        </div>
-                                    `);
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="mb-2">Rooms Selected:</h6>
+                        <p class="mb-0">${roomNames}</p>
+                        <small class="text-muted">${selectedRooms.length} room(s) at ${selectedHome.data('location') || 'Selected Property'}</small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="badge bg-primary">$${pricing.dailyRate}/night</span>
+                    </div>
+                </div>
+            `);
 
             $('#totalPriceDisplay').html(`
-                                        <div class="row align-items-center">
-                                            <div class="col-md-8">
-                                                <h6 class="mb-1">
-                                                    <i class="fas fa-calculator me-2"></i>Total Booking Cost
-                                                </h6>
-                                                <p class="mb-0">${pricing.dailyRate} × ${pricing.totalDays} day(s)</p>
-                                            </div>
-                                            <div class="col-md-4 text-end">
-                                                <h4 class="mb-0 text-success">${pricing.totalPrice}</h4>
-                                            </div>
-                                        </div>
-                                    `);
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="mb-1">Total Booking Cost</h6>
+                        <p class="mb-0">$${pricing.dailyRate} × ${pricing.totalDays} day(s)</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <h4 class="mb-0">$${pricing.totalPrice}</h4>
+                    </div>
+                </div>
+            `);
 
             $('#selectedRoomsSummary').removeClass('d-none');
             $('#SelectedRoomIds').val(selectedRooms.map(room => room.id).join(','));
@@ -418,7 +504,7 @@
     });
 
     // Update pricing when dates or home change
-    $('#BookingRange, #HomeId').on('change', function () {
+    $('#BookingDateFrom, #BookingDateTo, #HomeId').on('change', function () {
         updateBookingSummary();
     });
 
@@ -449,7 +535,6 @@
 
     // Form validation
     function validateForm() {
-        debugger
         let isValid = true;
         const form = document.getElementById('bookingForm');
 
@@ -472,34 +557,29 @@
             }
         });
 
-
-
         // Validate date range
         const startDate = new Date(document.getElementById('BookingDateFrom').value);
         const endDate = new Date(document.getElementById('BookingDateTo').value);
         if (startDate >= endDate) {
-            document.getElementById('BookingRange').classList.add('is-invalid');
+            document.getElementById('BookingDateFrom').classList.add('is-invalid');
+            document.getElementById('BookingDateTo').classList.add('is-invalid');
             isValid = false;
         }
 
         return isValid;
     }
 
-
-
     // Form submission
     function SaveBookingData() {
-        debugger
         // Validate form
-        // if (!validateForm()) {
-        //     // Show validation error notification
-        //     if (window.showNotification) {
-        //         window.showNotification('Please fill in all required fields correctly.', 'error');
-        //     } else {
-        //         alert('Please fill in all required fields correctly.');
-        //     }
-        //     return;
-        // }
+        if (!validateForm()) {
+            if (window.showNotification) {
+                window.showNotification('Please fill in all required fields correctly.', 'error');
+            } else {
+                alert('Please fill in all required fields correctly.');
+            }
+            return;
+        }
 
         const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
         const pricing = calculateTotalPrice();
@@ -513,8 +593,8 @@
             BookingDateFrom: $('#BookingDateFrom').val(),
             BookingDateTo: $('#BookingDateTo').val(),
             HomeId: parseInt($('#HomeId').val()),
-            PaymentStatus : "pending",
-            CreatedAt : new Date(),
+            PaymentStatus: "pending",
+            CreatedAt: new Date(),
             Price: pricing.totalPrice,
         };
 
@@ -529,7 +609,6 @@
             Rooms: selectedRooms
         };
 
-        
         // Submit to server
         $.ajax({
             url: '/Scheduler/SaveBooking',
@@ -542,7 +621,7 @@
                     `Property: ${$('#HomeId option:selected').text()}\n` +
                     `Rooms: ${selectedRooms.length}\n` +
                     `Dates: ${bookingData.BookingDateFrom} to ${bookingData.BookingDateTo}\n` +
-                    `Total: ${bookingData.TotalPrice}`;
+                    `Total: $${bookingData.TotalPrice}`;
 
                 if (window.showNotification) {
                     window.showNotification('Booking saved successfully!', 'success');
@@ -584,7 +663,6 @@
 
     // Reset form function
     function resetForm() {
-        //$('#bookingForm')[0].reset();
         localStorage.removeItem('selectedRoomData');
         localStorage.removeItem('bookingData');
         updateBookingSummary();
@@ -595,10 +673,11 @@
         });
 
         // Reset date picker
-        picker.clearSelection();
+        if (window.currentDatePicker) {
+            window.currentDatePicker.clearSelection();
+        }
     }
 
     // Initialize home selection state
     $('#HomeId').trigger('change');
-
 </script>

@@ -3,125 +3,632 @@
 @{
     ViewData["Title"] = "Home Master";
 }
-<style> 
 
-    #layoutPreview div {
-        transition: all 0.3s ease;
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #34495e;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --danger-color: #e74c3c;
+        --info-color: #3498db;
+        --light-gray: #f8f9fa;
+        --border-color: #ddd;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --white: #ffffff;
+        --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--light-gray);
+        color: var(--text-dark);
+        line-height: 1.6;
+    }
+
+    .page-header {
+        background-color: var(--primary-color);
+        color: var(--white);
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .page-subtitle {
+        opacity: 0.9;
+        margin-top: 0.5rem;
+    }
+
+    .content-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .actions-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        background: var(--white);
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: var(--box-shadow);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-professional {
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-success-professional {
+        background-color: var(--success-color);
+        color: var(--white);
+    }
+
+    .btn-success-professional:hover {
+        background-color: #229954;
+        color: var(--white);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+    }
+
+    .btn-primary-professional {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+
+    .btn-primary-professional:hover {
+        background-color: var(--secondary-color);
+        color: var(--white);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+    }
+
+    .btn-warning-professional {
+        background-color: var(--warning-color);
+        color: var(--white);
+    }
+
+    .btn-warning-professional:hover {
+        background-color: #e67e22;
+        color: var(--white);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+    }
+
+    .btn-danger-professional {
+        background-color: var(--danger-color);
+        color: var(--white);
+    }
+
+    .btn-danger-professional:hover {
+        background-color: #c0392b;
+        color: var(--white);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .table-container {
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: var(--box-shadow);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+    }
+
+    .table-header {
+        background-color: var(--primary-color);
+        color: var(--white);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-header h5 {
+        margin: 0;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .table {
+        margin: 0;
+        background: var(--white);
+    }
+
+    .table th {
+        background-color: var(--light-gray);
+        color: var(--text-dark);
+        font-weight: 600;
+        border-bottom: 2px solid var(--border-color);
+        padding: 1rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .table td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table tbody tr:hover {
+        background-color: var(--light-gray);
+    }
+
+    .price-cell {
+        font-weight: 600;
+        color: var(--success-color);
+    }
+
+    .date-cell {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .actions-cell {
+        white-space: nowrap;
+    }
+
+    .actions-cell .btn-professional {
+        margin-right: 0.5rem;
+    }
+
+    /* Offcanvas Drawer Styles */
+    .offcanvas {
+        width: 450px !important;
+        border: none;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .offcanvas-header {
+        background-color: var(--primary-color);
+        color: var(--white);
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .offcanvas-title {
+        font-weight: 600;
+        font-size: 1.3rem;
+        margin: 0;
+    }
+
+    .offcanvas-body {
+        padding: 2rem;
+        background: var(--white);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-label i {
+        margin-right: 0.5rem;
+        color: var(--primary-color);
+        width: 16px;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        color: var(--text-dark);
+        background: var(--white);
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.1);
+        outline: none;
+        background: var(--white);
+        color: var(--text-dark);
+    }
+
+    .layout-preview {
+        background: var(--light-gray);
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .layout-preview-header {
+        background-color: var(--primary-color);
+        color: var(--white);
+        padding: 0.75rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .layout-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+        color: var(--text-muted);
+        text-align: center;
+    }
+
+    .layout-empty-state i {
+        font-size: 3rem;
+        opacity: 0.3;
+        margin-bottom: 1rem;
+    }
+
+    /* Room preview elements */
+    .room-preview {
+        position: absolute;
+        background: rgba(44, 62, 80, 0.1);
+        border: 1px solid var(--primary-color);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: var(--text-dark);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+
+    .room-preview:hover {
+        background: rgba(44, 62, 80, 0.2);
+        transform: scale(1.05);
+        z-index: 10;
+    }
+
+    /* DataTables customization */
+    .dataTables_wrapper {
+        padding: 1.5rem;
+    }
+
+    .dataTables_length select {
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--white);
+        color: var(--text-dark);
+    }
+
+    .dataTables_filter input {
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--white);
+        color: var(--text-dark);
+        margin-left: 0.5rem;
+    }
+
+    .dataTables_paginate .paginate_button {
+        padding: 0.5rem 0.75rem !important;
+        margin: 0 0.1rem !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 4px !important;
+        color: var(--text-dark) !important;
+        background: var(--white) !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover {
+        background: var(--primary-color) !important;
+        color: var(--white) !important;
+        border-color: var(--primary-color) !important;
+    }
+
+    .dataTables_paginate .paginate_button.current {
+        background: var(--primary-color) !important;
+        color: var(--white) !important;
+        border-color: var(--primary-color) !important;
+    }
+
+    /* Alert styles */
+    .alert {
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .page-title {
+            font-size: 1.8rem;
+        }
+
+        .content-wrapper {
+            padding: 0 0.5rem;
+        }
+
+        .actions-bar {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .offcanvas {
+            width: 90% !important;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            min-width: 800px;
+        }
+
+        .btn-professional {
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+
+        .actions-cell .btn-professional {
+            width: auto;
+            margin-bottom: 0.25rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .page-header {
+            padding: 1.5rem 0;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .actions-bar {
+            padding: 1rem;
+        }
+
+        .offcanvas-body {
+            padding: 1.5rem;
+        }
+
+        .layout-preview {
+            height: 200px;
+        }
+    }
 </style>
-<h2>Home Master</h2>
 
-<a id="addHomeBtn" class="btn btn-success mb-2">+ Add Home</a>
+<!-- Page Header -->
+<div class="page-header">
+    <div class="content-wrapper">
+        <h1 class="page-title">
+            <i class="fas fa-home me-3"></i>Property Management
+        </h1>
+        <p class="page-subtitle">Manage your properties and room layouts</p>
+    </div>
+</div>
 
-<div class="card">
-    <div class="card-body">
-        <table id="homeTable" class="table table-bordered table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Location</th>
-                    <th>Description</th>
-                    <th>Price Per Day</th>
-                    <th>Created At</th>
-                    <th>Submitted User</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var home in Model)
-                {
+<div class="content-wrapper">
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <div>
+            <h5 class="mb-0 text-muted">
+                <i class="fas fa-list me-2"></i>Properties Overview
+            </h5>
+        </div>
+        <div>
+            <button id="addHomeBtn" class="btn btn-success-professional btn-professional">
+                <i class="fas fa-plus me-2"></i>Add New Property
+            </button>
+        </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-container">
+        <div class="table-header">
+            <h5>
+                <i class="fas fa-table me-2"></i>Properties List
+            </h5>
+        </div>
+        <div class="table-responsive">
+            <table id="homeTable" class="table table-hover">
+                <thead>
                     <tr>
-                        <td>@home.Name</td>
-                        <td>@home.Location</td>
-                        <td>@home.Description</td>
-                        <td>@home.PricePerDay?.ToString("C")</td>
-                        <td>@home.CreatedAt?.ToString("dd-MM-yyyy")</td>
-                        <td>@home.SUser</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary edit-home-btn"
-                                    data-home='@Html.Raw(Json.Serialize(home))' data-id="@home.Id">
-                                Edit
-                            </button>
-                            <a href="/YourController/DeleteHome/@home.Id"
-                               class="btn btn-sm btn-danger"
-                               onclick="return confirm('Are you sure?');">
-                                Delete
-                            </a>
-                            
-                        </td>
+                        <th><i class="fas fa-home me-1"></i>Name</th>
+                        <th><i class="fas fa-map-marker-alt me-1"></i>Location</th>
+                        <th><i class="fas fa-align-left me-1"></i>Description</th>
+                        <th><i class="fas fa-dollar-sign me-1"></i>Price Per Day</th>
+                        <th><i class="fas fa-calendar me-1"></i>Created At</th>
+                        <th><i class="fas fa-user me-1"></i>Submitted User</th>
+                        <th><i class="fas fa-cogs me-1"></i>Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var home in Model)
+                    {
+                        <tr>
+                            <td class="fw-medium">@home.Name</td>
+                            <td>@home.Location</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(home.Description))
+                                {
+                                    @(home.Description.Length > 50 ? home.Description.Substring(0, 50) + "..." : home.Description)
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No description</span>
+                                }
+                            </td>
+                            <td class="price-cell">@home.PricePerDay?.ToString("C")</td>
+                            <td class="date-cell">@home.CreatedAt?.ToString("dd-MM-yyyy")</td>
+                            <td>
+                                <span class="badge bg-secondary">@home.SUser</span>
+                            </td>
+                            <td class="actions-cell">
+                                <button class="btn btn-primary-professional btn-professional btn-sm edit-home-btn"
+                                        data-home='@Html.Raw(Json.Serialize(home))' data-id="@home.Id">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </button>
+                                <a href="/Configuration/DeleteHome/@home.Id"
+                                   class="btn btn-danger-professional btn-professional btn-sm"
+                                   onclick="return confirm('Are you sure you want to delete this property?');">
+                                    <i class="fas fa-trash me-1"></i>Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <!-- Offcanvas Drawer for Add/Edit Home -->
-<div id="homeDrawer" class="offcanvas offcanvas-end text-bg-light shadow-lg border-end rounded-end" tabindex="-1" aria-labelledby="homeDrawerLabel" style="width: 420px;">
-    <div class="offcanvas-header bg-primary text-white">
-        <h5 class="offcanvas-title" id="homeDrawerLabel">🏠 Home Details</h5>
+<div id="homeDrawer" class="offcanvas offcanvas-end" tabindex="-1" aria-labelledby="homeDrawerLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="homeDrawerLabel">
+            <i class="fas fa-home me-2"></i>Property Details
+        </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-        <input type="hidden" id="homeId" />
-        <div class="mb-3">
-            <label class="form-label fw-bold">Name</label>
-            <input type="text" id="homeName" class="form-control shadow-sm" placeholder="Enter home name" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label fw-bold">Location</label>
-            <input type="text" id="homeLocation" class="form-control shadow-sm" placeholder="City / Area" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label fw-bold">Description</label>
-            <textarea id="homeDescription" class="form-control shadow-sm" rows="3" placeholder="Describe the home"></textarea>
-        </div>
-        <div class="mb-3">
-            <label class="form-label fw-bold">Price Per Day</label>
-            <input type="number" id="homePrice" class="form-control shadow-sm" placeholder="₹ per day" />
-        </div>
+        <form id="homeForm">
+            <input type="hidden" id="homeId" />
+            
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fas fa-home"></i>Property Name *
+                </label>
+                <input type="text" id="homeName" class="form-control" 
+                       placeholder="Enter property name" required />
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fas fa-map-marker-alt"></i>Location *
+                </label>
+                <input type="text" id="homeLocation" class="form-control" 
+                       placeholder="City, Area or Address" required />
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fas fa-align-left"></i>Description
+                </label>
+                <textarea id="homeDescription" class="form-control" rows="3" 
+                          placeholder="Describe the property features and amenities"></textarea>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">
+                    <i class="fas fa-dollar-sign"></i>Price Per Day *
+                </label>
+                <input type="number" id="homePrice" class="form-control" 
+                       placeholder="Enter daily rate" min="0" step="0.01" required />
+            </div>
 
-        <div class="d-grid gap-2">
-            <button id="saveHomeBtn" class="btn btn-success shadow-sm">💾 Save </button>
-            <a id="addLayout" class="btn btn-warning shadow-sm" href="/Configuration/Configuration" target="_blank"> + Add Layout </a>
-            <a id="viewLayoutBtn" class="btn btn-danger" onclick="checkForLayoutUpdate('')">📐 View Layout</a>
+            <div class="d-grid gap-2 mb-4">
+                <button type="button" id="saveHomeBtn" class="btn btn-success-professional btn-professional">
+                    <i class="fas fa-save me-2"></i>Save Property
+                </button>
+                <a id="addLayout" class="btn btn-warning-professional btn-professional" 
+                   href="/Configuration/Configuration" target="_blank">
+                    <i class="fas fa-plus me-2"></i>Create Room Layout
+                </a>
+                <button type="button" id="viewLayoutBtn" class="btn btn-primary-professional btn-professional" 
+                        onclick="checkForLayoutUpdate('')">
+                    <i class="fas fa-eye me-2"></i>View Layout
+                </button>
+            </div>
 
-            <div id="layoutPreview" class="mt-3 border p-2 rounded shadow-sm bg-light"
-                 style="width: 100%; height: 300px; overflow: hidden; position: relative;"></div>
-
-
-        </div>
+            <!-- Layout Preview -->
+            <div class="layout-preview" id="layoutPreview" style="width: 100%; height: 300px;">
+                <div class="layout-preview-header">
+                    <i class="fas fa-map me-2"></i>Room Layout Preview
+                </div>
+                <div class="layout-empty-state">
+                    <i class="fas fa-home"></i>
+                    <p class="mb-0">No layout created yet</p>
+                    <small class="text-muted">Create a layout to see preview here</small>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
-
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script>
         $(document).ready(function () {
             const homeDrawer = new bootstrap.Offcanvas('#homeDrawer');
 
+            // Initialize DataTable
             $('#homeTable').DataTable({
                 responsive: true,
                 autoWidth: false,
                 ordering: true,
-                pageLength: 5,
+                pageLength: 10,
                 lengthMenu: [5, 10, 20, 50],
                 columnDefs: [
-                    { orderable: false, targets: -1 } // Disable ordering on "Actions" column
-                ]
+                    { orderable: false, targets: -1 }
+                ],
+                language: {
+                    search: "Search properties:",
+                    lengthMenu: "Show _MENU_ properties per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ properties",
+                    emptyTable: "No properties found"
+                }
             });
-
 
             // Open drawer on Add Home
             $('#addHomeBtn').on('click', function () {
                 resetHomeModal();
-                $('#homeDrawerLabel').text('🏠 Add New Home');
-               
-                //$('#viewLayoutBtn').addClass('d-none');
-                homeDrawer.show();
+                $('#homeDrawerLabel').html('<i class="fas fa-plus me-2"></i>Add New Property');
                 $('#addLayout').show();
                 $('#viewLayoutBtn').show();
+                homeDrawer.show();
             });
 
             // Edit Home Button Click
@@ -134,38 +641,42 @@
                 $('#homeLocation').val(home.location);
                 $('#homeDescription').val(home.description);
                 $('#homePrice').val(home.pricePerDay);
-                $('#homeSUser').val(home.sUser);
 
-                $('#homeDrawerLabel').text('✏️ Edit Home');
+                $('#homeDrawerLabel').html('<i class="fas fa-edit me-2"></i>Edit Property');
                 $('#addLayout').hide();
                 $('#viewLayoutBtn').hide();
-                // 🔧 Bind click to View Layout button for on-demand check
-                // $('#viewLayoutBtn').off('click').on('click', function () {
-                //     checkForLayoutUpdate(home.id);
-                // });
 
-                // 🔧 Bind layout preview immediately with current layout
+                // Load existing layout
                 checkForLayoutUpdate(home.id);
 
                 homeDrawer.show();
             });
 
-
+            // Save Home Button Click
             $('#saveHomeBtn').on('click', function () {
+                if (!validateForm()) {
+                    return;
+                }
+
                 const homeData = {
                     Id: parseInt($('#homeId').val()) || 0,
-                    Name: $('#homeName').val(),
-                    Location: $('#homeLocation').val(),
-                    Description: $('#homeDescription').val(),
+                    Name: $('#homeName').val().trim(),
+                    Location: $('#homeLocation').val().trim(),
+                    Description: $('#homeDescription').val().trim(),
                     PricePerDay: parseFloat($('#homePrice').val()) || 0,
                     SUser: "admin"
                 };
 
                 const layoutData = localStorage.getItem('homestayLayout');
                 if (!layoutData) {
-                    alert("⚠️ No layout found in localStorage.");
+                    showAlert("Please create a room layout first.", "warning");
                     return;
                 }
+
+                // Show loading state
+                const btn = $('#saveHomeBtn');
+                const originalText = btn.html();
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
 
                 const layoutObj = JSON.parse(layoutData);
 
@@ -182,13 +693,13 @@
 
                             return {
                                 HomeId: savedHomeId,
-                                Id: 0, // or roomId if editing
+                                Id: 0,
                                 Name: element.label,
                                 Width: element.width,
                                 Height: element.height,
                                 PositionX: element.x,
                                 PositionY: element.y,
-                                Type: element.label, // or get from somewhere else
+                                Type: element.label,
                                 PricePerDay: 0,
                                 AllowIndividualBooking: true,
                                 CreatedAt: new Date().toISOString(),
@@ -202,7 +713,6 @@
                             type: 'POST',
                             data: { roomSaveRequests: roomSaveRequests },
                             success: function (savedRooms) {
-                                debugger
                                 const layoutElements = layoutObj.elements.map(el => {
                                     const matchedRoom = savedRooms.find(r => r.id === el.roomId);
                                     return {
@@ -222,30 +732,63 @@
                                     type: 'POST',
                                     data: { layoutElements: layoutElements },
                                     success: function (response) {
-                                        debugger
                                         if (response == true) {
-                                            // alert("Home added!!!");
+                                            showAlert("Property saved successfully!", "success");
                                             localStorage.removeItem('homestayLayout');
-                                            window.location.href = `/Configuration/GetMaster`;
+                                            
+                                            setTimeout(() => {
+                                                window.location.href = `/Configuration/GetMaster`;
+                                            }, 1500);
                                         }
                                     },
                                     error: function () {
-                                        alert('❌ Error saving layout elements.');
+                                        showAlert('Error saving layout elements.', 'danger');
                                     }
                                 });
                             },
                             error: function () {
-                                alert('❌ Error saving rooms.');
+                                showAlert('Error saving rooms.', 'danger');
                             }
                         });
                     },
                     error: function () {
-                        alert('❌ Error saving home.');
+                        showAlert('Error saving property.', 'danger');
+                    },
+                    complete: function () {
+                        // Restore button state
+                        btn.prop('disabled', false).html(originalText);
                     }
                 });
             });
 
+            // Form validation
+            function validateForm() {
+                let isValid = true;
+                const requiredFields = ['homeName', 'homeLocation', 'homePrice'];
+                
+                requiredFields.forEach(fieldId => {
+                    const field = $('#' + fieldId);
+                    const value = field.val().trim();
+                    
+                    if (!value) {
+                        field.addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        field.removeClass('is-invalid');
+                    }
+                });
 
+                if (!isValid) {
+                    showAlert('Please fill in all required fields.', 'warning');
+                }
+
+                return isValid;
+            }
+
+            // Clear validation on input
+            $('input, textarea').on('input', function() {
+                $(this).removeClass('is-invalid');
+            });
 
             function resetHomeModal() {
                 $('#homeId').val('');
@@ -253,9 +796,24 @@
                 $('#homeLocation').val('');
                 $('#homeDescription').val('');
                 $('#homePrice').val('');
-                $('#homeSUser').val('');
-                $('#layoutPreview').html('');
+                resetLayoutPreview();
                 localStorage.removeItem('homestayLayout');
+                
+                // Clear validation
+                $('input, textarea').removeClass('is-invalid');
+            }
+
+            function resetLayoutPreview() {
+                $('#layoutPreview').html(`
+                    <div class="layout-preview-header">
+                        <i class="fas fa-map me-2"></i>Room Layout Preview
+                    </div>
+                    <div class="layout-empty-state">
+                        <i class="fas fa-home"></i>
+                        <p class="mb-0">No layout created yet</p>
+                        <small class="text-muted">Create a layout to see preview here</small>
+                    </div>
+                `);
             }
 
             // Cache max room/home IDs
@@ -265,90 +823,6 @@
             const maxRoomId = allRooms.length > 0 ? Math.max(...allRooms.map(r => r.id)) : 0;
             localStorage.setItem('maxRoomId', maxRoomId);
         });
-
-        // let lastLayoutTimestamp = null;
-
-        // function checkForLayoutUpdate(homeId) {
-        //     debugger
-        //     var layoutData = localStorage.getItem('homestayLayout');
-        //     var newLayout = {};
-        //     if (!layoutData) {
-        //         $.ajax({
-        //             url: '/Configuration/GetLayoutByhomeId',
-        //             type: 'GET',
-        //             data: { homeId: homeId },
-        //             success: function (response) {
-        //                 debugger
-        //                 if (response) {
-        //                      newLayout = {
-        //                         timestamp: new Date().toISOString(),
-        //                         designWidth: 800,
-        //                         designHeight: 600,
-        //                         elements: response
-        //                     };
-        //                     localStorage.setItem('homestayLayout', JSON.stringify(newLayout));
-        //                     layoutData = newLayout;
-        //                 }
-        //             },
-        //             error: function () {
-        //                 //alert('❌ Error saving layout elements.');
-        //             }
-        //         });
-        //         alert("please create layout first");
-        //     }
-
-        //     const parsed = JSON.parse(layoutData);
-
-        //     if (parsed.timestamp !== lastLayoutTimestamp) {
-        //         lastLayoutTimestamp = parsed.timestamp;
-        //         renderLayoutPreview(parsed);
-        //     }
-        // }
-
-        function renderLayoutPreview(layout) {
-            debugger
-            const container = document.getElementById('layoutPreview');
-            container.innerHTML = '';
-
-            // Get container dimensions
-            const containerWidth = container.clientWidth;
-            const containerHeight = container.clientHeight;
-
-            // Calculate scale factor
-            const scaleX = containerWidth / layout.designWidth;
-            const scaleY = containerHeight / layout.designHeight;
-            const scale = Math.min(scaleX, scaleY); // Keep aspect ratio
-
-            // Optional: Center the layout inside the preview
-            const offsetX = (containerWidth - layout.designWidth * scale) / 2;
-            const offsetY = (containerHeight - layout.designWidth * scale) / 2;
-
-            layout.elements.forEach(el => {
-                const box = document.createElement('div');
-                box.textContent = el.label;
-
-                // Position & size with scaling
-                box.style.position = 'absolute';
-                box.style.left = (el.x * scale + offsetX) + 'px';
-                box.style.top = (el.y * scale + offsetY) + 'px';
-                box.style.width = (el.width * scale) + 'px';
-                box.style.height = (el.height * scale) + 'px';
-
-                // Styles
-                box.style.backgroundColor = '#e6f2ff';
-                box.style.border = '1px solid #007bff';
-                box.style.borderRadius = '6px';
-                box.style.textAlign = 'center';
-                box.style.lineHeight = (el.height * scale) + 'px';
-                box.style.fontSize = Math.max(10, 12 * scale) + 'px';
-                box.style.boxShadow = '2px 2px 5px rgba(0,0,0,0.1)';
-                box.style.overflow = 'hidden';
-                box.style.whiteSpace = 'nowrap';
-                box.style.textOverflow = 'ellipsis';
-
-                container.appendChild(box);
-            });
-        }
 
         let lastLayoutTimestamp = null;
 
@@ -369,14 +843,14 @@
                     type: 'GET',
                     data: { homeId: homeId },
                     success: function (response) {
-                        if (response && Array.isArray(response)) {
+                        if (response && Array.isArray(response) && response.length > 0) {
                             // Construct layout object with fallback defaults
                             const newLayout = {
                                 timestamp: new Date().toISOString(),
                                 designWidth: 800,
                                 designHeight: 600,
                                 elements: response,
-                                roomsData: response.map(e => e.roomId).filter((v, i, a) => v != null && a.indexOf(v) === i) // unique valid roomIds
+                                roomsData: response.map(e => e.roomId).filter((v, i, a) => v != null && a.indexOf(v) === i)
                             };
 
                             // Save to localStorage
@@ -388,18 +862,113 @@
                                 renderLayoutPreview(newLayout);
                             }
                         } else {
-                            alert("⚠️ No layout data found for this home.");
+                            resetLayoutPreview();
+                            showAlert("No layout found for this property.", "info");
                         }
                     },
                     error: function () {
-                        alert('❌ Error fetching layout from server.');
+                        resetLayoutPreview();
+                        showAlert('Error fetching layout from server.', 'danger');
                     }
                 });
             } else if (!layoutData) {
-                alert("⚠️ Please create layout first.");
+                resetLayoutPreview();
+                showAlert("Please create layout first.", "warning");
             }
         }
 
+        function renderLayoutPreview(layout) {
+            const container = document.getElementById('layoutPreview');
+            
+            // Clear and add header
+            container.innerHTML = `
+                <div class="layout-preview-header">
+                    <i class="fas fa-map me-2"></i>Room Layout Preview (${layout.elements.length} rooms)
+                </div>
+            `;
+
+            // Get container dimensions (excluding header)
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight - 50; // Account for header
+
+            // Calculate scale factor
+            const scaleX = containerWidth / layout.designWidth;
+            const scaleY = containerHeight / layout.designHeight;
+            const scale = Math.min(scaleX, scaleY, 0.8); // Max scale of 0.8 for better visibility
+
+            // Center the layout inside the preview
+            const offsetX = (containerWidth - layout.designWidth * scale) / 2;
+            const offsetY = ((containerHeight - layout.designHeight * scale) / 2) + 50; // Account for header
+
+            layout.elements.forEach(el => {
+                const roomDiv = document.createElement('div');
+                roomDiv.className = 'room-preview';
+                roomDiv.textContent = el.label;
+
+                // Position & size with scaling
+                roomDiv.style.left = (el.x * scale + offsetX) + 'px';
+                roomDiv.style.top = (el.y * scale + offsetY) + 'px';
+                roomDiv.style.width = (el.width * scale) + 'px';
+                roomDiv.style.height = (el.height * scale) + 'px';
+
+                // Add tooltip
+                roomDiv.title = `${el.label} (${el.width}x${el.height})`;
+
+                container.appendChild(roomDiv);
+            });
+        }
+
+        // Alert system
+        function showAlert(message, type = 'info', duration = 5000) {
+            // Remove existing alerts
+            $('.alert').remove();
+
+            const alertClass = `alert-${type}`;
+            const iconClass = type === 'success' ? 'fa-check-circle' :
+                            type === 'danger' ? 'fa-exclamation-circle' :
+                            type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+
+            const alert = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" 
+                     role="alert">
+                    <i class="fas ${iconClass} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `);
+
+            $('body').append(alert);
+
+            if (duration > 0) {
+                setTimeout(() => {
+                    alert.alert('close');
+                }, duration);
+            }
+        }
+
+        // Add custom styles for form validation
+        const validationStyles = `
+            <style>
+                .form-control.is-invalid, .form-select.is-invalid {
+                    border-color: #e74c3c;
+                    box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.1);
+                }
+                
+                .form-control.is-invalid:focus, .form-select.is-invalid:focus {
+                    border-color: #e74c3c;
+                    box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+                }
+                
+                .is-invalid + .invalid-feedback {
+                    display: block;
+                    width: 100%;
+                    margin-top: 0.25rem;
+                    font-size: 0.875em;
+                    color: #e74c3c;
+                }
+            </style>
+        `;
+        $('head').append(validationStyles);
     </script>
 }
-
