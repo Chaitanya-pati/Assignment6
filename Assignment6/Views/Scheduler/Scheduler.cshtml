@@ -847,6 +847,7 @@
         // jQuery Ready Function
         $(document).ready(function () {
             // Handle Home dropdown change
+            fetchAndDisplayBookings();
             $(document).on('change', '#HomeId', function () {
                 const homeId = $(this).val();
                 if (!homeId) return;

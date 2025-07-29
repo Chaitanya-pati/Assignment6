@@ -796,8 +796,8 @@
                 $('#homeLocation').val('');
                 $('#homeDescription').val('');
                 $('#homePrice').val('');
-                resetLayoutPreview();
-                localStorage.removeItem('homestayLayout');
+               // resetLayoutPreview();
+               // localStorage.removeItem('homestayLayout');
                 
                 // Clear validation
                 $('input, textarea').removeClass('is-invalid');
@@ -867,12 +867,12 @@
                         }
                     },
                     error: function () {
-                        resetLayoutPreview();
+                       resetLayoutPreview();
                         showAlert('Error fetching layout from server.', 'danger');
                     }
                 });
             } else if (!layoutData) {
-                resetLayoutPreview();
+               // resetLayoutPreview();
                 showAlert("Please create layout first.", "warning");
             }
         }
