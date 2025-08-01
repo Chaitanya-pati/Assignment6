@@ -42,10 +42,10 @@
         align-items: center;
     }
 
-    .section-title i {
-        color: var(--primary-color);
-        margin-right: 0.5rem;
-    }
+        .section-title i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
 
     .form-control, .form-select {
         border: 1px solid var(--border-color);
@@ -57,13 +57,13 @@
         transition: border-color 0.2s ease;
     }
 
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.1);
-        outline: none;
-        background: var(--white);
-        color: var(--text-dark);
-    }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.1);
+            outline: none;
+            background: var(--white);
+            color: var(--text-dark);
+        }
 
     .form-label {
         font-weight: 500;
@@ -72,11 +72,11 @@
         font-size: 0.9rem;
     }
 
-    .form-label i {
-        color: var(--primary-color);
-        margin-right: 0.25rem;
-        width: 14px;
-    }
+        .form-label i {
+            color: var(--primary-color);
+            margin-right: 0.25rem;
+            width: 14px;
+        }
 
     .btn-professional {
         border-radius: 4px;
@@ -97,30 +97,30 @@
         color: var(--white);
     }
 
-    .btn-primary-professional:hover {
-        background-color: var(--secondary-color);
-        color: var(--white);
-    }
+        .btn-primary-professional:hover {
+            background-color: var(--secondary-color);
+            color: var(--white);
+        }
 
     .btn-success-professional {
         background-color: var(--success-color);
         color: var(--white);
     }
 
-    .btn-success-professional:hover {
-        background-color: #229954;
-        color: var(--white);
-    }
+        .btn-success-professional:hover {
+            background-color: #229954;
+            color: var(--white);
+        }
 
     .btn-secondary-professional {
         background-color: var(--text-muted);
         color: var(--white);
     }
 
-    .btn-secondary-professional:hover {
-        background-color: #5a6268;
-        color: var(--white);
-    }
+        .btn-secondary-professional:hover {
+            background-color: #5a6268;
+            color: var(--white);
+        }
 
     .room-selection-container {
         background: var(--light-gray);
@@ -161,11 +161,11 @@
         margin-top: 1.5rem;
     }
 
-    .booking-summary h6 {
-        color: var(--text-dark);
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
+        .booking-summary h6 {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
 
     .price-display {
         background: var(--light-gray);
@@ -176,11 +176,11 @@
         text-align: center;
     }
 
-    .price-display h4 {
-        color: var(--success-color);
-        font-weight: 700;
-        margin: 0;
-    }
+        .price-display h4 {
+            color: var(--success-color);
+            font-weight: 700;
+            margin: 0;
+        }
 
     .invalid-feedback {
         display: block;
@@ -243,7 +243,7 @@
             <div class="section-title">
                 <i class="fas fa-user"></i>Customer Information
             </div>
-            
+
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="CustomerName" class="form-label">
@@ -251,7 +251,6 @@
                     </label>
                     <input type="text" class="form-control" id="CustomerName" name="CustomerName"
                            placeholder="Enter full name" value="@Model?.CustomerName" required>
-                    <div class="invalid-feedback">Please enter customer name.</div>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="CustomerEmail" class="form-label">
@@ -259,7 +258,6 @@
                     </label>
                     <input type="email" class="form-control" id="CustomerEmail" name="CustomerEmail"
                            placeholder="Enter email address" value="@Model?.CustomerEmail" required>
-                    <div class="invalid-feedback">Please enter a valid email address.</div>
                 </div>
             </div>
 
@@ -270,7 +268,20 @@
                     </label>
                     <input type="tel" class="form-control" id="CustomerPhone" name="CustomerPhone"
                            placeholder="Enter phone number" value="@Model?.CustomerPhone" required>
-                    <div class="invalid-feedback">Please enter phone number.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="GuestNumbers" class="form-label">
+                        <i class="fas fa-users"></i>Number of Guests *
+                    </label>
+                    <input type="number" class="form-control" id="GuestNumbers" name="GuestNumbers"
+                           placeholder="Enter number of guests" value="@Model?.GuestNumbers" min="1" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="Document" class="form-label">
+                        <i class="fas fa-file-upload"></i>Upload Document/ID
+                    </label>
+                    <input type="file" class="form-control" id="Document" name="Document"
+                           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="BookingRange" class="form-label">
@@ -278,13 +289,12 @@
                     </label>
                     <div class="row">
                         <div class="col-6">
-                            <input type="datetime-local" class="form-control" id="BookingDateFrom" name="BookingDateFrom" value="" />
+                            <input type="date" class="form-control" id="BookingDateFrom" name="BookingDateFrom" value="" />
                         </div>
                         <div class="col-6">
-                            <input type="datetime-local" class="form-control" id="BookingDateTo" name="BookingDateTo" value="" />
+                            <input type="date" class="form-control" id="BookingDateTo" name="BookingDateTo" value="" />
                         </div>
                     </div>
-                    <div class="invalid-feedback">Please select booking dates.</div>
                 </div>
             </div>
         </div>
@@ -314,7 +324,6 @@
                             }
                         }
                     </select>
-                    <div class="invalid-feedback">Please select a property.</div>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Room Selection</label>
@@ -334,14 +343,13 @@
             <div class="section-title">
                 <i class="fas fa-comment"></i>Special Requests
             </div>
-            
+
             <div class="mb-3">
                 <label for="Message" class="form-label">
                     <i class="fas fa-sticky-note"></i>Additional Notes
                 </label>
                 <textarea class="form-control textarea-professional" id="Message" name="Message" rows="4"
-                          placeholder="Any special requests, dietary requirements, or additional notes...">@Model?.Message</textarea>
-                <small class="text-muted">Optional: Let us know about any special requirements</small>
+                          placeholder="Description">@Model?.Message</textarea>
             </div>
         </div>
 
@@ -364,13 +372,16 @@
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary-professional btn-professional" data-bs-dismiss="modal">
-        <i class="fas fa-times me-2"></i>Cancel
-    </button>
-    <button onclick="SaveBookingData()" class="btn btn-success-professional btn-professional" id="saveBookingBtn">
-        <i class="fas fa-save me-2"></i>Save Booking
-    </button>
+    <div class="row">
+        <button type="button" class="btn btn-secondary-professional btn-professional col" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button onclick="SaveBookingData()" class="btn btn-success-professional btn-professional col" id="saveBookingBtn">
+            <i class="fas fa-save me-2"></i>Save Booking
+        </button>
+    </div>
 </div>
+
 
 <!-- Include Litepicker for date selection -->
 <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/bundle.js"></script>
@@ -392,7 +403,7 @@
 
         // Store picker reference globally for calendar integration
         window.currentDatePicker = picker;
-        
+
         // Initialize summary on page load
         updateBookingSummary();
     });
@@ -454,31 +465,30 @@
 
         if (selectedRooms.length > 0) {
             const roomNames = selectedRooms.map(room => room.label).join(', ');
-
             $('#selectedRoomsDisplay').html(`
-                <div class="row">
-                    <div class="col-md-8">
-                        <h6 class="mb-2">Rooms Selected:</h6>
-                        <p class="mb-0">${roomNames}</p>
-                        <small class="text-muted">${selectedRooms.length} room(s) at ${selectedHome.data('location') || 'Selected Property'}</small>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="mb-2">Rooms Selected:</h6>
+                            <p class="mb-0">${roomNames}</p>
+                            <small class="text-muted">${selectedRooms.length} room(s) at ${selectedHome.data('location') || 'Selected Property'}</small>
+                            <br><small class="text-muted">Guests: ${$('#GuestNumbers').val() || '1'} person(s)</small>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge bg-primary">$${pricing.dailyRate}/night</span>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <span class="badge bg-primary">$${pricing.dailyRate}/night</span>
-                    </div>
-                </div>
-            `);
-
+                `);
             $('#totalPriceDisplay').html(`
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h6 class="mb-1">Total Booking Cost</h6>
-                        <p class="mb-0">$${pricing.dailyRate} × ${pricing.totalDays} day(s)</p>
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="mb-1">Total Booking Cost</h6>
+                            <p class="mb-0">$${pricing.dailyRate} × ${pricing.totalDays} day(s)</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <h4 class="mb-0">$${pricing.totalPrice}</h4>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <h4 class="mb-0">$${pricing.totalPrice}</h4>
-                    </div>
-                </div>
-            `);
+                `);
 
             $('#selectedRoomsSummary').removeClass('d-none');
             $('#SelectedRoomIds').val(selectedRooms.map(room => room.id).join(','));
@@ -545,7 +555,7 @@
 
         // Validate required fields
         const requiredFields = [
-            'CustomerName', 'CustomerEmail', 'CustomerPhone',
+            'CustomerName', 'CustomerEmail', 'CustomerPhone', 'GuestNumbers',
             'BookingDateFrom', 'BookingDateTo', 'HomeId'
         ];
 
@@ -596,6 +606,8 @@
             PaymentStatus: "pending",
             CreatedAt: new Date(),
             Price: pricing.totalPrice,
+            GuestNumbers: parseInt($('#GuestNumbers').val()),
+            Document: $('#Document')[0].files[0] ? $('#Document')[0].files[0].name : null
         };
 
         // Disable submit button to prevent double submission
@@ -631,7 +643,7 @@
 
                 // Close modal
                 $('#bookingModal').modal('hide');
-
+                fetchAndDisplayBookings();
                 // Clear form and selections
                 resetForm();
 

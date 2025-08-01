@@ -20,5 +20,11 @@ namespace DbService.Interface
         public List<Booking> GetBookingsBetween(DateTime startDate, DateTime endDate, int? homeId = null);
 
         public List<Booking> GetAllBookings(DateTime? startDate = null, DateTime? endDate = null, int? homeId = null);
+
+        bool UpdatePaymentStatus(int bookingId, string paymentStatus);
+        Booking GetBookingById(int bookingId);
+
+        bool DeleteBooking(int bookingId);
+        bool CompleteBookingWithInvoice(int bookingId);
     }
 }

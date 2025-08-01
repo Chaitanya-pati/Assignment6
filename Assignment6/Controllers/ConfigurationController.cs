@@ -39,7 +39,13 @@ namespace Assignment6.Controllers
         {
             var savedRooms =  _configurationService.SaveRooms(roomSaveRequests);
             return savedRooms;
-        }
+        } 
+        
+        //public List<Room> UpdateHome(List<Room> roomSaveRequests)
+        //{
+        //    var savedRooms =  _configurationService.UpdateHome(roomSaveRequests);
+        //    return savedRooms;
+        //}
 
         
         public bool SaveLayoutElements(List<LayoutElement> layoutElements)

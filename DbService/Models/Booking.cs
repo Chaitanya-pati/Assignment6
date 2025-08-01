@@ -29,6 +29,10 @@ public partial class Booking
 
     public long Price { get; set; }
 
+    public long GuestNumbers { get; set; }
+
+    public string Document { get; set; }
+
     public virtual ICollection<BookingRoom> BookingRooms { get; set; } = new List<BookingRoom>();
 
     public virtual Home Home { get; set; }
