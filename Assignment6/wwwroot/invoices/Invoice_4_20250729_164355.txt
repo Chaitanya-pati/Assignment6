@@ -1,0 +1,24 @@
+
+            INVOICE
+            ========================================
+            Invoice Date: 2025-07-29
+            Booking ID: 4
+            
+            Customer Details:
+            Name: kartik
+            Email: kkk@gmail.com
+            Phone: 9380628625
+            
+            Booking Details:
+            Check-in: 2025-07-23
+            Check-out: 2025-07-23
+            Property: agp farmhouse
+            
+            Payment Details:
+            Amount: $12000
+            Status: PAID
+            Payment Date: 2025-07-29 16:43
+            
+            Thank you for your business!
+            ========================================
+        

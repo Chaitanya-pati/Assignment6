@@ -1,0 +1,24 @@
+
+            INVOICE
+            ========================================
+            Invoice Date: 2025-07-29
+            Booking ID: 1
+            
+            Customer Details:
+            Name: anirdudh
+            Email: sax
+            Phone: 874804040423
+            
+            Booking Details:
+            Check-in: 2025-07-19
+            Check-out: 2025-07-23
+            Property: home3
+            
+            Payment Details:
+            Amount: $12000
+            Status: PAID
+            Payment Date: 2025-07-29 16:42
+            
+            Thank you for your business!
+            ========================================
+        
