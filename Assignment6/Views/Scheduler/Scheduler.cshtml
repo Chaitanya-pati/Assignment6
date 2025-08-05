@@ -189,13 +189,14 @@
         margin: 0;
     }
 
-    /* Calendar Customization */
+    /* Enhanced Calendar Styling - ONLY THESE CALENDAR STYLES ARE UPDATED */
     .fc-header-toolbar {
         margin-bottom: 1.5rem !important;
         padding: 1rem !important;
-        background: var(--light-gray) !important;
+        background: var(--white) !important;
         border: 1px solid var(--border-color) !important;
-        border-radius: 4px !important;
+        border-radius: 8px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
     }
 
     .fc-toolbar-title {
@@ -206,11 +207,13 @@
 
     .fc-button-primary {
         background: var(--primary-color) !important;
-        border-color: var(--primary-color) !important;
-        border-radius: 4px !important;
+        border: 1px solid var(--primary-color) !important;
+        border-radius: 6px !important;
         padding: 0.5rem 1rem !important;
         font-weight: 500 !important;
         color: var(--white) !important;
+        font-size: 0.875rem !important;
+        transition: all 0.2s ease !important;
     }
 
         .fc-button-primary:hover {
@@ -224,26 +227,113 @@
             border-color: var(--text-muted) !important;
         }
 
-    .fc-day-today {
-        background: rgba(44, 62, 80, 0.1) !important;
+        .fc-button-primary:focus {
+            box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.2) !important;
+        }
+
+    /* Clean calendar grid */
+    .fc-daygrid-day {
+        border: 1px solid #e5e7eb !important;
+        transition: background-color 0.2s ease !important;
     }
 
-    .fc-daygrid-day:hover {
+    .fc-daygrid-day-number {
+        color: var(--text-dark) !important;
+        font-weight: 500 !important;
+        padding: 0.5rem !important;
+        text-decoration: none !important;
+    }
+
+    .fc-day-today {
         background: rgba(44, 62, 80, 0.05) !important;
+    }
+
+        .fc-day-today .fc-daygrid-day-number {
+            background: var(--primary-color) !important;
+            color: var(--white) !important;
+            border-radius: 50% !important;
+            width: 2rem !important;
+            height: 2rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-weight: 600 !important;
+        }
+
+    .fc-daygrid-day:hover {
+        background: rgba(44, 62, 80, 0.02) !important;
         cursor: pointer !important;
     }
 
+    /* Modern event styling */
     .fc-event {
-        border-radius: 4px !important;
         border: none !important;
+        border-radius: 4px !important;
         font-weight: 500 !important;
-        padding: 2px 4px !important;
+        padding: 2px 6px !important;
+        margin: 1px 2px !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        transition: all 0.2s ease !important;
     }
 
         .fc-event:hover {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-1px) !important;
         }
+
+    .fc-event-title {
+        font-size: 0.75rem !important;
+        line-height: 1.2 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /* Day headers */
+    .fc-col-header-cell {
+        background: var(--light-gray) !important;
+        border: 1px solid #e5e7eb !important;
+        font-weight: 600 !important;
+        color: var(--text-muted) !important;
+        text-transform: uppercase !important;
+        font-size: 0.75rem !important;
+        letter-spacing: 0.5px !important;
+        padding: 0.75rem 0.5rem !important;
+    }
+
+    .fc-col-header-cell-cushion {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+
+    /* Clean calendar border */
+    .fc-theme-standard .fc-scrollgrid {
+        border: 1px solid #e5e7eb !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+
+    /* Remove default FullCalendar styling conflicts */
+    .fc-daygrid-event-harness {
+        margin-top: 1px !important;
+        margin-bottom: 1px !important;
+    }
+
+    /* Status-based event colors */
+    .fc-event.status-paid {
+        background: var(--success-color) !important;
+        border-color: var(--success-color) !important;
+    }
+
+    .fc-event.status-pending {
+        background: var(--warning-color) !important;
+        border-color: var(--warning-color) !important;
+    }
+
+    .fc-event.status-cancelled {
+        background: var(--danger-color) !important;
+        border-color: var(--danger-color) !important;
+    }
 
     /* Loading Spinner */
     .loading-spinner {
@@ -374,7 +464,10 @@
         color: var(--white);
     }
 
-    /* Responsive Design */
+    .fc .fc-button-group{
+        gap: 5px;
+    }
+    /* Responsive Design - UPDATED CALENDAR RESPONSIVENESS */
     @@media (max-width: 1200px) {
         .container {
             max-width: 100%;
@@ -414,15 +507,54 @@
         .search-section {
             padding: 1rem;
         }
-
+        /* Mobile Calendar Responsiveness */
         .fc-header-toolbar {
             flex-direction: column !important;
-            gap: 0.5rem !important;
+            gap: 0.75rem !important;
+            padding: 1rem !important;
         }
 
         .fc-toolbar-chunk {
             display: flex !important;
             justify-content: center !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+
+        .fc-button-primary {
+            padding: 0.4rem 0.8rem !important;
+            font-size: 0.8rem !important;
+            border-radius: 4px !important;
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.25rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        /* Mobile calendar day numbers */
+        .fc-daygrid-day-number {
+            padding: 0.25rem !important;
+            font-size: 0.875rem !important;
+        }
+
+        .fc-day-today .fc-daygrid-day-number {
+            width: 1.5rem !important;
+            height: 1.5rem !important;
+            font-size: 0.75rem !important;
+        }
+        /* Mobile events */
+        .fc-event {
+            font-size: 0.7rem !important;
+            padding: 1px 4px !important;
+        }
+
+        .fc-event-title {
+            font-size: 0.65rem !important;
+        }
+        /* Mobile day headers */
+        .fc-col-header-cell {
+            padding: 0.5rem 0.25rem !important;
+            font-size: 0.7rem !important;
         }
     }
 
@@ -445,11 +577,14 @@
         }
 
         .fc-toolbar-title {
-            font-size: 1.2rem !important;
+            font-size: 1.1rem !important;
+        }
+
+        .fc-button-primary {
+            padding: 0.35rem 0.7rem !important;
+            font-size: 0.75rem !important;
         }
     }
-
-    /* ADD these CSS rules to your existing style section */
 
     /* Payment Update Section */
     .event-details .border-top {
@@ -507,8 +642,6 @@
         border-color: var(--danger-color) !important;
     }
 
-    /* ADD this CSS to your existing style section */
-
     .event-details .btn-danger {
         background-color: var(--danger-color);
         border-color: var(--danger-color);
@@ -528,18 +661,10 @@
         }
 </style>
 
-<!-- Main Header -->
-<div class="main-header">
-    <div class="container">
-        <div class="text-center">
-            <h1><i class="fas fa-calendar-alt me-3"></i>Property Scheduler</h1>
-            <p class="mb-0">Professional Booking Management System</p>
-        </div>
-    </div>
-</div>
+
 
 <!-- Container -->
-<div class="container">
+<div class="container-fluid">
     <!-- Controls Section -->
     <div class="controls-container">
         <!-- Action Buttons -->
@@ -648,49 +773,6 @@
 <script>
     var calendarEl = document.getElementById('calendar');
     var calendar;
-
-    // if (!calendarEl) {
-    //     console.error("Calendar element not found.");
-    //     return;
-    // }
-
-    // Initialize Calendar
-    // calendar = new FullCalendar.Calendar(calendarEl, {
-    //     initialView: 'dayGridMonth',
-    //     selectable: true,
-    //     selectMirror: true,
-    //     eventColor: '#2c3e50',
-    //     height: 'auto',
-    //     // validRange: {
-    //     //     start: new Date().toISOString().split('T')[0]  // disables all dates before today
-    //     // },
-    //     eventDidMount: function (info) {
-    //         $(info.el).tooltip({
-    //             title: info.event.title,
-    //             placement: 'top',
-    //             trigger: 'hover',
-    //             container: 'body'
-    //         });
-    //     },
-    //     headerToolbar: {
-    //         left: 'prev,next today',
-    //         center: 'title',
-    //         right: 'dayGridMonth,timeGridWeek,timeGridDay'
-    //     },
-    //     dateClick: function (info) {
-    //         handleDateClick(info.dateStr);
-    //     },
-    //     eventClick: function (info) {
-    //         showEventDetails(info.event);
-    //     },
-    //     loading: function (bool) {
-    //         if (bool) {
-    //             showLoading();
-    //         } else {
-    //             hideLoading();
-    //         }
-    //     }
-    // });
 
     // REPLACE your existing calendar initialization with this:
     calendar = new FullCalendar.Calendar(calendarEl, {
