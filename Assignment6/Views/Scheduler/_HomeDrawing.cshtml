@@ -417,7 +417,7 @@
                             </div>
                             <div class="col-md-4 text-md-end">
                                 <div class="price-badge">
-                                    <i class="fas fa-dollar-sign me-1"></i>@Model.Home.PricePerDay/day
+                                    <i class="fas fa-rupee-sign me-1"></i>₹@Model.Home.PricePerDay/day
                                 </div>
                             </div>
                         </div>
@@ -468,7 +468,7 @@
                                          data-price="@roomPrice"
                                          data-bs-toggle="tooltip"
                                          data-bs-placement="top"
-                                         title="@layout.Label - $@roomPrice/day">
+                                         title="@layout.Label - ₹@roomPrice/day">
                                         <input type="checkbox" class="form-check-input d-none" name="SelectedRoomIds" value="@layout.RoomId" />
                                         @layout.Label
                                     </div>
@@ -514,7 +514,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="stats-card">
-                                <div class="stats-number" id="estimatedPrice">$0</div>
+                                <div class="stats-number" id="estimatedPrice">₹0</div>
                                 <div class="stats-label">Per Night</div>
                             </div>
                         </div>
@@ -611,7 +611,7 @@ $(document).ready(function () {
                                  data-price="${roomPrice}"
                                  data-bs-toggle="tooltip"
                                  data-bs-placement="top"
-                                 title="${layout.label} - ${roomPrice}/day">
+                                 title="${layout.label} - ₹${roomPrice}/day">
                                 <input type="checkbox" class="form-check-input d-none" name="SelectedRoomIds" value="${layout.roomId}" />
                                 ${layout.label}
                             </div>
@@ -668,7 +668,7 @@ $(document).ready(function () {
                     </div>
                     <div class="col-md-4 text-md-end">
                         <div class="price-badge">
-                            <i class="fas fa-dollar-sign me-1"></i>${home.pricePerDay}/day
+                            <i class="fas fa-rupee-sign me-1"></i>₹${home.pricePerDay}/day
                         </div>
                     </div>
                 </div>
@@ -728,32 +728,61 @@ $(document).ready(function () {
         updateSelectAllCheckbox();
     }
 
-    // Update selection counter and price
+    // Simple function to check if room should be charged
+    function isChargeableRoom(roomLabel) {
+        const freeRooms = ['hall', 'balcony', 'living room', 'lounge', 'kitchen', 'dining room', 'corridor'];
+        const label = roomLabel.toLowerCase();
+        return !freeRooms.some(free => label.includes(free));
+    }
+
+    // Updated selection summary with fixed pricing logic
     function updateSelectionSummary() {
         const selectedRooms = $('.room-checkbox.selected');
         const count = selectedRooms.length;
         const totalRooms = $('.room-checkbox').length;
-        
+
         $('#selectedCount').text(count);
         $('#totalRooms').text(totalRooms);
-        
-        let totalPrice = 0;
+
+        let totalChargeablePrice = 0;
+        let chargeableCount = 0;
         const roomNames = [];
-        
-        selectedRooms.each(function() {
+
+        selectedRooms.each(function () {
             const price = parseFloat($(this).data('price')) || 0;
             const label = $(this).text().trim();
-            totalPrice += price;
+
+            if (isChargeableRoom(label)) {
+                totalChargeablePrice += price;
+                chargeableCount++;
+            }
+
             roomNames.push(label);
         });
-        
-        $('#estimatedPrice').text(`${totalPrice}`);
-        
+
+        // Calculate final price based on selection type
+        let finalPrice = 0;
+        if (count > 0 && totalChargeablePrice > 0) {
+            // If only chargeable rooms selected, show total price
+            if (chargeableCount === count) {
+                finalPrice = totalChargeablePrice;
+            } else {
+                // If mix of chargeable and non-chargeable, divide by total count
+                finalPrice = totalChargeablePrice / count;
+            }
+        }
+
+        // Display price in rupees
+        $('#estimatedPrice').text(`₹${finalPrice.toFixed(2)}`);
+
         if (count > 0) {
             $('#selectedRoomsList').html(roomNames.join(', '));
         } else {
             $('#selectedRoomsList').html('<em>No rooms selected</em>');
         }
+
+        // Debug info
+        console.log(`Selected: ${count}, Chargeable: ${chargeableCount}, Total Price: ₹${totalChargeablePrice}, Final: ₹${finalPrice}`);
     }
 
     // Update "Select All" checkbox state

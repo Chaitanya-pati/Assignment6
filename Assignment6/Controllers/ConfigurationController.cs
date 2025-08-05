@@ -47,7 +47,6 @@ namespace Assignment6.Controllers
         //    return savedRooms;
         //}
 
-        
         public bool SaveLayoutElements(List<LayoutElement> layoutElements)
         {
             var isSaved =  _configurationService.SaveLayoutElement(layoutElements);
@@ -59,7 +58,6 @@ namespace Assignment6.Controllers
             var layoutElements =  _configurationService.GetLayout(homeId);
             return layoutElements;
         }
-
 
     }
 }

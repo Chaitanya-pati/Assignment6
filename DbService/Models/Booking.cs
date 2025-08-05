@@ -33,6 +33,10 @@ public partial class Booking
 
     public string Document { get; set; }
 
+    public string Source { get; set; }
+
+    public bool CheckOut { get; set; }
+
     public virtual ICollection<BookingRoom> BookingRooms { get; set; } = new List<BookingRoom>();
 
     public virtual Home Home { get; set; }

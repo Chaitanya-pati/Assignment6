@@ -319,7 +319,7 @@
                                 <option value="@home.Id"
                                         data-price="@home.PricePerDay"
                                         data-location="@home.Location">
-                                    @home.Name - @home.Location ($@home.PricePerDay/day)
+                                    @home.Name - @home.Location (₹@home.PricePerDay/day)
                                 </option>
                             }
                         }
@@ -372,16 +372,15 @@
 </div>
 
 <div class="modal-footer">
-    <div class="row">
-        <button type="button" class="btn btn-secondary-professional btn-professional col" data-bs-dismiss="modal">
-            <i class="fas fa-times me-2"></i>Cancel
+    <div class="d-flex justify-content-end gap-2 w-100">
+        <button type="button" class="btn btn-secondary-professional btn-sm btn-professional" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i>Cancel
         </button>
-        <button onclick="SaveBookingData()" class="btn btn-success-professional btn-professional col" id="saveBookingBtn">
-            <i class="fas fa-save me-2"></i>Save Booking
+        <button onclick="SaveBookingData()" class="btn btn-success-professional btn-sm btn-professional" id="saveBookingBtn">
+            <i class="fas fa-save me-1"></i>Save Booking
         </button>
     </div>
 </div>
-
 
 <!-- Include Litepicker for date selection -->
 <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/bundle.js"></script>
@@ -408,6 +407,13 @@
         updateBookingSummary();
     });
 
+    // Simple function to check if room should be charged (same as in modal)
+    function isChargeableRoom(roomLabel) {
+        const freeRooms = ['hall', 'balcony', 'living room', 'lounge', 'kitchen', 'dining room', 'corridor'];
+        const label = roomLabel.toLowerCase();
+        return !freeRooms.some(free => label.includes(free));
+    }
+
     // Update room selection badge
     function updateRoomSelectionBadge() {
         const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
@@ -420,7 +426,7 @@
         }
     }
 
-    // Calculate total booking price
+    // Calculate total booking price with same logic as modal
     function calculateTotalPrice() {
         const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
         const homeSelect = $('#HomeId');
@@ -438,15 +444,35 @@
             totalDays = totalDays > 0 ? totalDays : 1;
         }
 
-        // Calculate room-specific pricing if available
-        let roomTotal = 0;
+        // Calculate room-specific pricing excluding non-chargeable rooms
+        let totalChargeablePrice = 0;
+        let chargeableCount = 0;
+        
         selectedRooms.forEach(room => {
-            roomTotal += parseFloat(room.price) || 0;
+            if (isChargeableRoom(room.label)) {
+                totalChargeablePrice += parseFloat(room.price) || 0;
+                chargeableCount++;
+            }
         });
 
-        // If no room-specific pricing, use home base price
-        const dailyRate = roomTotal > 0 ? roomTotal : homePricePerDay;
+        // Calculate daily rate based on selection type
+        let dailyRate = 0;
+        if (selectedRooms.length > 0 && totalChargeablePrice > 0) {
+            // If only chargeable rooms selected, use total price
+            if (chargeableCount === selectedRooms.length) {
+                dailyRate = totalChargeablePrice;
+            } else {
+                // If mix of chargeable and non-chargeable, divide by total count
+                dailyRate = totalChargeablePrice / selectedRooms.length;
+            }
+        } else {
+            dailyRate = homePricePerDay; // Fallback to home base price
+        }
+
         const totalPrice = dailyRate * totalDays;
+
+        // Debug info
+        console.log(`Booking Form - Selected: ${selectedRooms.length}, Chargeable: ${chargeableCount}, Daily rate: ₹${dailyRate}, Total: ₹${totalPrice}`);
 
         return {
             dailyRate: dailyRate,
@@ -474,7 +500,7 @@
                             <br><small class="text-muted">Guests: ${$('#GuestNumbers').val() || '1'} person(s)</small>
                         </div>
                         <div class="col-md-4 text-end">
-                            <span class="badge bg-primary">$${pricing.dailyRate}/night</span>
+                            <span class="badge bg-primary">₹${pricing.dailyRate.toFixed(2)}/night</span>
                         </div>
                     </div>
                 `);
@@ -482,10 +508,10 @@
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h6 class="mb-1">Total Booking Cost</h6>
-                            <p class="mb-0">$${pricing.dailyRate} × ${pricing.totalDays} day(s)</p>
+                            <p class="mb-0">₹${pricing.dailyRate.toFixed(2)} × ${pricing.totalDays} day(s)</p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <h4 class="mb-0">$${pricing.totalPrice}</h4>
+                            <h4 class="mb-0">₹${pricing.totalPrice.toFixed(2)}</h4>
                         </div>
                     </div>
                 `);
@@ -607,7 +633,9 @@
             CreatedAt: new Date(),
             Price: pricing.totalPrice,
             GuestNumbers: parseInt($('#GuestNumbers').val()),
-            Document: $('#Document')[0].files[0] ? $('#Document')[0].files[0].name : null
+            Document: $('#Document')[0].files[0] ? $('#Document')[0].files[0].name : null,
+            Source: "App",
+            CheckOut: false
         };
 
         // Disable submit button to prevent double submission
@@ -633,7 +661,7 @@
                     `Property: ${$('#HomeId option:selected').text()}\n` +
                     `Rooms: ${selectedRooms.length}\n` +
                     `Dates: ${bookingData.BookingDateFrom} to ${bookingData.BookingDateTo}\n` +
-                    `Total: $${bookingData.TotalPrice}`;
+                    `Total: ₹${bookingData.TotalPrice}`;
 
                 if (window.showNotification) {
                     window.showNotification('Booking saved successfully!', 'success');

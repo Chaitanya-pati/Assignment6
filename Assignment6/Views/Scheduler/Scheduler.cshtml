@@ -1210,7 +1210,7 @@
             return;
         }
 
-        if (!confirm(`Are you sure you want to complete this booking and generate an invoice?\n\nBooking: ${bookingTitle}\n\nNote: This will remove the booking from your calendar after generating the invoice.`)) {
+        if (!confirm(`Are you sure you want to generate an invoice?\n\nBooking: ${bookingTitle}`)) {
             return;
         }
 
@@ -1224,7 +1224,7 @@
             },
             success: function (response) {
                 if (response.success) {
-                    showNotification('Booking completed successfully! Invoice generated and booking cleared.', 'success');
+                    showNotification('Invoice generated!!!', 'success');
 
                     // Remove current notification after showing success
                     setTimeout(() => {

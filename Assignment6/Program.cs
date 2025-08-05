@@ -17,6 +17,10 @@ builder.Services.AddSingleton<IConfigurationService, ConfigurationService>(provi
 {
     return new ConfigurationService(builder.Configuration.GetConnectionString("Assignment6"));
 });
+builder.Services.AddSingleton<IWebService, WebService>(provide =>
+{
+    return new WebService(builder.Configuration.GetConnectionString("Assignment6"));
+});
 
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
@@ -44,7 +48,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Scheduler}/{action=Scheduler}/{id?}");
+    pattern: "{controller=Website}/{action=Website}/{id?}");
    //pattern: "{controller=Login}/{action=Login}/{id?}");
 
 app.Run();

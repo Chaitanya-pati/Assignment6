@@ -290,19 +290,20 @@ namespace DbService.Implementation
 
                     // First update payment status to paid
                     booking.PaymentStatus = "Paid";
+                    booking.CheckOut = true; // Assuming you want to mark it as checked out
                     db.SaveChanges();
 
                     // Then delete related BookingRooms
-                    var bookingRooms = db.BookingRooms.Where(br => br.BookingId == bookingId).ToList();
+                    //var bookingRooms = db.BookingRooms.Where(br => br.BookingId == bookingId).ToList();
 
-                    if (bookingRooms.Any())
-                    {
-                        db.BookingRooms.RemoveRange(bookingRooms);
-                    }
+                    //if (bookingRooms.Any())
+                    //{
+                    //    db.BookingRooms.RemoveRange(bookingRooms);
+                    //}
 
-                    // Finally delete the booking
-                    db.Bookings.Remove(booking);
-                    db.SaveChanges();
+                    //// Finally delete the booking
+                    //db.Bookings.Remove(booking);
+                    //db.SaveChanges();
 
                     return true;
                 }

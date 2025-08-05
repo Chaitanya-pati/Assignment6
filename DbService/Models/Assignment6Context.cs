@@ -35,13 +35,20 @@ public partial class Assignment6Context : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.CustomerEmail).HasMaxLength(100);
-            entity.Property(e => e.CustomerName).HasMaxLength(100);
-            entity.Property(e => e.CustomerPhone).HasMaxLength(20);
+            entity.Property(e => e.CustomerName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.CustomerPhone)
+                .IsRequired()
+                .HasMaxLength(20);
             entity.Property(e => e.Document)
                 .IsRequired()
                 .HasDefaultValue("");
             entity.Property(e => e.GuestNumbers).HasColumnName("Guest_Numbers");
             entity.Property(e => e.PaymentStatus)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.Source)
                 .IsRequired()
                 .HasMaxLength(50);
 

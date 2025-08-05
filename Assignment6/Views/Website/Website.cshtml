@@ -1,14 +1,10 @@
-﻿@{
+﻿@model HomeMasterViewModel
+
+@{
     ViewData["Title"] = "Home Page";
     Layout = "";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StayHome - Premium Homestay Experiences</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -324,8 +320,6 @@
             }
         }
     </style>
-</head>
-<body>
     <!-- Header -->
     <header class="header">
         <nav class="nav">
@@ -353,12 +347,11 @@
             <div class="form-group">
                 <label for="property">Select Property</label>
                 <select id="property" name="property">
-                    <option value="">Choose a homestay...</option>
-                    <option value="garden-villa">Garden Villa Homestay</option>
-                    <option value="mountain-retreat">Mountain Retreat</option>
-                    <option value="lakeside-cottage">Lakeside Cottage</option>
-                    <option value="city-apartment">Downtown Apartment</option>
-                    <option value="farm-house">Traditional Farm House</option>
+                <option value="">Select a Property</option>
+                @foreach (var home in Model.Homes)
+                {
+                    <option value="@home.Id">@home.Name</option>
+                }
                 </select>
             </div>
             <div class="form-group">
@@ -508,79 +501,6 @@
             document.getElementById('checkout').setAttribute('min', checkinDate);
         });
 
-        // Load homes data when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadHomes();
-        });
-
-        // Function to load homes from database
-        async function loadHomes() {
-            try {
-                const response = await fetch('/Booking/GetHomes'); // Adjust controller path as needed
-                const homes = await response.json();
-                
-                if (homes.error) {
-                    console.error('Error loading homes:', homes.error);
-                    return;
-                }
-
-                const propertySelect = document.getElementById('property');
-                
-                // Clear existing options except the first one
-                propertySelect.innerHTML = '<option value="">Choose a homestay...</option>';
-                
-                // Add homes from database
-                homes.forEach(home => {
-                    const option = document.createElement('option');
-                    option.value = home.id;
-                    option.textContent = `${home.name} - ${home.location} (${home.pricePerNight}/night)`;
-                    propertySelect.appendChild(option);
-                });
-                
-            } catch (error) {
-                console.error('Error fetching homes:', error);
-                // Fallback to static data if API fails
-                console.log('Using fallback static data');
-            }
-        }
-
-        // Function to load homes with availability check
-        async function loadHomesWithAvailability(checkIn, checkOut) {
-            try {
-                const url = `/Booking/GetHomesWithAvailability?checkIn=${checkIn}&checkOut=${checkOut}`;
-                const response = await fetch(url);
-                const homes = await response.json();
-                
-                const propertySelect = document.getElementById('property');
-                propertySelect.innerHTML = '<option value="">Choose a homestay...</option>';
-                
-                homes.forEach(home => {
-                    const option = document.createElement('option');
-                    option.value = home.id;
-                    option.textContent = `${home.name} - ${home.location} (${home.availableRooms} rooms available - ${home.pricePerNight}/night)`;
-                    propertySelect.appendChild(option);
-                });
-                
-            } catch (error) {
-                console.error('Error fetching available homes:', error);
-            }
-        }
-
-        // Update homes when dates change
-        document.getElementById('checkin').addEventListener('change', function() {
-            const checkOut = document.getElementById('checkout').value;
-            if (this.value && checkOut) {
-                loadHomesWithAvailability(this.value, checkOut);
-            }
-        });
-
-        document.getElementById('checkout').addEventListener('change', function() {
-            const checkIn = document.getElementById('checkin').value;
-            if (checkIn && this.value) {
-                loadHomesWithAvailability(checkIn, this.value);
-            }
-        });
-
         function searchAvailability() {
             const property = document.getElementById('property').value;
             const checkin = document.getElementById('checkin').value;
@@ -596,9 +516,8 @@
                 return;
             }
 
-            // Redirect to booking page with selected data
-            const bookingUrl = `/Booking/Details?homeId=${property}&checkIn=${checkin}&checkOut=${checkout}`;
-            window.location.href = bookingUrl;
+            // In a real application, this would make an API call
+            alert(`Searching availability for ${property} from ${checkin} to ${checkout}. This would redirect to your booking system.`);
         }
 
         // Smooth scrolling for navigation links
@@ -615,5 +534,3 @@
             });
         });
     </script>
-</body>
-</html>
