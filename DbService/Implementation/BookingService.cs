@@ -48,6 +48,14 @@ namespace DbService.Implementation
             {
                 try
                 {
+                    if(db.Bookings.Any(x =>
+                       x.HomeId == bookingData.HomeId &&
+                       x.BookingDateFrom <= bookingData.BookingDateFrom &&
+                        x.BookingDateTo >= bookingData.BookingDateTo))
+                    {
+                       return false;
+                    }
+                    //if()
                     // Set check -in time to 12:00 PM(noon)
                     bookingData.BookingDateFrom = bookingData.BookingDateFrom.Date.AddHours(12);
                     // Set check-out time to 1:00 PM (13:00)

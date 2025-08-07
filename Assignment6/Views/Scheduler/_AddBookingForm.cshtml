@@ -639,7 +639,7 @@
         };
 
         // Disable submit button to prevent double submission
-        const submitBtn = $('#saveBookingBtn');
+        const submitBtn = $('#ngBtn');
         const originalText = submitBtn.html();
         submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
 

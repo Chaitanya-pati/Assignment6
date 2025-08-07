@@ -818,11 +818,11 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="BookingDateFrom" class="form-label">Check-in Date *</label>
-                                    <input type="date" class="form-control" id="BookingDateFrom" name="BookingDateFrom" readonly>
+                                    <input type="date" class="form-control" id="BookingDateFrom" name="BookingDateFrom">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="BookingDateTo" class="form-label">Check-out Date *</label>
-                                    <input type="date" class="form-control" id="BookingDateTo" name="BookingDateTo" readonly>
+                                    <input type="date" class="form-control" id="BookingDateTo" name="BookingDateTo">
                                 </div>
                             </div>
                             <div class="row">
@@ -997,56 +997,53 @@
             }
         }
 
-        function searchAvailability() {
-            const propertyId = document.getElementById('property').value;
-            const checkin = document.getElementById('checkin').value;
-            const checkout = document.getElementById('checkout').value;
+    function searchAvailability() {
+        const propertyId = document.getElementById('property').value;
+        const checkin = document.getElementById('checkin').value;
+        const checkout = document.getElementById('checkout').value;
 
-            if (!propertyId || !checkin || !checkout) {
-                showNotification('Please fill in all fields to search availability.', 'error');
-                return;
-            }
-
-            if (new Date(checkout) <= new Date(checkin)) {
-                showNotification('Check-out date must be after check-in date.', 'error');
-                return;
-            }
-
-            // Your existing AJAX call structure
-            $.ajax({
-                url: '/Scheduler/CheckBookings',
-                type: 'GET',
-                data: {
-                    startDate: checkin,
-                    endDate: checkout,
-                    homeId: propertyId
-                },
-                success: function (data) {
-                    const homeName = getHomeName(propertyId);
-                    const dateRange = `${new Date(checkin).toLocaleDateString()} - ${new Date(checkout).toLocaleDateString()}`;
-
-                    if (data) {
-                        showNotification(
-                            `${homeName} is already booked for ${dateRange}. Please select different dates.`,
-                            "error"
-                        );
-                    } else {
-                        showNotification(
-                            `${homeName} is available for ${dateRange}! You can proceed with booking.`,
-                            "success"
-                        );
-                        showBookingOption(propertyId, checkin, checkout, homeName);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error checking availability:", error);
-                    showNotification("Error checking availability. Please try again.", "error");
-                },
-                complete: function () {
-                    //hideLoading();
-                }
-            });
+        if (!propertyId || !checkin || !checkout) {
+            showNotification('Please fill in all fields to search availability.', 'error');
+            return;
         }
+
+        // Validate dates first
+        if (!validateBookingDates()) {
+            return;
+        }
+
+        // Check availability via AJAX
+        $.ajax({
+            url: '/Scheduler/CheckBookings',
+            type: 'GET',
+            data: {
+                startDate: checkin,
+                endDate: checkout,
+                homeId: propertyId
+            },
+            success: function (data) {
+                const homeName = getHomeName(propertyId);
+                const dateRange = `${new Date(checkin).toLocaleDateString()} - ${new Date(checkout).toLocaleDateString()}`;
+
+                if (data) {
+                    showNotification(
+                        `${homeName} is already booked for ${dateRange}. Please select different dates.`,
+                        "error"
+                    );
+                } else {
+                    showNotification(
+                        `${homeName} is available for ${dateRange}! You can proceed with booking.`,
+                        "success"
+                    );
+                    showBookingOption(propertyId, checkin, checkout, homeName);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error checking availability:", error);
+                showNotification("Error checking availability. Please try again.", "error");
+            }
+        });
+    }
 
         function getHomeName(homeId) {
             // First try to get from model data
@@ -1122,39 +1119,44 @@
             document.querySelector('.booking-form').after(bookingActions);
         }
 
-        function openBookingModal(propertyId, checkin, checkout, homeName) {
-            // Populate modal with data
-            document.getElementById('HomeId').value = propertyId;
-            document.getElementById('BookingDateFrom').value = checkin;
-            document.getElementById('BookingDateTo').value = checkout;
-            document.getElementById('SelectedProperty').value = homeName;
+    function openBookingModal(propertyId, checkin, checkout, homeName) {
+        // Populate modal with data
+        document.getElementById('HomeId').value = propertyId;
+        document.getElementById('BookingDateFrom').value = checkin;
+        document.getElementById('BookingDateTo').value = checkout;
+        document.getElementById('SelectedProperty').value = homeName;
 
-            // Calculate days and pricing
-            const checkInDate = new Date(checkin);
-            const checkOutDate = new Date(checkout);
-            const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
-            const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-            
-            // Get pricing from model data
-            const pricePerDay = getPriceForProperty(propertyId);
-            const totalPrice = pricePerDay * totalDays;
+        // Calculate days and pricing
+        const checkInDate = new Date(checkin);
+        const checkOutDate = new Date(checkout);
+        const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
+        const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-            document.getElementById('TotalDays').value = totalDays;
-            document.getElementById('TotalPrice').value = totalPrice;
+        // Get pricing from model data
+        const pricePerDay = getPriceForProperty(propertyId);
+        const totalPrice = pricePerDay * totalDays;
 
-            // Update summary display
-            updateBookingSummary(homeName, checkin, checkout, totalDays, pricePerDay, totalPrice);
+        document.getElementById('TotalDays').value = totalDays;
+        document.getElementById('TotalPrice').value = totalPrice;
 
-            // Show modal
-            const modal = document.getElementById('bookingModal');
-            if (typeof bootstrap !== 'undefined') {
-                const bookingModal = new bootstrap.Modal(modal);
-                bookingModal.show();
-            } else {
-                modal.style.display = 'block';
-                modal.classList.add('show');
-            }
+        // Update summary display
+        updateBookingSummary(homeName, checkin, checkout, totalDays, pricePerDay, totalPrice);
+
+        // Reset room selection
+        selectedRooms = [];
+        localStorage.removeItem('selectedRoomData');
+        updateRoomSelectionDisplay([], false);
+
+        // Show modal
+        const modal = document.getElementById('bookingModal');
+        if (typeof bootstrap !== 'undefined') {
+            const bookingModal = new bootstrap.Modal(modal);
+            bookingModal.show();
+        } else {
+            modal.style.display = 'block';
+            modal.classList.add('show');
         }
+    }
 
         function getPriceForProperty(propertyId) {
             // Get price from model data
@@ -1387,116 +1389,160 @@
             setTimeout(() => displayRooms(rooms), 500);
         }
 
-        function displayRooms(rooms) {
-            const container = document.getElementById('roomListContainer');
-            
-            let html = `
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="bookingType" id="entireProperty" value="entire" checked>
-                            <label class="form-check-label fw-bold" for="entireProperty">
-                                <i class="fas fa-home text-primary"></i> Book Entire Property
-                            </label>
-                            <div class="text-muted small ms-4">Get access to all rooms and facilities</div>
-                        </div>
+    function displayRooms(rooms) {
+        const container = document.getElementById('roomListContainer');
+
+        let html = `
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="bookingType" id="entireProperty" value="entire" checked>
+                        <label class="form-check-label fw-bold" for="entireProperty">
+                            <i class="fas fa-home text-primary"></i> Book Entire Property
+                        </label>
+                        <div class="text-muted small ms-4">Get access to all rooms and facilities - Can book anytime</div>
                     </div>
-            `;
-            
-            // Only show individual room selection if rooms are available
-            if (rooms.length > 0) {
-                html += `
-                    <div class="col-12 mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="bookingType" id="selectiveRooms" value="selective">
-                            <label class="form-check-label fw-bold" for="selectiveRooms">
-                                <i class="fas fa-list text-success"></i> Select Individual Rooms
-                            </label>
-                            <div class="text-muted small ms-4">Choose specific rooms you need</div>
+                </div>
+        `;
+
+        // Only show individual room selection if rooms are available
+        if (rooms.length > 0) {
+            html += `
+                <div class="col-12 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="bookingType" id="selectiveRooms" value="selective">
+                        <label class="form-check-label fw-bold" for="selectiveRooms">
+                            <i class="fas fa-list text-success"></i> Select Individual Rooms
+                        </label>
+                        <div class="text-muted small ms-4">
+                            Choose specific bedrooms only - Must book within 3 days of stay
+                            <div class="alert alert-warning mt-2 p-2">
+                                <small><i class="fas fa-info-circle"></i> Individual room booking is only available 3 days before your check-in date</small>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <div id="roomCheckboxes" class="mt-3" style="display: none;">
-                    <div class="row">
-                `;
-                
-                rooms.forEach(room => {
-                    const isChargeable = room.price > 0;
-                    const roomPrice = room.price || 0;
-                    
-                    html += `
-                        <div class="col-md-6 mb-3">
-                            <div class="card room-card ${isChargeable ? 'border-primary' : 'border-secondary'}">
-                                <div class="card-body">
-                                    <div class="form-check">
-                                        <input class="form-check-input room-checkbox" type="checkbox" 
-                                               id="room_${room.id}" value="${room.id}" 
-                                               data-name="${room.label}" data-price="${roomPrice}">
-                                        <label class="form-check-label" for="room_${room.id}">
-                                            <strong>${room.label}</strong>
-                                            ${isChargeable ? 
-                                                `<span class="badge bg-primary ms-2">${roomPrice}/night</span>` : 
-                                                '<span class="badge bg-secondary ms-2">Free</span>'
-                                            }
-                                        </label>
-                                    </div>
+            </div>
+
+            <div id="roomCheckboxes" class="mt-3" style="display: none;">
+                <div class="row">
+            `;
+            debugger
+            rooms.forEach(room => {
+                const isChargeable = room.price > 0;
+                const roomPrice = room.price || 0;
+
+                // Determine if room is selectable (only bedrooms)
+                const roomType = room.label;
+                const isBedroom = roomType.includes('bedroom') || roomType.includes('bed') ||
+                    roomType.includes('suite') || roomType.includes('room');
+                const isSelectableRoom = isBedroom &&
+                    !roomType.includes('hall') &&
+                    !roomType.includes('balcony') &&
+                    !roomType.includes('living') &&
+                    !roomType.includes('kitchen');
+
+                html += `
+                    <div class="col-md-6 mb-3">
+                        <div class="card room-card ${isChargeable ? 'border-primary' : 'border-secondary'} ${!isSelectableRoom ? 'opacity-50' : ''}">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input room-checkbox" type="checkbox"
+                                           id="room_${room.id}" value="${room.id}"
+                                           data-name="${room.lable}" data-price="${roomPrice}"
+                                           ${!isSelectableRoom ? 'disabled' : ''}>
+                                    <label class="form-check-label" for="room_${room.id}">
+                                        <strong>${room.name}</strong>
+                                        ${isChargeable ?
+                        `<span class="badge bg-primary ms-2">${roomPrice}/night</span>` :
+                        '<span class="badge bg-secondary ms-2">Free</span>'
+                    }
+                                        ${!isSelectableRoom ?
+                        '<span class="badge bg-warning ms-2">Not Selectable</span>' :
+                        ''
+                    }
+                                    </label>
+                                    ${!isSelectableRoom ?
+                        '<div class="text-muted small">Only bedrooms can be selected individually</div>' :
+                        ''
+                    }
                                 </div>
                             </div>
                         </div>
-                    `;
-                });
-                
-                html += `
                     </div>
-                </div>
                 `;
-            } else {
-                html += `
-                </div>
-                <div class="alert alert-info mt-3">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Room details not configured.</strong><br>
-                    You can book the entire property which includes all available accommodations.
-                </div>
-                `;
-            }
-            
-            container.innerHTML = html;
-            
-            // Add event listeners
-            document.querySelectorAll('input[name="bookingType"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const roomCheckboxes = document.getElementById('roomCheckboxes');
-                    if (roomCheckboxes) {
-                        if (this.value === 'selective') {
-                            roomCheckboxes.style.display = 'block';
-                        } else {
-                            roomCheckboxes.style.display = 'none';
-                            // Clear all room selections
-                            document.querySelectorAll('.room-checkbox').forEach(cb => cb.checked = false);
-                        }
-                    }
-                });
             });
+
+            html += `
+                </div>
+            </div>
+            `;
+        } else {
+            html += `
+            </div>
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle"></i>
+                <strong>Room details not configured.</strong><br>
+                You can book the entire property which includes all available accommodations.
+            </div>
+            `;
         }
 
-        function confirmRoomSelection() {
-            const bookingType = document.querySelector('input[name="bookingType"]:checked').value;
-            
-            if (bookingType === 'entire') {
-                // Entire property booking
+        container.innerHTML = html;
+
+        // Add event listeners
+        document.querySelectorAll('input[name="bookingType"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const roomCheckboxes = document.getElementById('roomCheckboxes');
+                if (roomCheckboxes) {
+                    if (this.value === 'selective') {
+                        // Check if dates are within 3-day restriction for individual rooms
+                        if (!validateIndividualRoomBookingDates()) {
+                            // Reset to entire property if dates don't meet requirement
+                            document.getElementById('entireProperty').checked = true;
+                            roomCheckboxes.style.display = 'none';
+                            return;
+                        }
+                        roomCheckboxes.style.display = 'block';
+                    } else {
+                        roomCheckboxes.style.display = 'none';
+                        // Clear all room selections
+                        document.querySelectorAll('.room-checkbox').forEach(cb => cb.checked = false);
+                    }
+                }
+            });
+        });
+    }
+
+    function confirmRoomSelection() {
+        const bookingType = document.querySelector('input[name="bookingType"]:checked').value;
+
+        if (bookingType === 'entire') {
+            // Entire property booking - no date restrictions
+            selectedRooms = [];
+            localStorage.setItem('selectedRoomData', JSON.stringify([]));
+            updateRoomSelectionDisplay([], true);
+        } else {
+            // Individual room booking - validate 3-day rule
+            if (!validateIndividualRoomBookingDates()) {
+                showNotification('Individual room booking requires check-in within 3 days. Switching to entire property booking.', 'warning');
+                document.getElementById('entireProperty').checked = true;
                 selectedRooms = [];
                 localStorage.setItem('selectedRoomData', JSON.stringify([]));
                 updateRoomSelectionDisplay([], true);
             } else {
-                // Selective room booking
-                const checkedRooms = document.querySelectorAll('.room-checkbox:checked');
+                // Selective room booking - only get enabled checkboxes
+                const checkedRooms = document.querySelectorAll('.room-checkbox:checked:not([disabled])');
+
+                if (checkedRooms.length === 0) {
+                    showNotification('Please select at least one bedroom or switch to entire property booking.', 'warning');
+                    return;
+                }
+
                 selectedRooms = Array.from(checkedRooms).map(cb => {
-                    // Find the full room data from model
                     const roomId = parseInt(cb.value);
                     const roomData = window.websiteData.rooms.find(r => r.id === roomId);
-                    
+
                     return {
                         Id: roomId,
                         Label: roomData ? roomData.label : cb.dataset.name,
@@ -1507,41 +1553,39 @@
                 localStorage.setItem('selectedRoomData', JSON.stringify(selectedRooms));
                 updateRoomSelectionDisplay(selectedRooms, false);
             }
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('roomSelectionModal'));
-            modal.hide();
-            
-            // Update pricing
-            const propertyId = document.getElementById('HomeId').value;
-            const checkin = document.getElementById('BookingDateFrom').value;
-            const checkout = document.getElementById('BookingDateTo').value;
-            const homeName = getHomeName(propertyId);
-            
-            if (checkin && checkout && propertyId) {
-                // Recalculate pricing with room selection
-                const checkInDate = new Date(checkin);
-                const checkOutDate = new Date(checkout);
-                const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
-                const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                const pricePerDay = getPriceForProperty(propertyId);
-                
-                // Calculate total price considering room selection
-                let finalPrice = pricePerDay * totalDays;
-                if (selectedRooms.length > 0) {
-                    const roomTotal = selectedRooms.reduce((sum, room) => sum + (room.Price || 0), 0);
-                    if (roomTotal > 0) {
-                        finalPrice = roomTotal * totalDays;
-                    }
-                }
-                
-                updateBookingSummary(homeName, checkin, checkout, totalDays, pricePerDay, finalPrice);
-                
-                // Update hidden fields
-                document.getElementById('SelectedRoomIds').value = selectedRooms.map(room => room.Id).join(',');
-                document.getElementById('SelectedRoomData').value = JSON.stringify(selectedRooms);
-            }
         }
+
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('roomSelectionModal'));
+        modal.hide();
+
+        // Update pricing
+        const propertyId = document.getElementById('HomeId').value;
+        const checkin = document.getElementById('BookingDateFrom').value;
+        const checkout = document.getElementById('BookingDateTo').value;
+        const homeName = getHomeName(propertyId);
+
+        if (checkin && checkout && propertyId) {
+            const checkInDate = new Date(checkin);
+            const checkOutDate = new Date(checkout);
+            const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
+            const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            const pricePerDay = getPriceForProperty(propertyId);
+
+            let finalPrice = pricePerDay * totalDays;
+            if (selectedRooms.length > 0) {
+                const roomTotal = selectedRooms.reduce((sum, room) => sum + (room.Price || 0), 0);
+                if (roomTotal > 0) {
+                    finalPrice = roomTotal * totalDays;
+                }
+            }
+
+            updateBookingSummary(homeName, checkin, checkout, totalDays, pricePerDay, finalPrice);
+
+            document.getElementById('SelectedRoomIds').value = selectedRooms.map(room => room.Id).join(',');
+            document.getElementById('SelectedRoomData').value = JSON.stringify(selectedRooms);
+        }
+    }
 
         function updateRoomSelectionDisplay(rooms, isEntireProperty) {
             const badge = document.getElementById('roomSelectionBadge');
@@ -1582,4 +1626,121 @@
                 }
             });
         });
+
+
+    function validateIndividualRoomBookingDates() {
+        const checkinInput = document.getElementById('BookingDateFrom');
+        const checkoutInput = document.getElementById('BookingDateTo');
+
+        if (!checkinInput.value || !checkoutInput.value) {
+            showNotification('Please select check-in and check-out dates first before choosing individual rooms.', 'error');
+            return false;
+        }
+
+        const checkinDate = new Date(checkinInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+        checkinDate.setHours(0, 0, 0, 0);
+
+        // Calculate the difference in days
+        const timeDiff = checkinDate.getTime() - today.getTime();
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+        if (daysDiff > 3) {
+            const maxBookingDate = new Date(checkinDate);
+            maxBookingDate.setDate(maxBookingDate.getDate() - 3);
+
+            showNotification(
+                `Individual room booking for ${checkinDate.toDateString()} is only available from ${maxBookingDate.toDateString()} onwards. For earlier booking, please select "Book Entire Property".`,
+                'error',
+                8000
+            );
+            return false;
+        }
+
+        if (daysDiff < 0) {
+            showNotification('Cannot book for past dates.', 'error');
+            return false;
+        }
+
+        return true;
+    }
+
+    function validateBookingDates() {
+        const checkinInput = document.getElementById('checkin');
+        const checkoutInput = document.getElementById('checkout');
+
+        if (!checkinInput.value || !checkoutInput.value) {
+            return false;
+        }
+
+        const checkinDate = new Date(checkinInput.value);
+        const checkoutDate = new Date(checkoutInput.value);
+        const today = new Date();
+
+        // Reset times for accurate comparison
+        today.setHours(0, 0, 0, 0);
+        checkinDate.setHours(0, 0, 0, 0);
+        checkoutDate.setHours(0, 0, 0, 0);
+
+        // Check if dates are valid
+        if (checkinDate < today) {
+            showNotification('Check-in date cannot be in the past.', 'error');
+            return false;
+        }
+
+        if (checkoutDate <= checkinDate) {
+            showNotification('Check-out date must be after check-in date.', 'error');
+            return false;
+        }
+
+        return true;
+    }
+
+    // Update the date change event listeners
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkinInput = document.getElementById('checkin');
+        const checkoutInput = document.getElementById('checkout');
+
+        if (checkinInput) {
+            checkinInput.addEventListener('change', function () {
+                debugger
+                // Update minimum checkout date
+                const checkinDate = this.value;
+                if (checkoutInput) {
+                    checkoutInput.setAttribute('min', checkinDate);
+                }
+
+                // If individual rooms are selected, validate the 3-day rule
+                const selectiveRadio = document.getElementById('selectiveRooms');
+                if (selectiveRadio && selectiveRadio.checked) {
+                    if (!validateIndividualRoomBookingDates()) {
+                        // Switch back to entire property
+                        document.getElementById('entireProperty').checked = true;
+                        const roomCheckboxes = document.getElementById('roomCheckboxes');
+                        if (roomCheckboxes) {
+                            roomCheckboxes.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        }
+
+        if (checkoutInput) {
+            checkoutInput.addEventListener('change', function () {
+                // If individual rooms are selected, validate the 3-day rule
+                const selectiveRadio = document.getElementById('selectiveRooms');
+                if (selectiveRadio && selectiveRadio.checked) {
+                    if (!validateIndividualRoomBookingDates()) {
+                        // Switch back to entire property
+                        document.getElementById('entireProperty').checked = true;
+                        const roomCheckboxes = document.getElementById('roomCheckboxes');
+                        if (roomCheckboxes) {
+                            roomCheckboxes.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        }
+    });
     </script>
