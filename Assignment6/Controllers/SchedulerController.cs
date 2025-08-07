@@ -330,50 +330,14 @@ namespace Assignment6.Controllers
             return Json(result);
         }
 
-
-        //[HttpGet]
-        //public IActionResult GetBookings(DateTime? startDate = null, DateTime? endDate = null, int? homeId = null)
-        //{
-        //    try
-        //    {
-        //        var bookings =  _bookingService.GetAllBookings(startDate, endDate, homeId);
-
-        //        // Update the result object in GetBookings method
-        //        var result = bookings.Select(b => new
-        //        {
-        //            id = b.Id,
-        //            customerName = b.CustomerName,
-        //            customerEmail = b.CustomerEmail,
-        //            customerPhone = b.CustomerPhone,
-        //            message = b.Message,
-        //            bookingDateFrom = b.BookingDateFrom.ToString("yyyy-MM-dd"),
-        //            bookingDateTo = b.BookingDateTo.ToString("yyyy-MM-dd"),
-        //            homeId = b.HomeId,
-        //            paymentStatus = b.PaymentStatus,
-        //            price = b.Price,
-        //            guestNumbers = b.GuestNumbers,
-        //            document = b.Document,
-        //            bookingRooms = b.BookingRooms?.Select(br => new
-        //            {
-        //                roomId = br.RoomId,
-        //                bookingId = br.BookingId
-        //            }).ToList()
-        //        });
-
-        //        return Json(result);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { error = ex.Message });
-        //    }
-        //}
-
         [HttpGet]
         public IActionResult GetBookings(DateTime? startDate = null, DateTime? endDate = null, int? homeId = null)
         {
             try
             {
-                var bookings = _bookingService.GetAllBookings(startDate, endDate, homeId);
+                var bookings = _bookingService.GetAllBookings(startDate, endDate, homeId)
+                    .Where(b => b.IsBooked) // Only show approved bookings on calendar
+                    .ToList();
 
                 var result = bookings.Select(b => new
                 {
@@ -382,7 +346,6 @@ namespace Assignment6.Controllers
                     customerEmail = b.CustomerEmail,
                     customerPhone = b.CustomerPhone,
                     message = b.Message,
-                    // CHANGED: Include time information for proper calendar display
                     bookingDateFrom = b.BookingDateFrom.ToString("yyyy-MM-ddTHH:mm:ss"),
                     bookingDateTo = b.BookingDateTo.ToString("yyyy-MM-ddTHH:mm:ss"),
                     homeId = b.HomeId,
@@ -397,13 +360,7 @@ namespace Assignment6.Controllers
                     }).ToList()
                 });
 
-                // ADDED: Logging for debugging
-                Console.WriteLine($"Returning {result.Count()} bookings");
-                foreach (var booking in result.Take(3))
-                {
-                    Console.WriteLine($"Booking {booking.id}: {booking.bookingDateFrom} to {booking.bookingDateTo}");
-                }
-
+                Console.WriteLine($"Returning {result.Count()} approved bookings");
                 return Json(result);
             }
             catch (Exception ex)
@@ -413,54 +370,9 @@ namespace Assignment6.Controllers
             }
         }
 
-        // ADD these methods to your SchedulerController class
-
-        //[HttpPost]
-        //public IActionResult UpdatePaymentStatus(int bookingId, string paymentStatus)
-        //{
-        //    try
-        //    {
-        //        bool updated = _bookingService.UpdatePaymentStatus(bookingId, paymentStatus);
-
-        //        if (updated)
-        //        {
-        //            // Generate invoice after successful payment update
-        //            string invoiceUrl = GenerateInvoice(bookingId);
-
-        //            return Json(new
-        //            {
-        //                success = true,
-        //                message = "Payment status updated successfully!",
-        //                invoiceUrl = invoiceUrl
-        //            });
-        //        }
-        //        else
-        //        {
-        //            return Json(new
-        //            {
-        //                success = false,
-        //                message = "Failed to update payment status."
-        //            });
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Json(new
-        //        {
-        //            success = false,
-        //            message = "Error: " + ex.Message
-        //        });
-        //    }
-        //}
-
-        // First, install the PDF package via NuGet Package Manager:
-        // Install-Package iTextSharp or Install-Package PdfSharpCore
-        // For this example, I'll use a simple HTML to PDF approach
-
-        // ADD these using statements at the top of your controller
-
-
         // REPLACE the existing GenerateInvoice method with this updated version
+
+
         private string GenerateInvoice(int bookingId)
         {
             try
@@ -1064,7 +976,75 @@ namespace Assignment6.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult GetPendingBookingRequests()
+        {
+            try
+            {
+                var pendingBookings = _bookingService.GetAllBookings(null, null, null)
+                    .Where(b => !b.IsBooked) // Only get requests that haven't been approved
+                    .OrderByDescending(b => b.CreatedAt)
+                    .Select(b => new
+                    {
+                        id = b.Id,
+                        customerName = b.CustomerName,
+                        customerEmail = b.CustomerEmail,
+                        customerPhone = b.CustomerPhone,
+                        message = b.Message,
+                        bookingDateFrom = b.BookingDateFrom.ToString("yyyy-MM-dd"),
+                        bookingDateTo = b.BookingDateTo.ToString("yyyy-MM-dd"),
+                        homeId = b.HomeId,
+                        price = b.Price,
+                        guestNumbers = b.GuestNumbers,
+                        createdAt = b.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        paymentStatus = b.PaymentStatus
+                    });
 
+                return Json(pendingBookings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting pending booking requests: {ex.Message}");
+                return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ApproveBookingRequest(int bookingId)
+        {
+            try
+            {
+                if (bookingId <= 0)
+                {
+                    return Json(new { success = false, message = "Invalid booking ID" });
+                }
+
+                // Update the booking to set IsBooked = true
+                bool approved = _bookingService.ApproveBookingRequest(bookingId);
+
+                if (approved)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Booking request approved successfully"
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Failed to approve booking request"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error approving booking request: {ex.Message}");
+                return Json(new { success = false, message = "An unexpected error occurred" });
+            }
+        }
     }
 
 

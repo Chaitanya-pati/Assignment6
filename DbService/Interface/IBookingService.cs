@@ -26,5 +26,6 @@ namespace DbService.Interface
 
         bool DeleteBooking(int bookingId);
         bool CompleteBookingWithInvoice(int bookingId);
+        bool ApproveBookingRequest(int bookingId);
     }
 }

@@ -315,5 +315,27 @@ namespace DbService.Implementation
                 return false;
             }
         }
+
+        public bool ApproveBookingRequest(int bookingId)
+        {
+            try
+            {
+                using var context = new Assignment6Context(_dbconnection);
+                var booking = context.Bookings.FirstOrDefault(b => b.Id == bookingId);
+
+                if (booking != null)
+                {
+                    booking.IsBooked = true;
+                    context.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error approving booking request: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

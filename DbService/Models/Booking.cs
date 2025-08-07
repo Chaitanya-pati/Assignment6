@@ -33,7 +33,7 @@ public partial class Booking
 
     public string Document { get; set; }
 
-    public string Source { get; set; }
+    public bool IsBooked { get; set; }
 
     public bool CheckOut { get; set; }
 

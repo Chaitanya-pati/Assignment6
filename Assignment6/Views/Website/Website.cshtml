@@ -5,6 +5,8 @@
     Layout = "";
 }
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -149,6 +151,87 @@
         .search-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .notification.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .notification.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .notification-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.7;
+            padding: 0;
+            margin-left: auto;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @@keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .notification.slide-out {
+            animation: slideOut 0.3s ease-in;
         }
 
         /* Sections */
@@ -304,7 +387,197 @@
             text-decoration: none;
         }
 
-        /* Responsive */
+        /* Booking Modal Styles */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 1.5rem;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .form-section {
+            padding: 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.75rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .booking-summary {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .price-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 2px solid #667eea;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .availability-actions {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .book-now-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .book-now-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .file-upload-label:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .file-upload-label.has-file {
+            border-color: #28a745;
+            background: #d4edda;
+            border-style: solid;
+        }
+
+        .file-info {
+            margin-left: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Room Selection Styles */
+        .room-selection-container {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .room-selection-btn {
+            position: relative;
+        }
+
+        .room-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ffc107;
+            color: #000;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid #fff;
+        }
+
+        .room-badge.bg-success {
+            background: #28a745 !important;
+            color: white;
+        }
+
+        .room-card.border-primary {
+            border-color: #667eea !important;
+        }
+
+        .room-card.border-secondary {
+            border-color: #6c757d !important;
+        }
+
         @@media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -318,8 +591,15 @@
             .nav-links {
                 display: none;
             }
+
+            .notification {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
         }
     </style>
+
     <!-- Header -->
     <header class="header">
         <nav class="nav">
@@ -347,11 +627,11 @@
             <div class="form-group">
                 <label for="property">Select Property</label>
                 <select id="property" name="property">
-                <option value="">Select a Property</option>
-                @foreach (var home in Model.Homes)
-                {
-                    <option value="@home.Id">@home.Name</option>
-                }
+                    <option value="">Select a Property</option>
+                    @foreach (var home in Model.Homes)
+                    {
+                        <option value="@home.Id">@home.Name</option>
+                    }
                 </select>
             </div>
             <div class="form-group">
@@ -475,6 +755,178 @@
         </div>
     </section>
 
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">
+                        <i class="fas fa-calendar-plus"></i> Book Your Stay
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookingForm">
+                        <!-- Customer Information Section -->
+                        <div class="form-section mb-4">
+                            <h6 class="section-title">
+                                <i class="fas fa-user"></i> Customer Information
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="CustomerName" class="form-label">Full Name *</label>
+                                    <input type="text" class="form-control" id="CustomerName" name="CustomerName" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="CustomerEmail" class="form-label">Email Address *</label>
+                                    <input type="email" class="form-control" id="CustomerEmail" name="CustomerEmail" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="CustomerPhone" class="form-label">Phone Number *</label>
+                                    <input type="tel" class="form-control" id="CustomerPhone" name="CustomerPhone" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="GuestNumbers" class="form-label">Number of Guests *</label>
+                                    <input type="number" class="form-control" id="GuestNumbers" name="GuestNumbers" min="1" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label for="Document" class="form-label">
+                                        <i class="fas fa-file-upload"></i> Upload Identity Document *
+                                    </label>
+                                    <div class="file-upload-wrapper">
+                                        <input type="file" class="file-upload-input" id="Document" name="Document"
+                                               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="handleFileUpload(this)" required>
+                                        <label for="Document" class="file-upload-label" id="documentLabel">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <span class="file-info">Click to upload document (PDF, JPG, PNG, DOC)</span>
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">Please upload a valid government ID or passport</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Booking Details Section -->
+                        <div class="form-section mb-4">
+                            <h6 class="section-title">
+                                <i class="fas fa-home"></i> Booking Details
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="BookingDateFrom" class="form-label">Check-in Date *</label>
+                                    <input type="date" class="form-control" id="BookingDateFrom" name="BookingDateFrom" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="BookingDateTo" class="form-label">Check-out Date *</label>
+                                    <input type="date" class="form-control" id="BookingDateTo" name="BookingDateTo" readonly>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label for="SelectedProperty" class="form-label">Selected Property</label>
+                                    <input type="text" class="form-control" id="SelectedProperty" name="SelectedProperty" readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Room Selection</label>
+                                    <div class="room-selection-container">
+                                        <button type="button" class="btn btn-outline-primary btn-sm room-selection-btn" 
+                                                onclick="openRoomSelection()" id="selectRoomsBtn">
+                                            <i class="fas fa-map"></i> Choose Rooms
+                                            <span id="roomSelectionBadge" class="room-badge d-none">0</span>
+                                        </button>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Or book entire property</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Room Selection Summary -->
+                            <div id="roomSelectionSummary" class="mt-3 d-none">
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-info-circle"></i> Selected Rooms:</h6>
+                                    <div id="selectedRoomsDisplay"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Special Requests Section -->
+                        <div class="form-section mb-4">
+                            <h6 class="section-title">
+                                <i class="fas fa-comment"></i> Special Requests
+                            </h6>
+                            <div class="mb-3">
+                                <label for="Message" class="form-label">Additional Notes</label>
+                                <textarea class="form-control" id="Message" name="Message" rows="3" 
+                                         placeholder="Any special requests or additional information..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Booking Summary -->
+                        <div id="bookingSummary" class="booking-summary">
+                            <h6><i class="fas fa-receipt"></i> Booking Summary</h6>
+                            <div id="bookingDetails"></div>
+                            <div id="totalPriceDisplay" class="price-display"></div>
+                        </div>
+
+                        <!-- Hidden fields -->
+                        <input type="hidden" id="HomeId" name="HomeId">
+                        <input type="hidden" id="TotalPrice" name="TotalPrice">
+                        <input type="hidden" id="TotalDays" name="TotalDays">
+                        <input type="hidden" id="SelectedRoomIds" name="SelectedRoomIds">
+                        <input type="hidden" id="SelectedRoomData" name="SelectedRoomData">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveBookingBtn" onclick="saveBookingData()">
+                        <i class="fas fa-save"></i> Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Selection Modal -->
+    <div class="modal fade" id="roomSelectionModal" tabindex="-1" aria-labelledby="roomSelectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roomSelectionModalLabel">
+                        <i class="fas fa-map"></i> Select Rooms
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Choose your preferred rooms or leave empty to book the entire property.</strong>
+                    </div>
+                    
+                    <!-- Room list will be populated here -->
+                    <div id="roomListContainer">
+                        <div class="text-center p-4">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div class="mt-2">Loading rooms...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="confirmRoomSelection()">
+                        <i class="fas fa-check"></i> Confirm Selection
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
@@ -489,7 +941,28 @@
         </div>
     </footer>
 
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Make model data available to JavaScript
+        window.websiteData = {
+            homes: @Html.Raw(Json.Serialize(Model.Homes.Select(h => new { 
+                id = h.Id, 
+                name = h.Name, 
+                location = h.Location, 
+                pricePerDay = h.PricePerDay 
+            }))),
+            rooms: @Html.Raw(Json.Serialize(Model.Rooms.Select(r => new { 
+                id = r.Id, 
+                label = r.Name, 
+                price = r.PricePerDay, 
+                homeId = r.HomeId 
+            })))
+        };
+
+        // Room selection functionality
+        let selectedRooms = [];
+
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('checkin').setAttribute('min', today);
@@ -501,23 +974,599 @@
             document.getElementById('checkout').setAttribute('min', checkinDate);
         });
 
+        function handleFileUpload(input) {
+            const label = document.getElementById('documentLabel');
+            const fileInfo = label.querySelector('.file-info');
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileName = file.name;
+                const fileSize = (file.size / 1024 / 1024).toFixed(2); // Convert to MB
+
+                // Update label appearance
+                label.classList.add('has-file');
+                fileInfo.innerHTML = `<strong>${fileName}</strong> (${fileSize} MB)`;
+
+                // Update form validation
+                input.style.borderColor = '#28a745';
+            } else {
+                // Reset if no file
+                label.classList.remove('has-file');
+                fileInfo.innerHTML = 'Click to upload document (PDF, JPG, PNG, DOC)';
+                input.style.borderColor = '#e0e0e0';
+            }
+        }
+
         function searchAvailability() {
-            const property = document.getElementById('property').value;
+            const propertyId = document.getElementById('property').value;
             const checkin = document.getElementById('checkin').value;
             const checkout = document.getElementById('checkout').value;
 
-            if (!property || !checkin || !checkout) {
-                alert('Please fill in all fields to search availability.');
+            if (!propertyId || !checkin || !checkout) {
+                showNotification('Please fill in all fields to search availability.', 'error');
                 return;
             }
 
             if (new Date(checkout) <= new Date(checkin)) {
-                alert('Check-out date must be after check-in date.');
+                showNotification('Check-out date must be after check-in date.', 'error');
                 return;
             }
 
-            // In a real application, this would make an API call
-            alert(`Searching availability for ${property} from ${checkin} to ${checkout}. This would redirect to your booking system.`);
+            // Your existing AJAX call structure
+            $.ajax({
+                url: '/Scheduler/CheckBookings',
+                type: 'GET',
+                data: {
+                    startDate: checkin,
+                    endDate: checkout,
+                    homeId: propertyId
+                },
+                success: function (data) {
+                    const homeName = getHomeName(propertyId);
+                    const dateRange = `${new Date(checkin).toLocaleDateString()} - ${new Date(checkout).toLocaleDateString()}`;
+
+                    if (data) {
+                        showNotification(
+                            `${homeName} is already booked for ${dateRange}. Please select different dates.`,
+                            "error"
+                        );
+                    } else {
+                        showNotification(
+                            `${homeName} is available for ${dateRange}! You can proceed with booking.`,
+                            "success"
+                        );
+                        showBookingOption(propertyId, checkin, checkout, homeName);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error checking availability:", error);
+                    showNotification("Error checking availability. Please try again.", "error");
+                },
+                complete: function () {
+                    //hideLoading();
+                }
+            });
+        }
+
+        function getHomeName(homeId) {
+            // First try to get from model data
+            const home = window.websiteData.homes.find(h => h.id == homeId);
+            if (home) {
+                return home.name;
+            }
+            
+            // Fallback to select option
+            const homeSelector = document.getElementById('property');
+            for (let option of homeSelector.options) {
+                if (option.value === homeId) {
+                    return option.text;
+                }
+            }
+            return `Property ${homeId}`;
+        }
+
+        function showNotification(message, type = 'info', duration = 5000) {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                notification.remove();
+            });
+
+            const iconMap = {
+                'success': '✅',
+                'error': '❌',
+                'info': 'ℹ️'
+            };
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span class="notification-icon">${iconMap[type] || iconMap.info}</span>
+                <span class="notification-message">${message}</span>
+                <button class="notification-close" onclick="closeNotification(this)">&times;</button>
+            `;
+
+            document.body.appendChild(notification);
+
+            if (duration > 0) {
+                setTimeout(() => {
+                    closeNotification(notification.querySelector('.notification-close'));
+                }, duration);
+            }
+        }
+
+        function closeNotification(closeButton) {
+            const notification = closeButton.parentElement;
+            notification.classList.add('slide-out');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }
+
+        function showBookingOption(propertyId, checkin, checkout, homeName) {
+            // Create and show booking button
+            const existingActions = document.querySelector('.availability-actions');
+            if (existingActions) {
+                existingActions.remove();
+            }
+
+            const bookingActions = document.createElement('div');
+            bookingActions.className = 'availability-actions';
+            bookingActions.innerHTML = `
+                <button class="book-now-btn" onclick="openBookingModal('${propertyId}', '${checkin}', '${checkout}', '${homeName}')">
+                    <i class="fas fa-calendar-plus"></i> Book This Property
+                </button>
+            `;
+
+            // Insert after the booking form
+            document.querySelector('.booking-form').after(bookingActions);
+        }
+
+        function openBookingModal(propertyId, checkin, checkout, homeName) {
+            // Populate modal with data
+            document.getElementById('HomeId').value = propertyId;
+            document.getElementById('BookingDateFrom').value = checkin;
+            document.getElementById('BookingDateTo').value = checkout;
+            document.getElementById('SelectedProperty').value = homeName;
+
+            // Calculate days and pricing
+            const checkInDate = new Date(checkin);
+            const checkOutDate = new Date(checkout);
+            const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
+            const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            // Get pricing from model data
+            const pricePerDay = getPriceForProperty(propertyId);
+            const totalPrice = pricePerDay * totalDays;
+
+            document.getElementById('TotalDays').value = totalDays;
+            document.getElementById('TotalPrice').value = totalPrice;
+
+            // Update summary display
+            updateBookingSummary(homeName, checkin, checkout, totalDays, pricePerDay, totalPrice);
+
+            // Show modal
+            const modal = document.getElementById('bookingModal');
+            if (typeof bootstrap !== 'undefined') {
+                const bookingModal = new bootstrap.Modal(modal);
+                bookingModal.show();
+            } else {
+                modal.style.display = 'block';
+                modal.classList.add('show');
+            }
+        }
+
+        function getPriceForProperty(propertyId) {
+            // Get price from model data
+            const home = window.websiteData.homes.find(h => h.id == propertyId);
+            return home ? (home.pricePerDay || 100) : 100;
+        }
+
+        function updateBookingSummary(propertyName, checkin, checkout, days, pricePerDay, totalPrice) {
+            const bookingDetails = document.getElementById('bookingDetails');
+            const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+            const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
+            
+            // Calculate pricing based on room selection
+            let finalPrice = totalPrice;
+            let rateDescription = `${pricePerDay}/night (Entire Property)`;
+            
+            if (selectedRooms.length > 0) {
+                // Calculate price for selected rooms
+                const roomTotal = selectedRooms.reduce((sum, room) => sum + (room.price || 0), 0);
+                if (roomTotal > 0) {
+                    finalPrice = roomTotal * days;
+                    rateDescription = `${roomTotal}/night (Selected Rooms)`;
+                }
+            }
+
+            bookingDetails.innerHTML = `
+                <div class="booking-detail-item">
+                    <strong>Property:</strong> ${propertyName}
+                </div>
+                <div class="booking-detail-item">
+                    <strong>Check-in:</strong> ${new Date(checkin).toLocaleDateString()}
+                </div>
+                <div class="booking-detail-item">
+                    <strong>Check-out:</strong> ${new Date(checkout).toLocaleDateString()}
+                </div>
+                <div class="booking-detail-item">
+                    <strong>Duration:</strong> ${days} night${days > 1 ? 's' : ''}
+                </div>
+                <div class="booking-detail-item">
+                    <strong>Rate:</strong> ${rateDescription}
+                </div>
+            `;
+
+            totalPriceDisplay.innerHTML = `Total: ${finalPrice}`;
+            
+            // Update hidden field
+            document.getElementById('TotalPrice').value = finalPrice;
+        }
+
+        function validateForm() {
+            const requiredFields = ['CustomerName', 'CustomerEmail', 'CustomerPhone', 'GuestNumbers', 'Document'];
+            let isValid = true;
+
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (fieldId === 'Document') {
+                    // Special validation for file input
+                    if (!field.files || field.files.length === 0) {
+                        document.getElementById('documentLabel').style.borderColor = '#dc3545';
+                        isValid = false;
+                    } else {
+                        document.getElementById('documentLabel').style.borderColor = '#28a745';
+                    }
+                } else {
+                    if (!field.value.trim()) {
+                        field.style.borderColor = '#dc3545';
+                        isValid = false;
+                    } else {
+                        field.style.borderColor = '#e0e0e0';
+                    }
+                }
+            });
+
+            // Email validation
+            const email = document.getElementById('CustomerEmail').value;
+            const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            if (email && !emailRegex.test(email)) {
+                document.getElementById('CustomerEmail').style.borderColor = '#dc3545';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Your existing saveBookingData function structure preserved
+        function saveBookingData() {
+            // Validate form
+            if (!validateForm()) {
+                showNotification('Please fill in all required fields correctly.', 'error');
+                return;
+            }
+
+            // Get selected rooms data (if any) - for full property booking, this will be empty
+            const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
+            
+            // Prepare booking data with your exact structure
+            const bookingSaveModel = {
+                BookingData: {
+                    CustomerName: document.getElementById('CustomerName').value.trim(),
+                    CustomerEmail: document.getElementById('CustomerEmail').value.trim(),
+                    CustomerPhone: document.getElementById('CustomerPhone').value.trim(),
+                    Message: document.getElementById('Message').value.trim(),
+                    BookingDateFrom: document.getElementById('BookingDateFrom').value,
+                    BookingDateTo: document.getElementById('BookingDateTo').value,
+                    HomeId: parseInt(document.getElementById('HomeId').value),
+                    PaymentStatus: "pending",
+                    CreatedAt: new Date().toISOString(),
+                    Price: parseFloat(document.getElementById('TotalPrice').value),
+                    GuestNumbers: parseInt(document.getElementById('GuestNumbers').value),
+                    Document: document.getElementById('Document').files[0] ? document.getElementById('Document').files[0].name : null,
+                    IsBooked: false, // For website bookings (user requests)
+                    CheckOut: false,
+                    TotalDays: parseInt(document.getElementById('TotalDays').value)
+                },
+                Rooms: selectedRooms // This will be empty for full property bookings
+            };
+
+            // Disable submit button to prevent double submission
+            const submitBtn = document.getElementById('saveBookingBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            // Your existing AJAX structure preserved
+            $.ajax({
+                url: '/Scheduler/SaveBooking',
+                type: 'POST',
+                data: bookingSaveModel,
+                success: function (bookingData) {
+                    if (window.showNotification) {
+                        window.showNotification('Booking request submitted successfully! We will contact you soon.', 'success');
+                    } else {
+                        alert('Booking request submitted successfully! We will contact you soon.');
+                    }
+
+                    // Close modal
+                    $('#bookingModal').modal('hide');
+                    resetForm();
+
+                    // Remove booking button
+                    const bookingActions = document.querySelector('.availability-actions');
+                    if (bookingActions) {
+                        bookingActions.remove();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Booking submission error:', error);
+                    let errorMessage = 'Error saving booking. Please try again.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        errorMessage = xhr.responseText;
+                    }
+
+                    if (window.showNotification) {
+                        window.showNotification(errorMessage, 'error');
+                    } else {
+                        alert(errorMessage);
+                    }
+                },
+                complete: function () {
+                    // Re-enable submit button
+                    submitBtn.prop('disabled', false).html(originalText);
+                }
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('bookingModal');
+            if (typeof bootstrap !== 'undefined') {
+                const bookingModal = bootstrap.Modal.getInstance(modal);
+                if (bookingModal) {
+                    bookingModal.hide();
+                }
+            } else {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+            }
+        }
+
+        function resetBookingForm() {
+            document.getElementById('bookingForm').reset();
+            // Reset border colors
+            const fields = document.querySelectorAll('.form-control');
+            fields.forEach(field => {
+                field.style.borderColor = '#e0e0e0';
+            });
+            // Clear room selection
+            localStorage.removeItem('selectedRoomData');
+            selectedRooms = [];
+            updateRoomSelectionDisplay([], false);
+        }
+
+        function resetForm() {
+            resetBookingForm();
+        }
+
+        // Room Selection Functions
+        function openRoomSelection() {
+            const homeId = document.getElementById('HomeId').value;
+            if (!homeId) {
+                showNotification('Please select a property first', 'error');
+                return;
+            }
+            
+            // Load rooms for the selected property
+            loadRoomsForProperty(homeId);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('roomSelectionModal'));
+            modal.show();
+        }
+
+        function loadRoomsForProperty(homeId) {
+            const container = document.getElementById('roomListContainer');
+            container.innerHTML = `
+                <div class="text-center p-4">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="mt-2">Loading rooms...</div>
+                </div>
+            `;
+            
+            // Get rooms from the model data
+            const rooms = window.websiteData.rooms.filter(r => r.homeId == homeId);
+            
+            // Small delay for UX
+            setTimeout(() => displayRooms(rooms), 500);
+        }
+
+        function displayRooms(rooms) {
+            const container = document.getElementById('roomListContainer');
+            
+            let html = `
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="bookingType" id="entireProperty" value="entire" checked>
+                            <label class="form-check-label fw-bold" for="entireProperty">
+                                <i class="fas fa-home text-primary"></i> Book Entire Property
+                            </label>
+                            <div class="text-muted small ms-4">Get access to all rooms and facilities</div>
+                        </div>
+                    </div>
+            `;
+            
+            // Only show individual room selection if rooms are available
+            if (rooms.length > 0) {
+                html += `
+                    <div class="col-12 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="bookingType" id="selectiveRooms" value="selective">
+                            <label class="form-check-label fw-bold" for="selectiveRooms">
+                                <i class="fas fa-list text-success"></i> Select Individual Rooms
+                            </label>
+                            <div class="text-muted small ms-4">Choose specific rooms you need</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="roomCheckboxes" class="mt-3" style="display: none;">
+                    <div class="row">
+                `;
+                
+                rooms.forEach(room => {
+                    const isChargeable = room.price > 0;
+                    const roomPrice = room.price || 0;
+                    
+                    html += `
+                        <div class="col-md-6 mb-3">
+                            <div class="card room-card ${isChargeable ? 'border-primary' : 'border-secondary'}">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input room-checkbox" type="checkbox" 
+                                               id="room_${room.id}" value="${room.id}" 
+                                               data-name="${room.label}" data-price="${roomPrice}">
+                                        <label class="form-check-label" for="room_${room.id}">
+                                            <strong>${room.label}</strong>
+                                            ${isChargeable ? 
+                                                `<span class="badge bg-primary ms-2">${roomPrice}/night</span>` : 
+                                                '<span class="badge bg-secondary ms-2">Free</span>'
+                                            }
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                    </div>
+                </div>
+                `;
+            } else {
+                html += `
+                </div>
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Room details not configured.</strong><br>
+                    You can book the entire property which includes all available accommodations.
+                </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+            // Add event listeners
+            document.querySelectorAll('input[name="bookingType"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const roomCheckboxes = document.getElementById('roomCheckboxes');
+                    if (roomCheckboxes) {
+                        if (this.value === 'selective') {
+                            roomCheckboxes.style.display = 'block';
+                        } else {
+                            roomCheckboxes.style.display = 'none';
+                            // Clear all room selections
+                            document.querySelectorAll('.room-checkbox').forEach(cb => cb.checked = false);
+                        }
+                    }
+                });
+            });
+        }
+
+        function confirmRoomSelection() {
+            const bookingType = document.querySelector('input[name="bookingType"]:checked').value;
+            
+            if (bookingType === 'entire') {
+                // Entire property booking
+                selectedRooms = [];
+                localStorage.setItem('selectedRoomData', JSON.stringify([]));
+                updateRoomSelectionDisplay([], true);
+            } else {
+                // Selective room booking
+                const checkedRooms = document.querySelectorAll('.room-checkbox:checked');
+                selectedRooms = Array.from(checkedRooms).map(cb => {
+                    // Find the full room data from model
+                    const roomId = parseInt(cb.value);
+                    const roomData = window.websiteData.rooms.find(r => r.id === roomId);
+                    
+                    return {
+                        Id: roomId,
+                        Label: roomData ? roomData.label : cb.dataset.name,
+                        Price: roomData ? (roomData.price || 0) : parseFloat(cb.dataset.price || 0),
+                        HomeId: roomData ? roomData.homeId : null
+                    };
+                });
+                localStorage.setItem('selectedRoomData', JSON.stringify(selectedRooms));
+                updateRoomSelectionDisplay(selectedRooms, false);
+            }
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('roomSelectionModal'));
+            modal.hide();
+            
+            // Update pricing
+            const propertyId = document.getElementById('HomeId').value;
+            const checkin = document.getElementById('BookingDateFrom').value;
+            const checkout = document.getElementById('BookingDateTo').value;
+            const homeName = getHomeName(propertyId);
+            
+            if (checkin && checkout && propertyId) {
+                // Recalculate pricing with room selection
+                const checkInDate = new Date(checkin);
+                const checkOutDate = new Date(checkout);
+                const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
+                const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                const pricePerDay = getPriceForProperty(propertyId);
+                
+                // Calculate total price considering room selection
+                let finalPrice = pricePerDay * totalDays;
+                if (selectedRooms.length > 0) {
+                    const roomTotal = selectedRooms.reduce((sum, room) => sum + (room.Price || 0), 0);
+                    if (roomTotal > 0) {
+                        finalPrice = roomTotal * totalDays;
+                    }
+                }
+                
+                updateBookingSummary(homeName, checkin, checkout, totalDays, pricePerDay, finalPrice);
+                
+                // Update hidden fields
+                document.getElementById('SelectedRoomIds').value = selectedRooms.map(room => room.Id).join(',');
+                document.getElementById('SelectedRoomData').value = JSON.stringify(selectedRooms);
+            }
+        }
+
+        function updateRoomSelectionDisplay(rooms, isEntireProperty) {
+            const badge = document.getElementById('roomSelectionBadge');
+            const summary = document.getElementById('roomSelectionSummary');
+            const display = document.getElementById('selectedRoomsDisplay');
+            
+            if (isEntireProperty) {
+                badge.textContent = 'Full';
+                badge.className = 'room-badge bg-success';
+                badge.classList.remove('d-none');
+                
+                display.innerHTML = '<strong>Entire Property Selected</strong><br><small class="text-muted">Access to all rooms and facilities</small>';
+                summary.classList.remove('d-none');
+            } else if (rooms.length > 0) {
+                badge.textContent = rooms.length;
+                badge.className = 'room-badge bg-warning';
+                badge.classList.remove('d-none');
+                
+                const roomNames = rooms.map(r => r.Label).join(', ');
+                display.innerHTML = `<strong>Selected Rooms:</strong><br>${roomNames}`;
+                summary.classList.remove('d-none');
+            } else {
+                badge.classList.add('d-none');
+                summary.classList.add('d-none');
+            }
         }
 
         // Smooth scrolling for navigation links

@@ -45,10 +45,8 @@ public partial class Assignment6Context : DbContext
                 .IsRequired()
                 .HasDefaultValue("");
             entity.Property(e => e.GuestNumbers).HasColumnName("Guest_Numbers");
+            entity.Property(e => e.IsBooked).HasColumnName("isBooked");
             entity.Property(e => e.PaymentStatus)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.Source)
                 .IsRequired()
                 .HasMaxLength(50);
 
