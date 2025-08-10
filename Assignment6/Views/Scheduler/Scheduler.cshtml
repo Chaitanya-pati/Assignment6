@@ -738,6 +738,186 @@
             cursor: not-allowed;
             transform: none;
         }
+
+    /* Enhanced booking day cells */
+    .booking-overlay {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        font-size: 0.7rem !important;
+        line-height: 1.1 !important;
+        padding: 2px !important;
+        z-index: 1 !important;
+        border-radius: 4px !important;
+        pointer-events: none; /* Allow clicks to pass through to day cell */
+    }
+
+    .booking-customer {
+        font-weight: bold !important;
+        margin-bottom: 1px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .booking-property {
+        font-size: 0.6rem !important;
+        opacity: 0.9 !important;
+        margin-bottom: 1px !important;
+    }
+
+    .booking-price {
+        font-size: 0.65rem !important;
+        font-weight: bold !important;
+        background: rgba(255,255,255,0.2) !important;
+        padding: 1px 3px !important;
+        border-radius: 2px !important;
+    }
+
+    /* Day numbers should remain visible */
+    .fc-daygrid-day-number {
+        position: relative !important;
+        z-index: 2 !important;
+        background: rgba(255, 255, 255, 0.3) !important;
+        border-radius: 50% !important;
+        width: 1.4rem !important;
+        height: 1.4rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 2px !important;
+        color: white !important;
+        font-weight: bold !important;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.5) !important;
+        pointer-events: none; /* Allow clicks to pass through */
+    }
+
+    /* Available dates hover effect */
+    .fc-daygrid-day:not(:has(.booking-overlay)):hover {
+        background-color: rgba(44, 62, 80, 0.1) !important;
+        cursor: pointer !important;
+        transition: background-color 0.2s ease !important;
+    }
+
+        .fc-daygrid-day:not(:has(.booking-overlay)):hover::before {
+            content: "Click to book" !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            background: rgba(44, 62, 80, 0.9) !important;
+            color: white !important;
+            padding: 4px 8px !important;
+            border-radius: 4px !important;
+            font-size: 0.7rem !important;
+            z-index: 10 !important;
+            pointer-events: none !important;
+        }
+
+    /* Booked dates hover effect */
+    .fc-daygrid-day:has(.booking-overlay):hover {
+        opacity: 0.9 !important;
+        transform: scale(1.01) !important;
+        transition: all 0.2s ease !important;
+        z-index: 10 !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+    }
+
+        .fc-daygrid-day:has(.booking-overlay):hover::before {
+            content: "Click to view details" !important;
+            position: absolute !important;
+            bottom: 2px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            background: rgba(0,0,0,0.8) !important;
+            color: white !important;
+            padding: 2px 6px !important;
+            border-radius: 3px !important;
+            font-size: 0.6rem !important;
+            z-index: 10 !important;
+            pointer-events: none !important;
+        }
+
+    /* Ensure all day cells are clickable */
+    .fc-daygrid-day {
+        cursor: pointer !important;
+        position: relative !important;
+    }
+
+    .booking-overlay {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        font-size: 0.7rem !important;
+        line-height: 1.1 !important;
+        padding: 2px !important;
+        z-index: 1 !important;
+        border-radius: 4px !important;
+    }
+
+    .booking-customer {
+        font-weight: bold !important;
+        margin-bottom: 1px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .booking-property {
+        font-size: 0.6rem !important;
+        opacity: 0.9 !important;
+        margin-bottom: 1px !important;
+    }
+
+    .booking-price {
+        font-size: 0.65rem !important;
+        font-weight: bold !important;
+        background: rgba(255,255,255,0.2) !important;
+        padding: 1px 3px !important;
+        border-radius: 2px !important;
+    }
+
+    /* Day numbers should remain visible */
+    .fc-daygrid-day-number {
+        position: relative !important;
+        z-index: 2 !important;
+        background: rgba(255, 255, 255, 0.3) !important;
+        border-radius: 50% !important;
+        width: 1.4rem !important;
+        height: 1.4rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 2px !important;
+        color: white !important;
+        font-weight: bold !important;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.5) !important;
+    }
+
+    /* Available dates hover effect */
+    .fc-daygrid-day:not(:has(.booking-overlay)):hover {
+        background-color: rgba(44, 62, 80, 0.1) !important;
+        cursor: pointer !important;
+        transition: background-color 0.2s ease !important;
+    }
+
+    /* Booked dates hover effect */
+    .fc-daygrid-day:has(.booking-overlay):hover {
+        opacity: 0.8 !important;
+        transform: scale(1.01) !important;
+        transition: all 0.2s ease !important;
+        z-index: 10 !important;
+    }
 </style>
 
 
@@ -1083,44 +1263,114 @@
     var calendarEl = document.getElementById('calendar');
     var calendar;
 
-    // REPLACE your existing calendar initialization with this:
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         selectable: true,
         selectMirror: true,
         eventColor: '#2c3e50',
         height: 'auto',
+        validRange: {
+            start: new Date().toISOString().split('T')[0] // Only allow today and future dates
+        },
+        eventSources: [],
+        eventDisplay: 'background', // Show events as background colors
+        displayEventTime: false,
+        displayEventEnd: false,
 
-        // REMOVE OR COMMENT OUT this validRange restriction
-        // validRange: {
-        //     start: new Date().toISOString().split('T')[0]  // disables all dates before today
-        // },
+        // Make booked dates unclickable for NEW BOOKINGS only
+        selectAllow: function (selectInfo) {
+            const selectedStart = new Date(selectInfo.startStr);
+            const selectedEnd = new Date(selectInfo.endStr);
 
-        // ADD these properties to ensure proper event loading
-        eventSources: [], // Initialize empty
-        eventDisplay: 'block',
-        displayEventTime: true,
-        displayEventEnd: true,
+            // Check if any day in selection overlaps with existing bookings
+            const hasConflict = calendar.getEvents().some(event => {
+                const eventStart = new Date(event.startStr);
+                const eventEnd = new Date(event.endStr);
 
+                // Check for date overlap (excluding checkout day)
+                return (selectedStart < eventEnd && selectedEnd > eventStart);
+            });
+
+            return !hasConflict;
+        },
+
+        // Handle date clicking - allow both booking creation and detail viewing
+        dateClick: function (info) {
+            const clickedDate = new Date(info.dateStr);
+
+            // Check if clicked date has any booking
+            const bookedEvent = calendar.getEvents().find(event => {
+                const eventStart = new Date(event.startStr);
+                const eventEnd = new Date(event.endStr);
+
+                // Date has booking if it falls within booking period (excluding checkout day)
+                return clickedDate >= eventStart && clickedDate < eventEnd;
+            });
+
+            if (bookedEvent) {
+                // Show booking details if date is booked
+                showEventDetails(bookedEvent);
+            } else {
+                // Allow new booking if date is available
+                handleDateClick(info.dateStr);
+            }
+        },
+
+        // Custom styling for booked days
         eventDidMount: function (info) {
+            if (info.event.display === 'background') {
+                const dayEl = info.el.closest('.fc-daygrid-day');
+                if (dayEl) {
+                    // Style the entire day cell
+                    dayEl.style.backgroundColor = info.event.backgroundColor;
+                    dayEl.style.color = 'white';
+                    dayEl.style.cursor = 'pointer'; // Keep cursor pointer for clicking
+                    dayEl.style.position = 'relative';
+
+                    // Add booking details overlay
+                    const overlay = document.createElement('div');
+                    overlay.className = 'booking-overlay';
+                    // In the eventDidMount function, replace the overlay innerHTML:
+                    overlay.innerHTML = `
+                            <div class="booking-customer">${info.event.title}</div>
+                            <div class="booking-property">${info.event.extendedProps.homeName}</div>
+                            <div class="booking-price">₹${info.event.extendedProps.price}</div>
+                        `;
+
+                    dayEl.appendChild(overlay);
+
+                    // Add click handler directly to the day cell for booking details
+                    dayEl.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        showEventDetails(info.event);
+                    });
+
+
+                }
+            }
+
+            // Add tooltip
+            // Add tooltip with Indian Rupee
             $(info.el).tooltip({
-                title: info.event.title,
+                title: `Click to view details: ${info.event.title} - ${info.event.extendedProps.homeName} (₹${info.event.extendedProps.price})`,
                 placement: 'top',
                 trigger: 'hover',
                 container: 'body'
             });
         },
+
+        // Keep the original eventClick for backup
+        eventClick: function (info) {
+            showEventDetails(info.event);
+        },
+
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-        dateClick: function (info) {
-            handleDateClick(info.dateStr);
-        },
-        eventClick: function (info) {
-            showEventDetails(info.event);
-        },
+
         loading: function (bool) {
             if (bool) {
                 showLoading();
@@ -1129,15 +1379,11 @@
             }
         },
 
-        // ADD this to handle month changes
         datesSet: function (info) {
             console.log('Calendar view changed:', info.startStr, 'to', info.endStr);
-            // Optionally refresh events when month changes
             fetchAndDisplayBookings();
         }
     });
-    //calendar.render();
-
     // Event Listeners
     document.getElementById("test-button").addEventListener("click", syncAirbnb);
     document.getElementById("book").addEventListener("click", fetchAndDisplayBookings);
@@ -1245,19 +1491,20 @@
                     const homeName = getHomeName(booking.homeId);
                     const roomCount = booking.bookingRooms ? booking.bookingRooms.length : 0;
 
-                    // IMPORTANT: Ensure dates are properly formatted
-                    const startDate = new Date(booking.bookingDateFrom);
-                    const endDate = new Date(booking.bookingDateTo);
+                    // Use actual dates without manipulation
+                    const startDate = booking.bookingDateFrom; // Already in YYYY-MM-DD format
+                    const endDate = booking.bookingDateTo;     // Already in YYYY-MM-DD format
 
-                    console.log(`Booking ${booking.id}: ${startDate.toISOString()} to ${endDate.toISOString()}`);
+                    console.log(`Booking ${booking.id}: ${startDate} to ${endDate}`);
 
                     return {
                         id: booking.id,
-                        title: `${homeName} - ${roomCount} room(s) - ${booking.customerName}`,
-                        start: startDate.toISOString(), // Ensure ISO format
-                        end: endDate.toISOString(),     // Ensure ISO format
+                        title: `${booking.customerName}`,
+                        start: startDate,
+                        end: endDate,
                         color: getBookingColor(booking.paymentStatus),
-                        allDay: false, // Set to false to show time
+                        allDay: true,
+                        display: 'background', // This colors the entire day cell
                         extendedProps: {
                             customerName: booking.customerName,
                             customerEmail: booking.customerEmail,
@@ -1275,7 +1522,7 @@
 
                 console.log("Processed events:", events);
 
-                // Add events to calendar using addEventSource for better performance
+                // Add events to calendar
                 calendar.addEventSource(events);
 
                 // Force calendar to re-render
@@ -1573,7 +1820,7 @@
                     <div class="col-7">${props.roomCount || 0}</div>
 
                     <div class="col-5"><strong>Total:</strong></div>
-                    <div class="col-7"><strong>${props.price || 0}</strong></div>
+                    <div class="col-7"><strong>₹${props.price || 0}</strong></div>
                 </div>
 
                 ${props.message ? `
@@ -1591,7 +1838,6 @@
 
         showNotification(eventInfo, 'info', 0);
     }
-
     // REPLACE your existing updatePaymentStatus function with this:
     function completeBookingWithInvoice(bookingId, bookingTitle) {
         const checkbox = document.getElementById(`paymentPaidCheck_${bookingId}`);

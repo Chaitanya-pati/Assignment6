@@ -34,25 +34,21 @@ namespace Assignment6.Controllers
             return savedHome.Id;
         }
 
-    
-        public List<Room> SaveRooms(List<Room> roomSaveRequests)
-        {
-            var savedRooms =  _configurationService.SaveRooms(roomSaveRequests);
-            return savedRooms;
-        } 
-        
-        //public List<Room> UpdateHome(List<Room> roomSaveRequests)
-        //{
-        //    var savedRooms =  _configurationService.UpdateHome(roomSaveRequests);
-        //    return savedRooms;
-        //}
 
-        public bool SaveLayoutElements(List<LayoutElement> layoutElements)
+        [HttpPost]
+        public List<Room> SaveRooms([FromBody] List<Room> roomSaveRequests)
         {
-            var isSaved =  _configurationService.SaveLayoutElement(layoutElements);
+            var savedRooms = _configurationService.SaveRooms(roomSaveRequests);
+            return savedRooms;
+        }
+
+        [HttpPost]
+        public bool SaveLayoutElements([FromBody] List<LayoutElement> layoutElements)
+        {
+            var isSaved = _configurationService.SaveLayoutElement(layoutElements);
             return isSaved;
-        } 
-        
+        }
+
         public List<LayoutElement> GetLayoutByhomeId(int homeId)
         {
             var layoutElements =  _configurationService.GetLayout(homeId);

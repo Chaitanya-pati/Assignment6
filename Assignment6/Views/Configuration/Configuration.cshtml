@@ -433,6 +433,22 @@
             margin-right: 0.5rem;
         }
     }
+
+    .room-price {
+        position: absolute;
+        bottom: 2px;
+        left: 2px;
+        font-size: 0.6rem !important;
+        background: rgba(39, 174, 96, 0.9) !important;
+        color: white !important;
+        padding: 1px 4px !important;
+        border-radius: 2px !important;
+        font-weight: bold !important;
+    }
+
+    .room-element:hover .room-price {
+        background: rgba(39, 174, 96, 1) !important;
+    }
 </style>
 
 <div class="header">
@@ -520,6 +536,12 @@
     <div class="property-group">
         <label><i class="fas fa-tag me-1"></i>Label:</label>
         <input type="text" id="labelInput">
+    </div>
+    <!-- ADD: Price input field -->
+    <div class="property-group">
+        <label><i class="fas fa-rupee-sign me-1"></i>Price per Day (₹):</label>
+        <input type="number" id="priceInput" min="0" step="100" placeholder="0">
+        <small class="text-muted">Leave 0 for non-chargeable rooms</small>
     </div>
 </div>
 
@@ -763,9 +785,14 @@
         const roomId = parseInt(maxRoomId) + (++elementCounter);
         element.id = roomId;
 
+        // Set default price based on room type
+        const defaultPrice = getDefaultRoomPrice(type);
+        element.setAttribute('data-price', defaultPrice);
+
         const label = type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ');
         element.innerHTML = `
             <span>${label}</span>
+            <div class="room-price">₹${defaultPrice}</div>
             <div class="resize-handle"></div>
             <button class="delete-btn" onclick="deleteElement('${roomId}')">×</button>
         `;
@@ -783,6 +810,22 @@
         selectElement({ target: element });
 
         return element;
+    }
+
+    // ADD: Function to get default room prices
+    function getDefaultRoomPrice(roomType) {
+        const defaultPrices = {
+            'bedroom': 1500,
+            'bathroom': 0,
+            'kitchen': 0,
+            'living-room': 0,
+            'dining-room': 0,
+            'hall': 0,
+            'lobby': 500,
+            'garden': 0,
+            'parking': 0
+        };
+        return defaultPrices[roomType] || 1000;
     }
 
     function handleMouseDown(e) {
@@ -894,7 +937,26 @@
         document.getElementById('xInput').value = parseInt(selectedElement.style.left);
         document.getElementById('yInput').value = parseInt(selectedElement.style.top);
         document.getElementById('labelInput').value = selectedElement.querySelector('span').textContent;
+        // ADD: Update price input
+        document.getElementById('priceInput').value = selectedElement.getAttribute('data-price') || 0;
     }
+
+    // ADD: Price input handler
+    document.getElementById('priceInput').addEventListener('input', (e) => {
+        if (selectedElement) {
+            const price = parseInt(e.target.value) || 0;
+            selectedElement.setAttribute('data-price', price);
+
+            // Update price display in room
+            let priceDisplay = selectedElement.querySelector('.room-price');
+            if (!priceDisplay) {
+                priceDisplay = document.createElement('div');
+                priceDisplay.className = 'room-price';
+                selectedElement.appendChild(priceDisplay);
+            }
+            priceDisplay.textContent = `₹${price}`;
+        }
+    });
 
     // Properties panel inputs
     document.getElementById('widthInput').addEventListener('input', (e) => {
@@ -947,6 +1009,7 @@
         const elements = Array.from(document.querySelectorAll('.room-element')).map(el => {
             const roomId = parseInt(el.id);
             const type = el.getAttribute('data-type');
+            const price = parseInt(el.getAttribute('data-price')) || 0;
 
             rooms.push(roomId);
 
@@ -958,7 +1021,8 @@
                 label: el.querySelector('span').textContent,
                 type: type,
                 roomId: roomId,
-                homeId: localStorage.getItem('maxHomeId')
+                homeId: localStorage.getItem('maxHomeId'),
+                pricePerDay: price // ADD: Include price in layout data
             };
         });
 
@@ -970,30 +1034,65 @@
             roomsData: rooms
         };
 
-        localStorage.setItem('homestayLayout', JSON.stringify(layout));
-        
-        // Show success message
-        const successMsg = document.createElement('div');
-        successMsg.className = 'alert alert-success';
-        successMsg.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            padding: 1rem;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        `;
-        successMsg.innerHTML = '<i class="fas fa-check-circle me-2"></i>Layout saved successfully!';
-        document.body.appendChild(successMsg);
-        
-        setTimeout(() => {
-            successMsg.remove();
-            window.close();
-        }, 2000);
+        // Save layout and rooms with prices
+        Promise.all([
+            saveLayoutElements(layout.elements),
+            saveRoomsWithPrices(layout.elements)
+        ]).then(() => {
+            localStorage.setItem('homestayLayout', JSON.stringify(layout));
+
+            const successMsg = document.createElement('div');
+            successMsg.className = 'alert alert-success';
+            successMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                padding: 1rem;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+            `;
+            successMsg.innerHTML = '<i class="fas fa-check-circle me-2"></i>Layout and room prices saved successfully!';
+            document.body.appendChild(successMsg);
+
+            setTimeout(() => {
+                successMsg.remove();
+                window.close();
+            }, 2000);
+        });
+    }
+
+    // ADD: Function to save rooms with prices
+    function saveRoomsWithPrices(elements) {
+        const roomsData = elements.map(el => ({
+            Id: el.roomId,
+            Name: el.label,
+            Type: el.type,
+            PricePerDay: el.pricePerDay,
+            HomeId: localStorage.getItem('maxHomeId')
+        }));
+
+        return fetch('/Configuration/SaveRooms', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(roomsData)
+        });
+    }
+
+    // ADD: Function to save layout elements
+    function saveLayoutElements(elements) {
+        return fetch('/Configuration/SaveLayoutElements', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(elements)
+        });
     }
 
     function loadLayout() {

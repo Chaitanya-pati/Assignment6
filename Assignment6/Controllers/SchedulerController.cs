@@ -235,8 +235,7 @@ namespace Assignment6.Controllers
         public IActionResult GetHomeDrawing(int homeId)
         {
             var home = _bookingService.GetHomeDrawing(homeId);
-
-            var layouts = _bookingService.GetLayoutByHomeId(homeId);
+            var layouts = _bookingService.GetLayoutByHomeId(homeId); // This now includes Room data
 
             var model = new HomeLayoutViewModel
             {
@@ -346,8 +345,9 @@ namespace Assignment6.Controllers
                     customerEmail = b.CustomerEmail,
                     customerPhone = b.CustomerPhone,
                     message = b.Message,
-                    bookingDateFrom = b.BookingDateFrom.ToString("yyyy-MM-ddTHH:mm:ss"),
-                    bookingDateTo = b.BookingDateTo.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    // FIXED: Don't add extra day to checkout date
+                    bookingDateFrom = b.BookingDateFrom.ToString("yyyy-MM-dd"),
+                    bookingDateTo = b.BookingDateTo.ToString("yyyy-MM-dd"), // Use actual checkout date
                     homeId = b.HomeId,
                     paymentStatus = b.PaymentStatus,
                     price = b.Price,
@@ -369,7 +369,6 @@ namespace Assignment6.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
         // REPLACE the existing GenerateInvoice method with this updated version
 
 

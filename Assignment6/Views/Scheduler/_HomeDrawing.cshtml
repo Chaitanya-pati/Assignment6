@@ -386,6 +386,72 @@
             min-height: 25px;
         }
     }
+
+    .room-price-tag {
+        position: absolute !important;
+        bottom: 2px !important;
+        right: 2px !important;
+        background: var(--success-color) !important;
+        color: white !important;
+        font-size: 0.6rem !important;
+        padding: 1px 4px !important;
+        border-radius: 2px !important;
+        font-weight: bold !important;
+    }
+
+    .room-block:hover .room-price-tag {
+        background: #229954 !important;
+    }
+
+    .room-label {
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        text-align: center !important;
+        width: 90% !important;
+    }
+
+    /* Common area styling */
+    .room-block.common-area {
+        background-color: #e8f5e8 !important;
+        border-color: var(--success-color) !important;
+    }
+
+        .room-block.common-area.selected {
+            background-color: var(--success-color) !important;
+            border-color: var(--success-color) !important;
+            color: var(--white) !important;
+        }
+
+    .room-included-tag {
+        position: absolute !important;
+        bottom: 2px !important;
+        right: 2px !important;
+        background: var(--info-color) !important;
+        color: white !important;
+        font-size: 0.5rem !important;
+        padding: 1px 3px !important;
+        border-radius: 2px !important;
+        font-weight: bold !important;
+    }
+
+    .room-block.common-area:hover .room-included-tag {
+        background: #2980b9 !important;
+    }
+
+    /* Ensure room labels don't overlap with price tags */
+    .room-label {
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        text-align: center !important;
+        width: 85% !important;
+        font-size: 0.75rem !important;
+        line-height: 1.1 !important;
+        padding-bottom: 12px !important; /* Space for price tag */
+    }
 </style>
 
 <div class="modal fade" id="homeDrawingModal" tabindex="-1" aria-labelledby="homeDrawingModalLabel" aria-hidden="true">
@@ -457,8 +523,13 @@
                             {
                                 foreach (var layout in Model.Layouts)
                                 {
-                                    var roomPrice = layout.Room?.PricePerDay ?? Model.Home?.PricePerDay ?? 0;
-                                    <div class="room-block room-checkbox"
+                                    var roomPrice = layout.Room?.PricePerDay ?? 0;
+                                    var isCommonArea = layout.Label.ToLower().Contains("hall") || layout.Label.ToLower().Contains("balcony") ||
+                                    layout.Label.ToLower().Contains("living room") || layout.Label.ToLower().Contains("lounge") ||
+                                    layout.Label.ToLower().Contains("kitchen") || layout.Label.ToLower().Contains("dining room") ||
+                                    layout.Label.ToLower().Contains("corridor");
+
+                                    <div class="room-block room-checkbox @(isCommonArea ? "common-area" : "")"
                                          data-room-id="@layout.RoomId"
                                          data-layout-id="@layout.Id"
                                          data-x="@layout.X"
@@ -466,11 +537,20 @@
                                          data-width="@layout.Width"
                                          data-height="@layout.Height"
                                          data-price="@roomPrice"
+                                         data-is-common="@isCommonArea.ToString().ToLower()"
                                          data-bs-toggle="tooltip"
                                          data-bs-placement="top"
-                                         title="@layout.Label - ₹@roomPrice/day">
-                                        <input type="checkbox" class="form-check-input d-none" name="SelectedRoomIds" value="@layout.RoomId" />
-                                        @layout.Label
+                                         title="@layout.Label - @(isCommonArea ? "Included" : "₹" + roomPrice + "/day")">
+                                        <input type="checkbox" class="form-check-input d-none" name="SelectedRoomIds" value="@layout.RoomId" @(isCommonArea ? "checked" : "") />
+                                        <span class="room-label">@layout.Label</span>
+                                        @if (!isCommonArea && roomPrice > 0)
+                                        {
+                                            <div class="room-price-tag">₹@roomPrice</div>
+                                        }
+                                        else if (isCommonArea)
+                                        {
+                                            <div class="room-included-tag">Included</div>
+                                        }
                                     </div>
                                 }
                             }
@@ -546,369 +626,395 @@
 </div>
 
 <script>
-$(document).ready(function () {
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Get current home ID from booking form
-    function getCurrentHomeId() {
-        return $('#HomeId').val() || $('#selectRoomsBtn').attr('data-home-id');
-    }
-
-    // Responsive room rendering
-    function renderScaledRooms() {
-        const layout = document.getElementById('layoutArea');
-        if (!layout) return;
-        
-        const designWidth = parseFloat(layout.dataset.designWidth) || 800;
-        const designHeight = parseFloat(layout.dataset.designHeight) || 600;
-
-        const actualWidth = layout.clientWidth;
-        const actualHeight = layout.clientHeight;
-
-        const scaleX = actualWidth / designWidth;
-        const scaleY = actualHeight / designHeight;
-
-        layout.querySelectorAll('.room-block').forEach(el => {
-            const x = parseFloat(el.dataset.x);
-            const y = parseFloat(el.dataset.y);
-            const w = parseFloat(el.dataset.width);
-            const h = parseFloat(el.dataset.height);
-
-            el.style.left = (x * scaleX) + 'px';
-            el.style.top = (y * scaleY) + 'px';
-            el.style.width = (w * scaleX) + 'px';
-            el.style.height = (h * scaleY) + 'px';
+    $(document).ready(function () {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-    }
 
-    // Load room layout for selected home
-    function loadHomeLayout(homeId) {
-        if (!homeId) return;
-        
-        $('#layoutLoading').removeClass('d-none');
-        
-        $.ajax({
-            url: '/Scheduler/GetHomeLayout/' + homeId,
-            type: 'GET',
-            success: function(response) {
-                if (response && response.layouts && response.layouts.length > 0) {
-                    $('#layoutArea .room-block').remove();
-                    
-                    response.layouts.forEach(function(layout) {
-                        const roomPrice = layout.room?.pricePerDay || response.home?.pricePerDay || 0;
-                        const roomBlock = $(`
-                            <div class="room-block room-checkbox"
-                                 data-room-id="${layout.roomId}"
-                                 data-layout-id="${layout.id}"
-                                 data-x="${layout.x}"
-                                 data-y="${layout.y}"
-                                 data-width="${layout.width}"
-                                 data-height="${layout.height}"
-                                 data-price="${roomPrice}"
-                                 data-bs-toggle="tooltip"
-                                 data-bs-placement="top"
-                                 title="${layout.label} - ₹${roomPrice}/day">
-                                <input type="checkbox" class="form-check-input d-none" name="SelectedRoomIds" value="${layout.roomId}" />
-                                ${layout.label}
-                            </div>
-                        `);
-                        $('#layoutArea').append(roomBlock);
-                    });
-                    
-                    if (response.home) {
-                        updateHomeInfo(response.home);
-                    }
-                    
-                    $('#totalRooms').text(response.layouts.length);
-                    
+        // Get current home ID from booking form
+        function getCurrentHomeId() {
+            return $('#HomeId').val() || $('#selectRoomsBtn').attr('data-home-id');
+        }
+
+        // Updated function to check if room should be charged
+        function isChargeableRoom(roomLabel) {
+            const freeRooms = ['hall', 'balcony', 'living room', 'lounge', 'kitchen', 'dining room', 'corridor'];
+            const label = roomLabel.toLowerCase();
+            return !freeRooms.some(free => label.includes(free));
+        }
+
+        // Updated function to check if room is common area
+        function isCommonArea(roomElement) {
+            return $(roomElement).data('is-common') === true || $(roomElement).data('is-common') === 'true';
+        }
+
+        // Responsive room rendering
+        function renderScaledRooms() {
+            const layout = document.getElementById('layoutArea');
+            if (!layout) return;
+
+            const designWidth = parseFloat(layout.dataset.designWidth) || 800;
+            const designHeight = parseFloat(layout.dataset.designHeight) || 600;
+
+            const actualWidth = layout.clientWidth;
+            const actualHeight = layout.clientHeight;
+
+            const scaleX = actualWidth / designWidth;
+            const scaleY = actualHeight / designHeight;
+
+            layout.querySelectorAll('.room-block').forEach(el => {
+                const x = parseFloat(el.dataset.x);
+                const y = parseFloat(el.dataset.y);
+                const w = parseFloat(el.dataset.width);
+                const h = parseFloat(el.dataset.height);
+
+                el.style.left = (x * scaleX) + 'px';
+                el.style.top = (y * scaleY) + 'px';
+                el.style.width = (w * scaleX) + 'px';
+                el.style.height = (h * scaleY) + 'px';
+            });
+        }
+
+        // Load room layout for selected home
+        function loadHomeLayout(homeId) {
+            if (!homeId) return;
+
+            $('#layoutLoading').removeClass('d-none');
+
+            $.ajax({
+                url: '/Scheduler/GetHomeDrawing?homeId=' + homeId,
+                type: 'GET',
+                success: function (html) {
+                    // Replace the entire modal content with new layout
+                    $('#homeDrawingContainer').html(html);
+
                     setTimeout(() => {
                         renderScaledRooms();
                         loadSavedSelections();
-                        
+
+                        // Auto-select all common areas
+                        $('.room-block.common-area').each(function () {
+                            $(this).addClass('selected');
+                            $(this).find('input[type="checkbox"]').prop('checked', true);
+                        });
+
+                        updateSelectionSummary();
+
                         // Reinitialize tooltips for new elements
                         $('[data-bs-toggle="tooltip"]').tooltip();
                     }, 100);
+
+                    $('#layoutLoading').addClass('d-none');
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading home layout:', error);
+                    $('#layoutLoading').addClass('d-none');
+
+                    $('#layoutArea').html(`
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h5>Error Loading Layout</h5>
+                            <p>Unable to load room layout for this property.</p>
+                            <p class="small">Please try again or contact support.</p>
+                        </div>
+                    `);
                 }
-                
-                $('#layoutLoading').addClass('d-none');
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading home layout:', error);
-                $('#layoutLoading').addClass('d-none');
-                
+            });
+        }
+
+        // Update home information display
+        function updateHomeInfo(home) {
+            const homeInfoHtml = `
+                <div class="home-info">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6>
+                                <i class="fas fa-building me-2"></i>${home.name}
+                            </h6>
+                            <p class="mb-1">
+                                <i class="fas fa-map-marker-alt me-1"></i>${home.location}
+                            </p>
+                            ${home.description ? `<p class="mb-0 small">${home.description}</p>` : ''}
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <div class="price-badge">
+                                <i class="fas fa-rupee-sign me-1"></i>₹${home.pricePerDay}/day
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $('.home-info').replaceWith(homeInfoHtml);
+        }
+
+        // Render rooms when modal is shown
+        $('#homeDrawingModal').on('shown.bs.modal', function () {
+            const homeId = getCurrentHomeId();
+            if (homeId) {
+                setTimeout(() => {
+                    renderScaledRooms();
+                    loadSavedSelections();
+
+                    // Auto-select all common areas
+                    $('.room-block.common-area').each(function () {
+                        $(this).addClass('selected');
+                        $(this).find('input[type="checkbox"]').prop('checked', true);
+                    });
+
+                    updateSelectionSummary();
+                }, 100);
+            } else {
                 $('#layoutArea').html(`
                     <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h5>Error Loading Layout</h5>
-                        <p>Unable to load room layout for this property.</p>
-                        <p class="small">Please try again or contact support.</p>
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h5>No Property Selected</h5>
+                        <p>Please select a property first.</p>
+                        <p class="small">Go back and choose a property from the dropdown.</p>
                     </div>
                 `);
             }
         });
-    }
 
-    // Update home information display
-    function updateHomeInfo(home) {
-        const homeInfoHtml = `
-            <div class="home-info">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h6>
-                            <i class="fas fa-building me-2"></i>${home.name}
-                        </h6>
-                        <p class="mb-1">
-                            <i class="fas fa-map-marker-alt me-1"></i>${home.location}
-                        </p>
-                        ${home.description ? `<p class="mb-0 small">${home.description}</p>` : ''}
-                    </div>
-                    <div class="col-md-4 text-md-end">
-                        <div class="price-badge">
-                            <i class="fas fa-rupee-sign me-1"></i>₹${home.pricePerDay}/day
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        $('.home-info').replaceWith(homeInfoHtml);
-    }
+        // Re-render on window resize
+        let resizeTimeout;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(renderScaledRooms, 100);
+        });
 
-    // Render rooms when modal is shown
-    $('#homeDrawingModal').on('shown.bs.modal', function () {
-        const homeId = getCurrentHomeId();
-        if (homeId) {
+        // Load saved selections from localStorage
+        function loadSavedSelections() {
+            const savedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
+            const currentHomeId = getCurrentHomeId();
+
+            const currentHomeRooms = savedRooms.filter(room =>
+                room.homeId == currentHomeId || !room.homeId
+            );
+
+            const savedRoomIds = currentHomeRooms.map(room => room.id.toString());
+
+            $('.room-checkbox').each(function () {
+                const roomId = $(this).data('room-id').toString();
+                const isCommon = isCommonArea(this);
+
+                if (savedRoomIds.includes(roomId) || isCommon) {
+                    $(this).addClass('selected');
+                    $(this).find('input[type="checkbox"]').prop('checked', true);
+                }
+            });
+
+            updateSelectionSummary();
+            updateSelectAllCheckbox();
+        }
+
+        // Updated selection summary with proper common area handling
+        function updateSelectionSummary() {
+            const selectedRooms = $('.room-checkbox.selected');
+            const count = selectedRooms.length;
+            const totalRooms = $('.room-checkbox').length;
+
+            $('#selectedCount').text(count);
+            $('#totalRooms').text(totalRooms);
+
+            let totalPrice = 0;
+            const roomNames = [];
+
+            selectedRooms.each(function () {
+                const price = parseFloat($(this).data('price')) || 0;
+                const label = $(this).find('.room-label').text().trim();
+                const isCommon = isCommonArea(this);
+
+                // Only add price for non-common areas
+                if (!isCommon && price > 0) {
+                    totalPrice += price;
+                }
+
+                roomNames.push(label + (isCommon ? ' (Included)' : ''));
+            });
+
+            // Display price in rupees
+            $('#estimatedPrice').text(`₹${totalPrice.toFixed(2)}`);
+
+            if (count > 0) {
+                $('#selectedRoomsList').html(roomNames.join(', '));
+            } else {
+                $('#selectedRoomsList').html('<em>No rooms selected</em>');
+            }
+
+            // Debug info
+            console.log(`Selected: ${count}, Total Price: ₹${totalPrice}`);
+        }
+
+        // Update "Select All" checkbox state
+        function updateSelectAllCheckbox() {
+            const totalChargeableRooms = $('.room-checkbox:not(.common-area)').length;
+            const selectedChargeableRooms = $('.room-checkbox.selected:not(.common-area)').length;
+
+            $('#selectAllRooms').prop('checked', selectedChargeableRooms === totalChargeableRooms && totalChargeableRooms > 0);
+            $('#selectAllRooms').prop('indeterminate', selectedChargeableRooms > 0 && selectedChargeableRooms < totalChargeableRooms);
+        }
+
+        // Room selection handling - updated to handle common areas
+        $(document).on('click', '.room-block', function (e) {
+            e.preventDefault();
+
+            const $room = $(this);
+            const isCommon = isCommonArea(this);
+
+            // Don't allow deselection of common areas
+            if (isCommon) {
+                $room.addClass('selected');
+                $room.find('input[type="checkbox"]').prop('checked', true);
+                showNotification('Common areas are always included in your booking', 'info', 2000);
+                return;
+            }
+
+            $room.toggleClass('selected');
+
+            const checkbox = $room.find('input[type="checkbox"]');
+            checkbox.prop('checked', $room.hasClass('selected'));
+
+            updateSelectAllCheckbox();
+            updateSelectionSummary();
+        });
+
+        // Select all rooms toggle - updated to handle common areas
+        $('#selectAllRooms').change(function () {
+            const checked = $(this).is(':checked');
+
+            $('.room-block').each(function () {
+                const $room = $(this);
+                const isCommon = isCommonArea(this);
+
+                // Common areas are always selected
+                if (isCommon) {
+                    $room.addClass('selected');
+                    $room.find('input[type="checkbox"]').prop('checked', true);
+                } else if (checked) {
+                    $room.addClass('selected');
+                    $room.find('input[type="checkbox"]').prop('checked', true);
+                } else {
+                    $room.removeClass('selected');
+                    $room.find('input[type="checkbox"]').prop('checked', false);
+                }
+            });
+
+            updateSelectionSummary();
+        });
+
+        // Clear all selections - but keep common areas selected
+        $('#clearSelection').click(function () {
+            $('.room-block').each(function () {
+                const $room = $(this);
+                const isCommon = isCommonArea(this);
+
+                if (!isCommon) {
+                    $room.removeClass('selected');
+                    $room.find('input[type="checkbox"]').prop('checked', false);
+                }
+            });
+
+            $('#selectAllRooms').prop('checked', false).prop('indeterminate', false);
+            updateSelectionSummary();
+            updateSelectAllCheckbox();
+
+            showNotification('Chargeable room selections cleared', 'info', 2000);
+        });
+
+        // Highlight all rooms
+        $('#highlightRooms').click(function () {
+            $('.room-block').css('background-color', '#fff3cd');
             setTimeout(() => {
-                renderScaledRooms();
-                loadSavedSelections();
-            }, 100);
-        } else {
-            $('#layoutArea').html(`
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <h5>No Property Selected</h5>
-                    <p>Please select a property first.</p>
-                    <p class="small">Go back and choose a property from the dropdown.</p>
+                $('.room-block').css('background-color', '');
+                $('.room-block.common-area').css('background-color', '#e8f5e8');
+            }, 2000);
+
+            showNotification('All rooms highlighted', 'info', 2000);
+        });
+
+        // Save room selection - updated to always include common areas
+        $('#saveDrawing').click(function () {
+            const selectedRooms = [];
+            const currentHomeId = getCurrentHomeId();
+
+            $('.room-checkbox.selected').each(function () {
+                const $el = $(this);
+                selectedRooms.push({
+                    id: $el.data('room-id'),
+                    layoutId: $el.data('layout-id'),
+                    homeId: currentHomeId,
+                    x: $el.data('x'),
+                    y: $el.data('y'),
+                    width: $el.data('width'),
+                    height: $el.data('height'),
+                    price: parseFloat($el.data('price')) || 0,
+                    label: $el.find('.room-label').text().trim(),
+                    isCommon: isCommonArea($el[0])
+                });
+            });
+
+            localStorage.setItem('selectedRoomData', JSON.stringify(selectedRooms));
+            $('#SelectedRoomIds').val(selectedRooms.map(room => room.id).join(','));
+
+            $('#homeDrawingModal').modal('hide');
+
+            $(window).trigger('roomsUpdated');
+
+            const chargeableCount = selectedRooms.filter(room => !room.isCommon).length;
+            const commonCount = selectedRooms.filter(room => room.isCommon).length;
+
+            showNotification(`${selectedRooms.length} room(s) selected (${chargeableCount} chargeable, ${commonCount} included)`, 'success');
+        });
+
+        // Utility function for notifications
+        function showNotification(message, type = 'info', duration = 5000) {
+            if (window.showNotification) {
+                window.showNotification(message, type, duration);
+                return;
+            }
+
+            const alertClass = type === 'success' ? 'alert-success' :
+                type === 'error' ? 'alert-danger' : 'alert-info';
+            const iconClass = type === 'success' ? 'fa-check-circle' :
+                type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+
+            const notification = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed"
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" role="alert">
+                    <i class="fas ${iconClass} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             `);
+
+            $('body').append(notification);
+
+            if (duration > 0) {
+                setTimeout(() => {
+                    notification.alert('close');
+                }, duration);
+            }
         }
-    });
 
-    // Re-render on window resize
-    let resizeTimeout;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(renderScaledRooms, 100);
-    });
+        // Listen for home selection changes from booking form
+        $(window).on('homeChanged', function (event, homeId) {
+            if ($('#homeDrawingModal').hasClass('show')) {
+                loadHomeLayout(homeId);
+            }
+        });
 
-    // Load saved selections from localStorage
-    function loadSavedSelections() {
-        const savedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
-        const currentHomeId = getCurrentHomeId();
-        
-        const currentHomeRooms = savedRooms.filter(room => 
-            room.homeId == currentHomeId || !room.homeId
-        );
-        
-        const savedRoomIds = currentHomeRooms.map(room => room.id.toString());
-        
-        $('.room-checkbox').each(function() {
-            const roomId = $(this).data('room-id').toString();
-            if (savedRoomIds.includes(roomId)) {
+        // Initialize selection summary and auto-select common areas on page load
+        setTimeout(() => {
+            // Auto-select all common areas
+            $('.room-block.common-area').each(function () {
                 $(this).addClass('selected');
                 $(this).find('input[type="checkbox"]').prop('checked', true);
-            }
-        });
-        
-        updateSelectionSummary();
-        updateSelectAllCheckbox();
-    }
-
-    // Simple function to check if room should be charged
-    function isChargeableRoom(roomLabel) {
-        const freeRooms = ['hall', 'balcony', 'living room', 'lounge', 'kitchen', 'dining room', 'corridor'];
-        const label = roomLabel.toLowerCase();
-        return !freeRooms.some(free => label.includes(free));
-    }
-
-    // Updated selection summary with fixed pricing logic
-    function updateSelectionSummary() {
-        const selectedRooms = $('.room-checkbox.selected');
-        const count = selectedRooms.length;
-        const totalRooms = $('.room-checkbox').length;
-
-        $('#selectedCount').text(count);
-        $('#totalRooms').text(totalRooms);
-
-        let totalChargeablePrice = 0;
-        let chargeableCount = 0;
-        const roomNames = [];
-
-        selectedRooms.each(function () {
-            const price = parseFloat($(this).data('price')) || 0;
-            const label = $(this).text().trim();
-
-            if (isChargeableRoom(label)) {
-                totalChargeablePrice += price;
-                chargeableCount++;
-            }
-
-            roomNames.push(label);
-        });
-
-        // Calculate final price based on selection type
-        let finalPrice = 0;
-        if (count > 0 && totalChargeablePrice > 0) {
-            // If only chargeable rooms selected, show total price
-            if (chargeableCount === count) {
-                finalPrice = totalChargeablePrice;
-            } else {
-                // If mix of chargeable and non-chargeable, divide by total count
-                finalPrice = totalChargeablePrice / count;
-            }
-        }
-
-        // Display price in rupees
-        $('#estimatedPrice').text(`₹${finalPrice.toFixed(2)}`);
-
-        if (count > 0) {
-            $('#selectedRoomsList').html(roomNames.join(', '));
-        } else {
-            $('#selectedRoomsList').html('<em>No rooms selected</em>');
-        }
-
-        // Debug info
-        console.log(`Selected: ${count}, Chargeable: ${chargeableCount}, Total Price: ₹${totalChargeablePrice}, Final: ₹${finalPrice}`);
-    }
-
-    // Update "Select All" checkbox state
-    function updateSelectAllCheckbox() {
-        const totalRooms = $('.room-checkbox').length;
-        const selectedRooms = $('.room-checkbox.selected').length;
-        
-        $('#selectAllRooms').prop('checked', selectedRooms === totalRooms && totalRooms > 0);
-        $('#selectAllRooms').prop('indeterminate', selectedRooms > 0 && selectedRooms < totalRooms);
-    }
-
-    // Room selection handling
-    $(document).on('click', '.room-block', function (e) {
-        e.preventDefault();
-        
-        const $room = $(this);
-        $room.toggleClass('selected');
-        
-        const checkbox = $room.find('input[type="checkbox"]');
-        checkbox.prop('checked', $room.hasClass('selected'));
-
-        updateSelectAllCheckbox();
-        updateSelectionSummary();
-    });
-
-    // Select all rooms toggle
-    $('#selectAllRooms').change(function () {
-        const checked = $(this).is(':checked');
-        
-        $('.room-block').each(function() {
-            const $room = $(this);
-            $room.toggleClass('selected', checked);
-            $room.find('input[type="checkbox"]').prop('checked', checked);
-        });
-        
-        updateSelectionSummary();
-    });
-
-    // Clear all selections
-    $('#clearSelection').click(function() {
-        $('.room-block').removeClass('selected');
-        $('.room-block input[type="checkbox"]').prop('checked', false);
-        $('#selectAllRooms').prop('checked', false).prop('indeterminate', false);
-        updateSelectionSummary();
-        
-        showNotification('All selections cleared', 'info', 2000);
-    });
-
-    // Highlight all rooms
-    $('#highlightRooms').click(function() {
-        $('.room-block').css('background-color', '#fff3cd');
-        setTimeout(() => {
-            $('.room-block').css('background-color', '');
-        }, 2000);
-        
-        showNotification('All rooms highlighted', 'info', 2000);
-    });
-
-    // Save room selection
-    $('#saveDrawing').click(function () {
-        const selectedRooms = [];
-        const currentHomeId = getCurrentHomeId();
-
-        $('.room-checkbox.selected').each(function () {
-            const $el = $(this);
-            selectedRooms.push({
-                id: $el.data('room-id'),
-                layoutId: $el.data('layout-id'),
-                homeId: currentHomeId,
-                x: $el.data('x'),
-                y: $el.data('y'),
-                width: $el.data('width'),
-                height: $el.data('height'),
-                price: parseFloat($el.data('price')) || 0,
-                label: $el.text().trim()
             });
-        });
-
-        localStorage.setItem('selectedRoomData', JSON.stringify(selectedRooms));
-        $('#SelectedRoomIds').val(selectedRooms.map(room => room.id).join(','));
-
-        $('#homeDrawingModal').modal('hide');
-        
-        $(window).trigger('roomsUpdated');
-        
-        showNotification(`${selectedRooms.length} room(s) selected successfully!`, 'success');
+            updateSelectionSummary();
+            updateSelectAllCheckbox();
+        }, 500);
     });
-
-    // Utility function for notifications
-    function showNotification(message, type = 'info', duration = 5000) {
-        if (window.showNotification) {
-            window.showNotification(message, type, duration);
-            return;
-        }
-        
-        const alertClass = type === 'success' ? 'alert-success' : 
-                         type === 'error' ? 'alert-danger' : 'alert-info';
-        const iconClass = type === 'success' ? 'fa-check-circle' : 
-                         type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
-        
-        const notification = $(`
-            <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
-                 style="top: 20px; right: 20px; z-index: 9999; min-width: 300px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" role="alert">
-                <i class="fas ${iconClass} me-2"></i>
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `);
-        
-        $('body').append(notification);
-        
-        if (duration > 0) {
-            setTimeout(() => {
-                notification.alert('close');
-            }, duration);
-        }
-    }
-
-    // Listen for home selection changes from booking form
-    $(window).on('homeChanged', function(event, homeId) {
-        if ($('#homeDrawingModal').hasClass('show')) {
-            loadHomeLayout(homeId);
-        }
-    });
-
-    // Initialize selection summary
-    updateSelectionSummary();
-});
 </script>

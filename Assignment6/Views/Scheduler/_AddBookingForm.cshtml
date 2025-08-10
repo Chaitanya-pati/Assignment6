@@ -444,35 +444,18 @@
             totalDays = totalDays > 0 ? totalDays : 1;
         }
 
-        // Calculate room-specific pricing excluding non-chargeable rooms
-        let totalChargeablePrice = 0;
-        let chargeableCount = 0;
-        
+        // Calculate total price based on individual room prices
+        let totalRoomPrice = 0;
         selectedRooms.forEach(room => {
-            if (isChargeableRoom(room.label)) {
-                totalChargeablePrice += parseFloat(room.price) || 0;
-                chargeableCount++;
-            }
+            const roomPrice = parseFloat(room.price) || 0;
+            totalRoomPrice += roomPrice;
         });
 
-        // Calculate daily rate based on selection type
-        let dailyRate = 0;
-        if (selectedRooms.length > 0 && totalChargeablePrice > 0) {
-            // If only chargeable rooms selected, use total price
-            if (chargeableCount === selectedRooms.length) {
-                dailyRate = totalChargeablePrice;
-            } else {
-                // If mix of chargeable and non-chargeable, divide by total count
-                dailyRate = totalChargeablePrice / selectedRooms.length;
-            }
-        } else {
-            dailyRate = homePricePerDay; // Fallback to home base price
-        }
-
+        // If no rooms selected or all rooms are free, use home base price
+        const dailyRate = totalRoomPrice > 0 ? totalRoomPrice : homePricePerDay;
         const totalPrice = dailyRate * totalDays;
 
-        // Debug info
-        console.log(`Booking Form - Selected: ${selectedRooms.length}, Chargeable: ${chargeableCount}, Daily rate: ₹${dailyRate}, Total: ₹${totalPrice}`);
+        console.log(`Booking Form - Selected: ${selectedRooms.length}, Daily rate: ₹${dailyRate}, Total: ₹${totalPrice}`);
 
         return {
             dailyRate: dailyRate,

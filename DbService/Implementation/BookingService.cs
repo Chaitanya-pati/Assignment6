@@ -36,7 +36,8 @@ namespace DbService.Implementation
             var layouts = new List<LayoutElement>();
             using (var db = new Assignment6Context(_dbconnection))
             {
-                layouts = db.LayoutElements.Where(e => e.HomeId == homeId).ToList();
+                layouts = db.LayoutElements.Include(l=>l.Room)
+                    .Where(e => e.HomeId == homeId).ToList();
             }
             return layouts;
         }
