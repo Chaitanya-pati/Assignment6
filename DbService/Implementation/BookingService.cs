@@ -42,6 +42,85 @@ namespace DbService.Implementation
             return layouts;
         }
 
+        //public bool SaveBooking(Booking bookingData, List<Room> rooms)
+        //{
+        //    var isSaved = false;
+        //    using (var db = new Assignment6Context(_dbconnection))
+        //    {
+        //        try
+        //        {
+        //            if(db.Bookings.Any(x =>
+        //               x.HomeId == bookingData.HomeId &&
+        //               x.BookingDateFrom <= bookingData.BookingDateFrom &&
+        //                x.BookingDateTo >= bookingData.BookingDateTo))
+        //            {
+        //               return false;
+        //            }
+        //            //if()
+        //            // Set check -in time to 12:00 PM(noon)
+        //            bookingData.BookingDateFrom = bookingData.BookingDateFrom.Date.AddHours(12);
+        //            // Set check-out time to 1:00 PM (13:00)
+        //            bookingData.BookingDateTo = bookingData.BookingDateTo.Date.AddHours(13);
+        //            bookingData.CreatedAt = DateTime.Now;
+        //            db.Bookings.Add(bookingData);
+        //            db.SaveChanges();
+        //            foreach (var room in rooms)
+        //            {
+        //                var roomSaveData = new BookingRoom();
+        //                roomSaveData.BookingId = bookingData.Id;
+        //                roomSaveData.RoomId = room.Id;
+        //                db.BookingRooms.Add(roomSaveData);
+        //            }
+
+        //            db.SaveChanges();
+        //            isSaved = true;
+        //        }
+        //        catch
+        //        {
+        //            isSaved = false;
+        //        }
+
+        //    }
+        //    return isSaved;
+        //}
+
+        //public bool CheckBookings(DateTime startDate, DateTime endDate, int homeId)
+        //{
+        //    using (var db = new Assignment6Context(_dbconnection))
+        //    {
+        //        // Check for conflicts
+        //        // A conflict exists if:
+        //        // - New booking starts before existing booking ends AND
+        //        // - New booking ends after existing booking starts
+        //        // Note: We use < and > (not <= and >=) so checkout day is available
+
+        //        return db.Bookings.Any(x =>
+        //               x.HomeId == homeId &&
+        //               x.IsBooked == true && // Only check approved bookings
+        //               x.BookingDateFrom < endDate &&   // Existing starts before new ends
+        //               x.BookingDateTo.AddDays(-1) > startDate      // Existing ends after new starts
+        //         );
+        //    }
+        //}
+
+
+        public bool CheckBookings(DateTime startDate, DateTime endDate, int homeId)
+        {
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                // Convert to date-only for comparison (removes time component)
+                var checkStartDate = startDate.Date;
+                var checkEndDate = endDate.Date;
+
+                return db.Bookings.Any(x =>
+                       x.HomeId == homeId &&
+                       x.IsBooked == true && // Only check approved bookings
+                       x.BookingDateFrom.Date < checkEndDate &&           // Existing starts before new ends
+                       x.BookingDateTo.Date > checkStartDate              // Existing ends after new starts (checkout day available)
+                 );
+            }
+        }
+
         public bool SaveBooking(Booking bookingData, List<Room> rooms)
         {
             var isSaved = false;
@@ -49,21 +128,30 @@ namespace DbService.Implementation
             {
                 try
                 {
-                    if(db.Bookings.Any(x =>
+                    // Convert to date-only for comparison
+                    var newStartDate = bookingData.BookingDateFrom.Date;
+                    var newEndDate = bookingData.BookingDateTo.Date;
+
+                    // Check for booking conflicts
+                    if (db.Bookings.Any(x =>
                        x.HomeId == bookingData.HomeId &&
-                       x.BookingDateFrom <= bookingData.BookingDateFrom &&
-                        x.BookingDateTo >= bookingData.BookingDateTo))
+                       x.IsBooked == true && // Only check approved bookings
+                       x.BookingDateFrom.Date < newEndDate &&             // Existing starts before new ends
+                       x.BookingDateTo.Date > newStartDate                // Existing ends after new starts
+                    ))
                     {
-                       return false;
+                        return false; // Booking conflict exists
                     }
-                    //if()
-                    // Set check -in time to 12:00 PM(noon)
+
+                    // Set check-in time to 12:00 PM (noon)
                     bookingData.BookingDateFrom = bookingData.BookingDateFrom.Date.AddHours(12);
                     // Set check-out time to 1:00 PM (13:00)
                     bookingData.BookingDateTo = bookingData.BookingDateTo.Date.AddHours(13);
                     bookingData.CreatedAt = DateTime.Now;
+
                     db.Bookings.Add(bookingData);
                     db.SaveChanges();
+
                     foreach (var room in rooms)
                     {
                         var roomSaveData = new BookingRoom();
@@ -79,11 +167,69 @@ namespace DbService.Implementation
                 {
                     isSaved = false;
                 }
-
             }
             return isSaved;
         }
 
+        // Alternative approach if the above doesn't work - using your AddDays(-1) logic
+        public bool CheckBookingsAlternative(DateTime startDate, DateTime endDate, int homeId)
+        {
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                return db.Bookings.Any(x =>
+                       x.HomeId == homeId &&
+                       x.IsBooked == true && // Only check approved bookings
+                       x.BookingDateFrom.Date < endDate.Date &&                    // Existing starts before new ends
+                       x.BookingDateTo.Date.AddDays(-1) >= startDate.Date          // Existing ends after new starts (checkout day available)
+                 );
+            }
+        }
+
+        public bool SaveBookingAlternative(Booking bookingData, List<Room> rooms)
+        {
+            var isSaved = false;
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                try
+                {
+                    // Check for booking conflicts using AddDays(-1) approach
+                    if (db.Bookings.Any(x =>
+                       x.HomeId == bookingData.HomeId &&
+                       x.IsBooked == true && // Only check approved bookings
+                       x.BookingDateFrom.Date < bookingData.BookingDateTo.Date &&                      // Existing starts before new ends
+                       x.BookingDateTo.Date.AddDays(-1) >= bookingData.BookingDateFrom.Date           // Existing ends after new starts
+                    ))
+                    {
+                        return false; // Booking conflict exists
+                    }
+
+                    // Set check-in time to 12:00 PM (noon)
+                    bookingData.BookingDateFrom = bookingData.BookingDateFrom.Date.AddHours(12);
+                    // Set check-out time to 1:00 PM (13:00)
+                    bookingData.BookingDateTo = bookingData.BookingDateTo.Date.AddHours(13);
+                    bookingData.CreatedAt = DateTime.Now;
+
+                    db.Bookings.Add(bookingData);
+                    db.SaveChanges();
+
+                    foreach (var room in rooms)
+                    {
+                        var roomSaveData = new BookingRoom();
+                        roomSaveData.BookingId = bookingData.Id;
+                        roomSaveData.RoomId = room.Id;
+                        db.BookingRooms.Add(roomSaveData);
+                    }
+
+                    db.SaveChanges();
+                    isSaved = true;
+                }
+                catch
+                {
+                    isSaved = false;
+                }
+            }
+            return isSaved;
+        }
         public HomeMasterViewModel GetSchedularData()
         {
             using (var db = new Assignment6Context(_dbconnection))
@@ -101,18 +247,6 @@ namespace DbService.Implementation
             }
         }
 
-        public bool CheckBookings(DateTime startDate, DateTime endDate, int homeId)
-        {
-            using (var db = new Assignment6Context(_dbconnection))
-            {
-                return db.Bookings.Any(x =>
-                       x.HomeId == homeId &&
-                       x.BookingDateFrom <= endDate &&
-                        x.BookingDateTo >= startDate &&
-                        x.PaymentStatus != "Paid"
-                 );
-            }
-        }
 
         public List<Booking> GetBookingsBetween(DateTime startDate, DateTime endDate, int? homeId = null)
         {

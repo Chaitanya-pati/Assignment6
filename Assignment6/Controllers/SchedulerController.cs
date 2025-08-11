@@ -296,7 +296,7 @@ namespace Assignment6.Controllers
                     bookingSaveModel.BookingData.Document = $"/uploads/bookings/{uniqueFileName}";
                 }
 
-                bool resultSaved = _bookingService.SaveBooking(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
+                bool resultSaved = _bookingService.SaveBookingAlternative(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
                 return Json(resultSaved);
             }
             catch (Exception ex)
@@ -305,12 +305,20 @@ namespace Assignment6.Controllers
             }
         }
 
-        public bool CheckBookings(DateTime startDate, DateTime endDate, int homeId)
-        {
-            bool isBooked = _bookingService.CheckBookings(startDate, endDate, homeId);
-            return isBooked;
-        }
-
+        // In your SchedulerController class
+[HttpGet]
+public IActionResult CheckBookings(DateTime startDate, DateTime endDate, int homeId)
+{
+    try
+    {
+        bool isBooked = _bookingService.CheckBookingsAlternative(startDate, endDate, homeId);
+        return Json(isBooked);
+    }
+    catch (Exception ex)
+    {
+        return Json(new { error = ex.Message });
+    }
+}
 
         public IActionResult GetBookingsByHomeId(DateTime start, DateTime end, int? homeId)
         {

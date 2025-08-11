@@ -27,5 +27,8 @@ namespace DbService.Interface
         bool DeleteBooking(int bookingId);
         bool CompleteBookingWithInvoice(int bookingId);
         bool ApproveBookingRequest(int bookingId);
+        public bool CheckBookingsAlternative(DateTime startDate, DateTime endDate, int homeId);
+        public bool SaveBookingAlternative(Booking bookingData, List<Room> rooms);
     }
+
 }

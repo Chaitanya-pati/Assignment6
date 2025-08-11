@@ -637,29 +637,34 @@
             url: '/Scheduler/SaveBooking',
             type: 'POST',
             data: bookingSaveModel,
-            success: function (bookingData) {
+            success: function (isBooked) {
+                debugger
                 // Show success message
-                const message = `Booking Created Successfully!\n\nDetails:\n` +
-                    `Customer: ${bookingData.CustomerName}\n` +
-                    `Property: ${$('#HomeId option:selected').text()}\n` +
-                    `Rooms: ${selectedRooms.length}\n` +
-                    `Dates: ${bookingData.BookingDateFrom} to ${bookingData.BookingDateTo}\n` +
-                    `Total: ₹${bookingData.TotalPrice}`;
+                if (isBooked) {
+                    const message = `Booking Created Successfully!\n\nDetails:\n` +
+                        `Customer: ${bookingData.CustomerName}\n` +
+                        `Property: ${$('#HomeId option:selected').text()}\n` +
+                        `Rooms: ${selectedRooms.length}\n` +
+                        `Dates: ${bookingData.BookingDateFrom} to ${bookingData.BookingDateTo}\n` +
+                        `Total: ₹${bookingData.TotalPrice}`;
 
-                if (window.showNotification) {
+                    // if (window.showNotification) {
                     window.showNotification('Booking saved successfully!', 'success');
-                } else {
-                    alert(message);
+                    // Close modal
+                    $('#bookingModal').modal('hide');
+                    fetchAndDisplayBookings();
+                    // Clear form and selections
+                    resetForm();
+                    //    } else {
+                    //      alert(message);
+                    // }
+                    // Trigger custom event for calendar refresh
+                    $(window).trigger('bookingSaved', [bookingData]);
                 }
-
-                // Close modal
-                $('#bookingModal').modal('hide');
-                fetchAndDisplayBookings();
-                // Clear form and selections
-                resetForm();
-
-                // Trigger custom event for calendar refresh
-                $(window).trigger('bookingSaved', [bookingData]);
+                else{
+                    window.showNotification('Check availability for the date range you are selecting!', 'warning');
+                }
+              
             },
             error: function (xhr, status, error) {
                 console.error('Booking submission error:', error);

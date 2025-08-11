@@ -1679,7 +1679,8 @@
         });
     }
 
-    // Search booking function
+    // Updated search booking function in your JavaScript
+    // Updated search booking function in your JavaScript
     function searchBooking() {
         const startDate = $("#startBookDate").val();
         const endDate = $("#endBookDate").val();
@@ -1687,6 +1688,12 @@
 
         if (!startDate || !endDate || isNaN(homeId)) {
             showNotification("Please select all search criteria.", "error");
+            return;
+        }
+
+        // Validate that end date is after start date
+        if (new Date(endDate) <= new Date(startDate)) {
+            showNotification("Check-out date must be after check-in date.", "error");
             return;
         }
 
@@ -1704,7 +1711,7 @@
                 const homeName = getHomeName(homeId);
                 const dateRange = `${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`;
 
-                if (data) {
+                if (data === true) {
                     showNotification(
                         `${homeName} is already booked for ${dateRange}. Please select different dates.`,
                         "error"
