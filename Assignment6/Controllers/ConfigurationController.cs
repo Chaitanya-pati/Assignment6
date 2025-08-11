@@ -14,46 +14,96 @@ namespace Assignment6.Controllers
         {
             _configurationService = configurationService;
         }
-       
-        
+
         public IActionResult Configuration()
         {
             return View();
         }
-        
+
         public IActionResult GetMaster()
         {
-           List<Home> model = _configurationService.GetHomeMaster();
-           return View(model);
+            List<Home> model = _configurationService.GetHomeMaster();
+            return View(model);
         }
 
         [HttpPost]
-        public int SaveHome(Home homeData)
+        public IActionResult SaveHome(Home homeData)
         {
-            Home savedHome = _configurationService.SaveHome(homeData);
-            return savedHome.Id;
-        }
+            try
+            {
+                if (homeData.Id == 0)
+                {
+                    homeData.CreatedAt = DateTime.Now;
+                }
 
+                Home savedHome = _configurationService.SaveHome(homeData);
+                return Json(savedHome.Id);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
 
         [HttpPost]
-        public List<Room> SaveRooms([FromBody] List<Room> roomSaveRequests)
+        public IActionResult UpdateHome(Home homeData)
         {
-            var savedRooms = _configurationService.SaveRooms(roomSaveRequests);
-            return savedRooms;
+            try
+            {
+                Home savedHome = _configurationService.SaveHome(homeData);
+                return Json(savedHome.Id);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
         }
 
         [HttpPost]
-        public bool SaveLayoutElements([FromBody] List<LayoutElement> layoutElements)
+        public IActionResult SaveRooms(List<Room> roomSaveRequests)
         {
-            var isSaved = _configurationService.SaveLayoutElement(layoutElements);
-            return isSaved;
+            try
+            {
+                foreach (var room in roomSaveRequests)
+                {
+                    room.CreatedAt = DateTime.Now;
+                }
+
+                var savedRooms = _configurationService.SaveRooms(roomSaveRequests);
+                return Json(savedRooms);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
         }
 
-        public List<LayoutElement> GetLayoutByhomeId(int homeId)
+        [HttpPost]
+        public IActionResult SaveLayoutElements(List<LayoutElement> layoutElements)
         {
-            var layoutElements =  _configurationService.GetLayout(homeId);
-            return layoutElements;
+            try
+            {
+                var isSaved = _configurationService.SaveLayoutElement(layoutElements);
+                return Json(isSaved);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
         }
 
+        [HttpGet]
+        public IActionResult GetLayoutByhomeId(int homeId)
+        {
+            try
+            {
+                var layoutElements = _configurationService.GetLayout(homeId);
+                return Json(layoutElements);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
     }
 }

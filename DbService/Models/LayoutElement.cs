@@ -25,6 +25,8 @@ public partial class LayoutElement
 
     public string SUser { get; set; }
 
+    public long? PricePerDay { get; set; }
+
     public virtual Home Home { get; set; }
 
     public virtual Room Room { get; set; }

@@ -640,12 +640,12 @@
             });
 
             // Save Home Button Click
+            // Clean Save Home Button Click in GetMaster.cshtml
             $('#saveHomeBtn').on('click', function () {
                 if (!validateForm()) {
                     return;
                 }
 
-                debugger
                 const homeData = {
                     Id: parseInt($('#homeId').val()) || 0,
                     Name: $('#homeName').val().trim(),
@@ -673,81 +673,105 @@
                     url: homeData.Id > 0 ? '/Configuration/UpdateHome' : '/Configuration/SaveHome',
                     type: 'POST',
                     data: homeData,
-                    success: function (savedHomeId) {
-                        // Step 2: Save Rooms
-                        const roomIds = layoutObj.roomsData;
-                        const roomSaveRequests = roomIds.map(roomId => {
-                            const element = layoutObj.elements.find(e => e.roomId === roomId);
-
-                            return {
-                                HomeId: savedHomeId,
-                                Id: 0,
-                                Name: element.label,
-                                Width: element.width,
-                                Height: element.height,
-                                PositionX: element.x,
-                                PositionY: element.y,
-                                Type: element.label,
-                                PricePerDay: 0,
-                                AllowIndividualBooking: true,
-                                CreatedAt: new Date().toISOString(),
-                                SUser: "admin"
-                            };
-                        });
-
-                        // Save all rooms
-                        $.ajax({
-                            url: '/Configuration/SaveRooms',
-                            type: 'POST',
-                            data: { roomSaveRequests: roomSaveRequests },
-                            success: function (savedRooms) {
-                                const layoutElements = layoutObj.elements.map(el => {
-                                    const matchedRoom = savedRooms.find(r => r.id === el.roomId);
-                                    return {
-                                        HomeId: savedHomeId,
-                                        RoomId: matchedRoom ? matchedRoom.id : null,
-                                        Label: el.label,
-                                        X: el.x,
-                                        Y: el.y,
-                                        Width: el.width,
-                                        Height: el.height,
-                                        SUser: "admin"
-                                    };
-                                });
-
-                                $.ajax({
-                                    url: '/Configuration/SaveLayoutElements',
-                                    type: 'POST',
-                                    data: { layoutElements: layoutElements },
-                                    success: function (response) {
-                                        if (response == true) {
-                                            showAlert("Property saved successfully!", "success");
-                                            localStorage.removeItem('homestayLayout');
-                                            
-                                            setTimeout(() => {
-                                                window.location.href = `/Configuration/GetMaster`;
-                                            }, 1500);
-                                        }
-                                    },
-                                    error: function () {
-                                        showAlert('Error saving layout elements.', 'danger');
-                                    }
-                                });
-                            },
-                            error: function () {
-                                showAlert('Error saving rooms.', 'danger');
-                            }
-                        });
+                    success: function (response) {
+                        if (typeof response === 'number' && response > 0) {
+                            const savedHomeId = response;
+                            saveRoomsAndLayoutElements(savedHomeId, layoutObj, btn, originalText);
+                        } else if (response.error) {
+                            showAlert('Error saving property: ' + response.error, 'danger');
+                            btn.prop('disabled', false).html(originalText);
+                        } else {
+                            showAlert('Unexpected response from server', 'danger');
+                            btn.prop('disabled', false).html(originalText);
+                        }
                     },
-                    error: function () {
-                        showAlert('Error saving property.', 'danger');
-                    },
-                    complete: function () {
-                        // Restore button state
+                    error: function (xhr, status, error) {
+                        showAlert('Error saving property: ' + error, 'danger');
                         btn.prop('disabled', false).html(originalText);
                     }
                 });
             });
+
+            function saveRoomsAndLayoutElements(savedHomeId, layoutObj, btn, originalText) {
+                // Step 2: Prepare Room Data with PricePerDay
+                const roomSaveRequests = layoutObj.elements.map((element, index) => {
+                    return {
+                        HomeId: savedHomeId,
+                        Id: 0,
+                        Name: element.label,
+                        Width: element.width,
+                        Height: element.height,
+                        PositionX: element.x,
+                        PositionY: element.y,
+                        Type: element.type,
+                        PricePerDay: element.pricePerDay || 0,
+                        AllowIndividualBooking: true,
+                        SUser: "admin"
+                    };
+                });
+
+                // Save all rooms
+                $.ajax({
+                    url: '/Configuration/SaveRooms',
+                    type: 'POST',
+                    data: { roomSaveRequests: roomSaveRequests },
+                    success: function (savedRooms) {
+                        if (savedRooms.error) {
+                            showAlert('Error saving rooms: ' + savedRooms.error, 'danger');
+                            btn.prop('disabled', false).html(originalText);
+                            return;
+                        }
+
+                        // Step 3: Create Layout Elements with correct Room IDs and PricePerDay
+                        const layoutElements = layoutObj.elements.map((el, index) => {
+                            const matchedRoom = savedRooms[index];
+
+                            return {
+                                HomeId: savedHomeId,
+                                RoomId: matchedRoom ? matchedRoom.id : null,
+                                Label: el.label,
+                                X: el.x,
+                                Y: el.y,
+                                Width: el.width,
+                                Height: el.height,
+                                PricePerDay: el.pricePerDay || 0,
+                                SUser: "admin"
+                            };
+                        });
+
+                        // Save Layout Elements
+                        $.ajax({
+                            url: '/Configuration/SaveLayoutElements',
+                            type: 'POST',
+                            data: { layoutElements: layoutElements },
+                            success: function (response) {
+                                if (response.error) {
+                                    showAlert('Error saving layout elements: ' + response.error, 'danger');
+                                } else if (response === true) {
+                                    showAlert("Property saved successfully!", "success");
+                                    localStorage.removeItem('homestayLayout');
+
+                                    setTimeout(() => {
+                                        window.location.href = `/Configuration/GetMaster`;
+                                    }, 1500);
+                                } else {
+                                    showAlert('Failed to save layout elements.', 'danger');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                showAlert('Error saving layout elements: ' + error, 'danger');
+                            },
+                            complete: function () {
+                                btn.prop('disabled', false).html(originalText);
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        showAlert('Error saving rooms: ' + error, 'danger');
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            }
 
             // Form validation
             function validateForm() {

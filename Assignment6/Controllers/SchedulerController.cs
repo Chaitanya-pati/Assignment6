@@ -426,168 +426,201 @@ public IActionResult CheckBookings(DateTime startDate, DateTime endDate, int hom
 <html>
 <head>
     <meta charset='utf-8'>
-    <title>Invoice - {booking.Id}</title>
+    <title>Invoice - {booking.Id:D6}</title>
     <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+
         body {{ 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            background-color: #fff;
-            color: #000;
-            line-height: 1.4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: white;
+            color: #333;
+            line-height: 1.3;
             font-size: 12px;
+            height: 100vh;
+            overflow: hidden;
         }}
         
         .invoice-container {{ 
             max-width: 800px; 
             margin: 0 auto; 
             background: white; 
-            border: 1px solid #000;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }}
         
         .header {{ 
-            padding: 20px 30px; 
-            border-bottom: 2px solid #000;
-        }}
-        
-        .company-info {{
-            float: left;
-            width: 60%;
-        }}
-        
-        .invoice-info {{
-            float: right;
-            width: 35%;
-            text-align: right;
-        }}
-        
-        .company-name {{ 
-            font-size: 18px; 
-            font-weight: bold; 
-            margin: 0 0 5px 0;
-        }}
-        
-        .company-details {{
-            font-size: 11px;
-            color: #666;
-        }}
-        
-        .invoice-title {{ 
-            font-size: 24px; 
-            font-weight: bold;
-            margin: 0 0 10px 0;
-        }}
-        
-        .invoice-number {{ 
-            font-size: 14px; 
-            margin-bottom: 5px;
-        }}
-        
-        .invoice-date {{ 
-            font-size: 12px;
-        }}
-        
-        .clearfix {{
-            clear: both;
-        }}
-        
-        .billing-section {{
-            padding: 20px 30px;
-            border-bottom: 1px solid #ddd;
-        }}
-        
-        .bill-to {{
-            float: left;
-            width: 45%;
-        }}
-        
-        .ship-to {{
-            float: right;
-            width: 45%;
-        }}
-        
-        .section-title {{
-            font-weight: bold;
-            font-size: 12px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }}
-        
-        .address-block {{
-            font-size: 11px;
-            line-height: 1.3;
-        }}
-        
-        .items-table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-        }}
-        
-        .items-table th {{
-            background-color: #f5f5f5;
-            border: 1px solid #ddd;
-            padding: 10px 8px;
-            text-align: left;
-            font-size: 11px;
-            font-weight: bold;
-        }}
-        
-        .items-table td {{
-            border: 1px solid #ddd;
-            padding: 8px;
-            font-size: 11px;
-            vertical-align: top;
-        }}
-        
-        .items-table .text-right {{
-            text-align: right;
-        }}
-        
-        .items-table .text-center {{
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            color: white;
+            padding: 20px;
             text-align: center;
         }}
         
-        .totals-section {{
-            float: right;
-            width: 300px;
-            margin: 20px 30px;
+        .company-name {{ 
+            font-size: 24px; 
+            font-weight: bold; 
+            margin-bottom: 4px;
+            letter-spacing: 1px;
         }}
         
-        .totals-table {{
-            width: 100%;
-            border-collapse: collapse;
-        }}
-        
-        .totals-table td {{
-            padding: 5px 10px;
+        .company-tagline {{
             font-size: 12px;
-            border-bottom: 1px solid #eee;
+            opacity: 0.9;
         }}
-        
-        .totals-table .total-row {{
+
+        .invoice-header {{
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }}
+
+        .invoice-title {{ 
+            font-size: 24px; 
             font-weight: bold;
-            border-top: 2px solid #000;
-            border-bottom: 2px solid #000;
+            color: #2d3748;
         }}
-        
-        .notes-section {{
-            clear: both;
-            padding: 20px 30px;
-            border-top: 1px solid #ddd;
+
+        .invoice-number {{ 
+            color: #e53e3e;
+            font-size: 16px;
+            font-weight: bold;
+        }}
+
+        .invoice-date {{
+            color: #718096;
+            font-size: 12px;
+            margin-top: 3px;
+        }}
+
+        .content-section {{
+            padding: 20px;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }}
+
+        .left-column {{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }}
+
+        .right-column {{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }}
+
+        .info-section {{
+            background: #4a5568;
+            color: white;
+            padding: 8px 15px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }}
+
+        .info-card {{
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4a5568;
+            flex: 1;
+        }}
+
+        .info-row {{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }}
+
+        .info-row:last-child {{
+            margin-bottom: 0;
+        }}
+
+        .info-label {{
+            font-weight: 600;
+            color: #4a5568;
             font-size: 11px;
         }}
-        
-        .payment-info {{
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
+
+        .info-value {{
+            color: #2d3748;
+            font-weight: 500;
         }}
-        
+
+        .payment-status {{
+            display: inline-block;
+            background: #48bb78;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }}
+
+        .total-section {{
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            grid-column: span 2;
+            margin-top: 10px;
+        }}
+
+        .total-label {{
+            font-size: 16px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }}
+
+        .total-amount {{
+            font-size: 32px;
+            font-weight: bold;
+        }}
+
+        .footer {{
+            background: #f7fafc;
+            padding: 12px 20px;
+            text-align: center;
+            color: #718096;
+            border-top: 1px solid #e2e8f0;
+        }}
+
+        .footer-title {{
+            font-size: 14px;
+            color: #2d3748;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }}
+
+        .footer-details {{
+            font-size: 10px;
+            line-height: 1.2;
+        }}
+
         @media print {{
-            body {{ margin: 0; padding: 0; }}
-            .invoice-container {{ border: none; }}
+            body {{ 
+                background-color: white;
+                margin: 0;
+                padding: 0;
+                height: auto;
+                overflow: visible;
+            }}
+            .invoice-container {{ 
+                height: auto;
+                page-break-inside: avoid;
+            }}
         }}
     </style>
 </head>
@@ -595,111 +628,115 @@ public IActionResult CheckBookings(DateTime startDate, DateTime endDate, int hom
     <div class='invoice-container'>
         <!-- Header -->
         <div class='header'>
-            <div class='company-info'>
-                <div class='company-name'>VERNEKAR HOMESTAYS</div>
-                <div class='company-details'>
-                    Premium Hospitality & Accommodation Services<br>
-                    Email: info@vernekarhomestays.com<br>
-                    Phone: +1 (555) 123-4567
-                </div>
-            </div>
-            <div class='invoice-info'>
+            <div class='company-name'>VERNEKAR HOMESTAYS</div>
+            <div class='company-tagline'>Premium Hospitality & Accommodation Services</div>
+        </div>
+
+        <!-- Invoice Title Section -->
+        <div class='invoice-header'>
+            <div>
                 <div class='invoice-title'>INVOICE</div>
-                <div class='invoice-number'>Invoice #: {booking.Id:D6}</div>
-                <div class='invoice-date'>Date: {DateTime.Now:MM/dd/yyyy}</div>
-                <div class='invoice-date'>Due Date: {DateTime.Now:MM/dd/yyyy}</div>
+                <div class='invoice-date'>Date: {DateTime.Now:MMMM dd, yyyy}</div>
             </div>
-            <div class='clearfix'></div>
+            <div>
+                <div class='invoice-number'>#{booking.Id:D6}</div>
+            </div>
         </div>
 
-        <!-- Billing Information -->
-        <div class='billing-section'>
-            <div class='bill-to'>
-                <div class='section-title'>Bill To:</div>
-                <div class='address-block'>
-                    <strong>{booking.CustomerName ?? "N/A"}</strong><br>
-                    {booking.CustomerEmail ?? "N/A"}<br>
-                    {booking.CustomerPhone ?? "N/A"}
+        <!-- Content in Two Columns -->
+        <div class='content-section'>
+            <!-- Left Column -->
+            <div class='left-column'>
+                <!-- Customer Information -->
+                <div>
+                    <div class='info-section'>Customer Information</div>
+                    <div class='info-card'>
+                        <div class='info-row'>
+                            <span class='info-label'>Full Name:</span>
+                            <span class='info-value'>{booking.CustomerName ?? "N/A"}</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Email:</span>
+                            <span class='info-value'>{booking.CustomerEmail ?? "N/A"}</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Phone:</span>
+                            <span class='info-value'>{booking.CustomerPhone ?? "N/A"}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Details -->
+                <div>
+                    <div class='info-section'>Booking Details</div>
+                    <div class='info-card'>
+                        <div class='info-row'>
+                            <span class='info-label'>Property:</span>
+                            <span class='info-value'>{booking.Home?.Name ?? "N/A"}</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Check-in:</span>
+                            <span class='info-value'>{booking.BookingDateFrom:MMM dd, yyyy}</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Check-out:</span>
+                            <span class='info-value'>{booking.BookingDateTo:MMM dd, yyyy}</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Duration:</span>
+                            <span class='info-value'>{(booking.BookingDateTo - booking.BookingDateFrom).Days} night{((booking.BookingDateTo - booking.BookingDateFrom).Days != 1 ? "s" : "")}</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Rooms:</span>
+                            <span class='info-value'>{booking.BookingRooms?.Count ?? 0} room{((booking.BookingRooms?.Count ?? 0) != 1 ? "s" : "")}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class='ship-to'>
-                <div class='section-title'>Property:</div>
-                <div class='address-block'>
-                    <strong>{booking.Home?.Name ?? "N/A"}</strong><br>
-                    Check-in: {booking.BookingDateFrom:MM/dd/yyyy}<br>
-                    Check-out: {booking.BookingDateTo:MM/dd/yyyy}<br>
-                    Duration: {(booking.BookingDateTo - booking.BookingDateFrom).Days} night{((booking.BookingDateTo - booking.BookingDateFrom).Days != 1 ? "s" : "")}<br>
-                    Guests: {booking.GuestNumbers} person{(booking.GuestNumbers != 1 ? "s" : "")}
+
+            <!-- Right Column -->
+            <div class='right-column'>
+                <!-- Payment Information -->
+                <div>
+                    <div class='info-section'>Payment Information</div>
+                    <div class='info-card'>
+                        <div class='info-row'>
+                            <span class='info-label'>Status:</span>
+                            <span class='payment-status'>✓ PAID</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Payment Date:</span>
+                            <span class='info-value'>{DateTime.Now:MMM dd, yyyy}</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Transaction ID:</span>
+                            <span class='info-value'>TXN-{booking.Id}-{DateTime.Now:yyyyMMdd}</span>
+                        </div>
+                    </div>
                 </div>
+
+                {(string.IsNullOrEmpty(booking.Message) ? "" : $@"
+                <!-- Notes -->
+                <div>
+                    <div class='info-section'>Notes</div>
+                    <div class='info-card'>
+                        <div class='info-value' style='line-height: 1.4;'>{booking.Message}</div>
+                    </div>
+                </div>")}
             </div>
-            <div class='clearfix'></div>
+
+            <!-- Total Amount (Full Width) -->
+            <div class='total-section'>
+                <div class='total-label'>Total Amount</div>
+                <div class='total-amount'>₹{booking.Price:F2}</div>
+            </div>
         </div>
 
-        <!-- Items Table -->
-        <table class='items-table'>
-            <thead>
-                <tr>
-                    <th style='width: 50%'>DESCRIPTION</th>
-                    <th style='width: 15%' class='text-center'>QTY</th>
-                    <th style='width: 15%' class='text-right'>RATE</th>
-                    <th style='width: 20%' class='text-right'>AMOUNT</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <strong>Accommodation - {booking.Home?.Name ?? "N/A"}</strong><br>
-                        <small>
-                            Stay from {booking.BookingDateFrom:MM/dd/yyyy} to {booking.BookingDateTo:MM/dd/yyyy}<br>
-                            {booking.BookingRooms?.Count ?? 0} room{((booking.BookingRooms?.Count ?? 0) != 1 ? "s" : "")} × {(booking.BookingDateTo - booking.BookingDateFrom).Days} night{((booking.BookingDateTo - booking.BookingDateFrom).Days != 1 ? "s" : "")}
-                        </small>
-                    </td>
-                    <td class='text-center'>1</td>
-                    <td class='text-right'>${booking.Price:F2}</td>
-                    <td class='text-right'>${booking.Price:F2}</td>
-                </tr>
-                <tr>
-                    <td colspan='4' style='height: 100px; border-bottom: none;'></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Totals -->
-        <div class='totals-section'>
-            <table class='totals-table'>
-                <tr>
-                    <td>SUBTOTAL:</td>
-                    <td class='text-right'>${booking.Price:F2}</td>
-                </tr>
-                <tr>
-                    <td>TAX:</td>
-                    <td class='text-right'>$0.00</td>
-                </tr>
-                <tr class='total-row'>
-                    <td>TOTAL:</td>
-                    <td class='text-right'>${booking.Price:F2}</td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- Notes and Payment Info -->
-        <div class='notes-section'>
-            <div class='payment-info'>
-                <strong>Payment Information:</strong><br>
-                Status: PAID<br>
-                Payment Date: {DateTime.Now:MM/dd/yyyy}<br>
-                Transaction ID: TXN-{booking.Id}-{DateTime.Now:yyyyMMdd}
-            </div>
-            
-            {(string.IsNullOrEmpty(booking.Message) ? "" : $@"
-            <div style='margin-top: 15px;'>
-                <strong>Notes:</strong><br>
-                {booking.Message}
-            </div>")}
-            
-            <div style='margin-top: 20px; font-size: 10px; color: #666;'>
-                Thank you for your business!<br>
-                Generated on {DateTime.Now:MM/dd/yyyy} at {DateTime.Now:hh:mm tt}
+        <!-- Footer -->
+        <div class='footer'>
+            <div class='footer-title'>Thank you for choosing Vernekar HomeStays!</div>
+            <div class='footer-details'>
+                Invoice generated on {DateTime.Now:MMM dd, yyyy} at {DateTime.Now:hh:mm tt} | For queries: info@vernekarhomestays.com
             </div>
         </div>
     </div>

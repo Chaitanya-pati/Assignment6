@@ -1,12 +1,7 @@
-//using UserManagement.Lib;
-using Hangfire;
-using Hangfire.MemoryStorage;
-using Ical.Net;
-using Ical.Net.CalendarComponents;
+
 using DbService.Implementation;
 using DbService.Interface;
 using Newtonsoft.Json;
-using Assignment6.hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,26 +20,26 @@ builder.Services.AddSingleton<IWebService, WebService>(provide =>
 {
     return new WebService(builder.Configuration.GetConnectionString("Assignment6"));
 });
-builder.Services.AddHangfire(cfg =>
-{
-    cfg.UseMemoryStorage();
-});
-builder.Services.AddHangfireServer();
+//builder.Services.AddHangfire(cfg =>
+//{
+//    cfg.UseMemoryStorage();
+//});
+//builder.Services.AddHangfireServer();
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
     });
-builder.Services.AddHttpClient();
-builder.Services.AddScoped<AirbnbSyncJob>();
+//builder.Services.AddHttpClient();
+//builder.Services.AddScoped<AirbnbSyncJob>();
 var app = builder.Build();
-app.UseHangfireDashboard("/hangfire");
+//app.UseHangfireDashboard("/hangfire");
 
 // Schedule Airbnb sync every minute
-RecurringJob.AddOrUpdate<AirbnbSyncJob>(
-    "sync-airbnb",
-    job => job.RunAsync(),
-    Cron.Minutely);
+//RecurringJob.AddOrUpdate<AirbnbSyncJob>(
+//    "sync-airbnb",
+//    job => job.RunAsync(),
+//    Cron.Minutely);
 
 //app.MapGet("/", () => "Hangfire Airbnb Sync Running (No History)...");
 // Configure the HTTP request pipeline.

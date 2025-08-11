@@ -935,14 +935,8 @@
             <button id="make-booking-button" class="btn btn-primary-professional btn-professional">
                 <i class="fas fa-plus me-2"></i>New Booking
             </button>
-            <button id="test-button" class="btn btn-warning-professional btn-professional">
-                <i class="fab fa-airbnb me-2"></i>Check Booking Requests
-            </button>
-            <!-- Notification Bell -->
-            <button id="notification-bell" class="notification-bell" onclick="showBookingRequests()" title="Booking Requests">
-                <i class="fas fa-bell"></i>
-                <span id="notification-badge" class="notification-badge d-none">0</span>
-            </button>
+          
+
         </div>
 
         <!-- Search Section -->
@@ -1385,7 +1379,7 @@
         }
     });
     // Event Listeners
-    document.getElementById("test-button").addEventListener("click", syncAirbnb);
+  //  document.getElementById("test-button").addEventListener("click", syncAirbnb);
     document.getElementById("book").addEventListener("click", fetchAndDisplayBookings);
     document.getElementById("make-booking-button").addEventListener("click", function () {
         handleDateClick(new Date().toISOString());
