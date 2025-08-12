@@ -249,18 +249,9 @@ namespace Assignment6.Controllers
         //--Just to open the Booking form--//
         public IActionResult AddBookingForm(DateTime date)
         {
-            string conn = "server = localhost; database = Assignment6; trusted_connection = true; multipleactiveresultsets = true; TrustServerCertificate = True;";
-            using (var db = new Assignment6Context(new DbContextOptionsBuilder<Assignment6Context>().UseSqlServer(conn).Options))
-            {
-                var model = new BookingViewModel
-                {
-                    BookingDateFrom = date,
-                    BookingDateTo = date.AddDays(1),
-                    AvailableHomes = db.Homes.ToList()
-                };
+            var model = _bookingService.GetBookingForm(date);
+            return PartialView("_AddBookingForm", model);
 
-                return PartialView("_AddBookingForm", model);
-            }
         }
 
         //[HttpPost]
@@ -270,6 +261,58 @@ namespace Assignment6.Controllers
         //    return Json(resultSaved);
         //}
 
+        //        [HttpPost]
+        //        public async Task<IActionResult> SaveBooking(BookingSaveModel bookingSaveModel, IFormFile Document)
+        //        {
+        //            try
+        //            {
+        //                // Handle file upload if document is provided
+        //                if (Document != null && Document.Length > 0)
+        //                {
+        //                    // Create uploads directory if it doesn't exist
+        //                    string uploadsFolder = Path.Combine("wwwroot", "uploads", "bookings");
+        //                    Directory.CreateDirectory(uploadsFolder);
+
+        //                    // Generate unique filename
+        //                    string uniqueFileName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{Document.FileName}";
+        //                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        //                    // Save file
+        //                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+        //                    {
+        //                        await Document.CopyToAsync(fileStream);
+        //                    }
+
+        //                    // Update booking data with file path
+        //                    bookingSaveModel.BookingData.Document = $"/uploads/bookings/{uniqueFileName}";
+        //                }
+
+        //                bool resultSaved = _bookingService.SaveBookingAlternative(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
+        //                return Json(resultSaved);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                return Json(new { success = false, message = ex.Message });
+        //            }
+        //        }
+
+        //        // In your SchedulerController class
+        //[HttpGet]
+        //public IActionResult CheckBookings(DateTime startDate, DateTime endDate, int homeId)
+        //{
+        //    try
+        //    {
+        //        bool isBooked = _bookingService.CheckBookingsAlternative(startDate, endDate, homeId);
+        //        return Json(isBooked);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { error = ex.Message });
+        //    }
+        //}
+
+
+        // REPLACE your existing SaveBooking method with this updated version
         [HttpPost]
         public async Task<IActionResult> SaveBooking(BookingSaveModel bookingSaveModel, IFormFile Document)
         {
@@ -296,8 +339,31 @@ namespace Assignment6.Controllers
                     bookingSaveModel.BookingData.Document = $"/uploads/bookings/{uniqueFileName}";
                 }
 
+                // Calculate correct pricing based on room selection
+                var homeData = _bookingService.GetSchedularData();
+                var home = homeData.Homes?.FirstOrDefault(h => h.Id == bookingSaveModel.BookingData.HomeId);
+
+                if (home != null)
+                {
+                    int days = (bookingSaveModel.BookingData.BookingDateTo - bookingSaveModel.BookingData.BookingDateFrom).Days;
+
+                    if (bookingSaveModel.Rooms != null && bookingSaveModel.Rooms.Any())
+                    {
+                        // Individual room pricing
+                        var roomIds = bookingSaveModel.Rooms.Select(r => r.Id).ToList();
+                        var selectedRooms = homeData.Rooms?.Where(r => roomIds.Contains(r.Id)).ToList() ?? new List<Room>();
+                        var dailyRoomTotal = selectedRooms.Sum(r => r.PricePerDay ?? 0);
+                        bookingSaveModel.BookingData.Price = (long)(dailyRoomTotal * days);
+                    }
+                    else
+                    {
+                        // Entire property pricing
+                        bookingSaveModel.BookingData.Price = (long)((home.PricePerDay ?? 0) * days);
+                    }
+                }
+
                 bool resultSaved = _bookingService.SaveBookingAlternative(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
-                return Json(resultSaved);
+                return Json(new { success = resultSaved, message = resultSaved ? "Booking saved successfully" : "Failed to save booking" });
             }
             catch (Exception ex)
             {
@@ -305,20 +371,20 @@ namespace Assignment6.Controllers
             }
         }
 
-        // In your SchedulerController class
-[HttpGet]
-public IActionResult CheckBookings(DateTime startDate, DateTime endDate, int homeId)
-{
-    try
-    {
-        bool isBooked = _bookingService.CheckBookingsAlternative(startDate, endDate, homeId);
-        return Json(isBooked);
-    }
-    catch (Exception ex)
-    {
-        return Json(new { error = ex.Message });
-    }
-}
+        // Your existing CheckBookings method (no changes needed)
+        [HttpGet]
+        public IActionResult CheckBookings(DateTime startDate, DateTime endDate, int homeId)
+        {
+            try
+            {
+                bool isBooked = _bookingService.CheckBookingsAlternative(startDate, endDate, homeId);
+                return Json(isBooked);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
 
         public IActionResult GetBookingsByHomeId(DateTime start, DateTime end, int? homeId)
         {

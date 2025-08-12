@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DbService.Interface
 {
@@ -29,6 +30,7 @@ namespace DbService.Interface
         bool ApproveBookingRequest(int bookingId);
         public bool CheckBookingsAlternative(DateTime startDate, DateTime endDate, int homeId);
         public bool SaveBookingAlternative(Booking bookingData, List<Room> rooms);
+        public BookingViewModel GetBookingForm(DateTime date);
     }
 
 }

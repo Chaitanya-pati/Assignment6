@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\kgomannache\.nuget\packages\select.htmltopdf.netcore\25.2.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\kgomannache\.nuget\packages\select.htmltopdf\25.2.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\kgomannache\.nuget\packages\select.pdf\23.1.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\kgomannache\.nuget\packages\select.pdf\23.1.0\contentFiles\any\any\Select.Tools.dep" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Hangfire" Version="1.8.20" />
     <PackageReference Include="Hangfire.Core" Version="1.8.20" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.2" />

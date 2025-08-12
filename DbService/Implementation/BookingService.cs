@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DbService.Implementation
 {
@@ -479,6 +480,21 @@ namespace DbService.Implementation
                 Console.WriteLine($"Error approving booking request: {ex.Message}");
                 return false;
             }
+        }
+
+        public BookingViewModel GetBookingForm(DateTime date)
+        {
+            var model = new BookingViewModel();
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                model = new BookingViewModel
+                {
+                    BookingDateFrom = date,
+                    BookingDateTo = date.AddDays(1),
+                    AvailableHomes = db.Homes.ToList()
+                };
+            }
+            return model;
         }
     }
 }

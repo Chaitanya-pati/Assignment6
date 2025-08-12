@@ -1163,7 +1163,7 @@
                     <td>${checkinDate}</td>
                     <td>${checkoutDate}</td>
                     <td>${request.guestNumbers}</td>
-                    <td><strong>$${request.price}</strong></td>
+                        <td><strong>₹${request.price}</strong></td>
                     <td><small>${requestDate}</small></td>
                     <td>
                         <button class="approve-btn" onclick="approveBookingRequest(${request.id}, '${request.customerName}')" id="approve-btn-${request.id}">
@@ -1592,7 +1592,7 @@
     $(document).ready(function () {
         // Handle Home dropdown change
         fetchAndDisplayBookings();
-        syncAirbnb();
+       // syncAirbnb();
         $(document).on('change', '#HomeId', function () {
             const homeId = $(this).val();
             if (!homeId) return;

@@ -14,11 +14,12 @@ namespace Assignment6.Controllers
         {
             _webService = webService;
         }
+
         public IActionResult Index()
         {
             return View();
         }
-        
+
         public IActionResult Website()
         {
             var model = _webService.GetWebSiteData();
@@ -33,10 +34,9 @@ namespace Assignment6.Controllers
                 var rooms = model.Rooms?.Where(r => r.HomeId == homeId).ToList() ?? new List<Room>();
                 return Json(rooms.Select(r => new {
                     id = r.Id,
-                    name = r.Name,
+                    label = r.Name,
                     price = r.PricePerDay ?? 0,
                     homeId = r.HomeId,
-                    // Determine if room is selectable (only bedrooms)
                     isSelectable = IsSelectableRoom(r.Name)
                 }));
             }
@@ -49,14 +49,11 @@ namespace Assignment6.Controllers
         private bool IsSelectableRoom(string roomName)
         {
             if (string.IsNullOrEmpty(roomName)) return false;
-
             var roomType = roomName.ToLower();
 
-            // Only bedrooms are selectable
             bool isBedroom = roomType.Contains("bedroom") || roomType.Contains("bed") ||
                              roomType.Contains("suite") || roomType.Contains("room");
 
-            // Exclude common areas
             bool isCommonArea = roomType.Contains("hall") || roomType.Contains("balcony") ||
                                roomType.Contains("living") || roomType.Contains("kitchen") ||
                                roomType.Contains("dining") || roomType.Contains("bathroom");
