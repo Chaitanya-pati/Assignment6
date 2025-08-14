@@ -18,6 +18,7 @@ using DbService.SaveModels;
 using System.Collections;
 using DbService.Implementation;
 using SelectPdf;
+using Microsoft.AspNetCore.Authorization;
 namespace Assignment6.Controllers
 {
     public class SchedulerController : Controller
@@ -37,7 +38,7 @@ namespace Assignment6.Controllers
         {
             return View();
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Scheduler()
         {
             var model = _bookingService.GetSchedularData();
@@ -254,66 +255,6 @@ namespace Assignment6.Controllers
 
         }
 
-        //[HttpPost]
-        //public IActionResult SaveBooking(BookingSaveModel bookingSaveModel)
-        //{
-        //    bool resultSaved = _bookingService.SaveBooking(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
-        //    return Json(resultSaved);
-        //}
-
-        //        [HttpPost]
-        //        public async Task<IActionResult> SaveBooking(BookingSaveModel bookingSaveModel, IFormFile Document)
-        //        {
-        //            try
-        //            {
-        //                // Handle file upload if document is provided
-        //                if (Document != null && Document.Length > 0)
-        //                {
-        //                    // Create uploads directory if it doesn't exist
-        //                    string uploadsFolder = Path.Combine("wwwroot", "uploads", "bookings");
-        //                    Directory.CreateDirectory(uploadsFolder);
-
-        //                    // Generate unique filename
-        //                    string uniqueFileName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{Document.FileName}";
-        //                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        //                    // Save file
-        //                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-        //                    {
-        //                        await Document.CopyToAsync(fileStream);
-        //                    }
-
-        //                    // Update booking data with file path
-        //                    bookingSaveModel.BookingData.Document = $"/uploads/bookings/{uniqueFileName}";
-        //                }
-
-        //                bool resultSaved = _bookingService.SaveBookingAlternative(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
-        //                return Json(resultSaved);
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                return Json(new { success = false, message = ex.Message });
-        //            }
-        //        }
-
-        //        // In your SchedulerController class
-        //[HttpGet]
-        //public IActionResult CheckBookings(DateTime startDate, DateTime endDate, int homeId)
-        //{
-        //    try
-        //    {
-        //        bool isBooked = _bookingService.CheckBookingsAlternative(startDate, endDate, homeId);
-        //        return Json(isBooked);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Json(new { error = ex.Message });
-        //    }
-        //}
-
-
-        // REPLACE your existing SaveBooking method with this updated version
-        [HttpPost]
         public async Task<IActionResult> SaveBooking(BookingSaveModel bookingSaveModel, IFormFile Document)
         {
             try
@@ -371,8 +312,6 @@ namespace Assignment6.Controllers
             }
         }
 
-        // Your existing CheckBookings method (no changes needed)
-        [HttpGet]
         public IActionResult CheckBookings(DateTime startDate, DateTime endDate, int homeId)
         {
             try
@@ -403,7 +342,6 @@ namespace Assignment6.Controllers
             return Json(result);
         }
 
-        [HttpGet]
         public IActionResult GetBookings(DateTime? startDate = null, DateTime? endDate = null, int? homeId = null)
         {
             try

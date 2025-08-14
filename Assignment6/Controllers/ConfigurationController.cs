@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using DbService.Models;
 using DbService.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Assignment6.Controllers
 {
@@ -14,12 +15,12 @@ namespace Assignment6.Controllers
         {
             _configurationService = configurationService;
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Configuration()
         {
             return View();
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult GetMaster()
         {
             List<Home> model = _configurationService.GetHomeMaster();
