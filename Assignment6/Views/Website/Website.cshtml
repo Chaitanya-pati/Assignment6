@@ -688,6 +688,375 @@
                 margin-bottom: 0.25rem;
             }
         }
+
+ /* Calendar Styles - Updated to match website theme */
+.calendar-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    max-width: 1200px;
+    margin: 2rem auto;
+    position: relative;
+    z-index: 50;
+}
+
+.calendar-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.calendar-title {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.calendar-header p {
+    color: #6c757d;
+    margin: 0.5rem 0 0 0;
+    font-size: 0.95rem;
+}
+
+/* FullCalendar custom styles */
+.fc {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.fc-toolbar {
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+}
+
+.fc-toolbar-title {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    color: #495057 !important;
+}
+
+.fc-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.fc-button:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+}
+
+.fc-button:disabled {
+    background: #e9ecef !important;
+    color: #6c757d !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.fc-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+}
+
+/* Calendar day cells */
+.fc-daygrid-day {
+    position: relative;
+    border: 1px solid #dee2e6 !important;
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.fc-daygrid-day:hover {
+    border-color: #667eea !important;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    z-index: 10;
+}
+
+/* Available dates - White background */
+.fc-daygrid-day.available {
+    background-color: #ffffff !important;
+    border-color: #e9ecef !important;
+}
+
+.fc-daygrid-day.available:hover {
+    background-color: #f8f9fa !important;
+}
+
+/* Booked dates - Gray background matching your website */
+.fc-daygrid-day.booked {
+    background-color: #6c757d !important;
+    border-color: #495057 !important;
+}
+
+.fc-daygrid-day.booked:hover {
+    background-color: #5a6268 !important;
+}
+
+/* Day number styling */
+.fc-daygrid-day-number {
+    padding: 4px 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.fc-daygrid-day.available .fc-daygrid-day-number {
+    color: #495057;
+}
+
+.fc-daygrid-day.booked .fc-daygrid-day-number {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Today highlighting */
+.fc-day-today.available {
+    background-color: #e3f2fd !important;
+    border-color: #667eea !important;
+}
+
+.fc-day-today.available .fc-daygrid-day-number {
+    color: #667eea !important;
+    font-weight: 700;
+}
+
+.fc-day-today.booked {
+    background-color: #495057 !important;
+    border-color: #343a40 !important;
+}
+
+/* Past dates styling */
+.fc-day-past.available {
+    background-color: #f8f9fa !important;
+    opacity: 0.6;
+}
+
+.fc-day-past.available .fc-daygrid-day-number {
+    color: #adb5bd;
+}
+
+/* Header row styling */
+.fc-col-header-cell {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-color: #dee2e6 !important;
+    font-weight: 600;
+    color: #495057;
+    padding: 0.75rem 0.5rem;
+}
+
+.fc-col-header-cell-cushion {
+    color: #495057;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* Legend - Updated to match theme */
+.calendar-legend {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.legend-color.available {
+    background-color: #ffffff;
+    border-color: #e9ecef;
+}
+
+.legend-color.booked {
+    background-color: #6c757d;
+    border-color: #495057;
+}
+
+/* Month view specific adjustments */
+.fc-daygrid {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Scrollbar styling for calendar */
+.fc-scroller::-webkit-scrollbar {
+    width: 6px;
+}
+
+.fc-scroller::-webkit-scrollbar-track {
+    background: #f1f3f4;
+    border-radius: 10px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+}
+
+/* Mobile responsive for calendar */
+@@media (max-width: 768px) {
+    .calendar-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .calendar-header {
+        margin-bottom: 1rem;
+    }
+    
+    .calendar-title {
+        font-size: 1.5rem;
+    }
+    
+    .calendar-legend {
+        gap: 2rem;
+        justify-content: space-around;
+    }
+    
+    .fc-toolbar {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .fc-toolbar-title {
+        font-size: 1.2rem !important;
+        order: 1;
+    }
+    
+    .fc-toolbar-chunk:first-child {
+        order: 2;
+    }
+    
+    .fc-toolbar-chunk:last-child {
+        order: 3;
+    }
+    
+    .legend-item {
+        font-size: 0.9rem;
+    }
+    
+    .fc-daygrid-day-number {
+        font-size: 0.8rem;
+    }
+}
+
+@@media (max-width: 480px) {
+    .calendar-container {
+        padding: 1rem;
+    }
+    
+    .calendar-legend {
+        gap: 1.5rem;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .fc-button {
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.875rem !important;
+    }
+}
+
+/* Booking info display on calendar */
+.booking-info {
+    pointer-events: none; /* Don't interfere with calendar interactions */
+    line-height: 1.2;
+}
+
+.fc-daygrid-day.booked .booking-info {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Ensure proper positioning for booking info */
+.fc-daygrid-day {
+    position: relative !important;
+}
+
+/* Improve hover effect for booked dates */
+.fc-daygrid-day.booked:hover .booking-info {
+    background: rgba(73, 80, 87, 0.95) !important;
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+/* Mobile responsive booking info */
+@@media (max-width: 768px) {
+    .booking-info {
+        font-size: 8px !important;
+        padding: 1px !important;
+    }
+}
+
+    /* Past dates styling */
+    .fc-daygrid-day.past-date {
+        background-color: #f8f9fa !important;
+        opacity: 0.5;
+        border-color: #dee2e6 !important;
+    }
+
+        .fc-daygrid-day.past-date .fc-daygrid-day-number {
+            color: #adb5bd !important;
+            font-weight: 400;
+        }
+
+        .fc-daygrid-day.past-date:hover {
+            background-color: #f8f9fa !important;
+            border-color: #dee2e6 !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+    /* Ensure today's date is clearly visible */
+    .fc-day-today {
+        border-color: #667eea !important;
+        box-shadow: inset 0 0 0 2px #667eea;
+    }
+
+        .fc-day-today.available {
+            background-color: #e3f2fd !important;
+        }
+
+        .fc-day-today.booked {
+            background-color: #495057 !important;
+            border-color: #343a40 !important;
+        }
+
+        .fc-day-today .fc-daygrid-day-number {
+            color: #667eea !important;
+            font-weight: 700 !important;
+        }
     </style>
     <!-- Header -->
     <header class="header">
@@ -709,6 +1078,30 @@
             <p>Discover comfortable, welcoming homes away from home with personalized hospitality</p>
         </div>
     </section>
+
+
+<!-- Calendar Container -->
+<div class="calendar-container">
+    <div class="calendar-header">
+        <h3 class="calendar-title">
+            <i class="fas fa-calendar-week me-2"></i>Booking Calendar
+        </h3>
+        <p class="text-muted mb-0">Check availability across all properties</p>
+    </div>
+    <div id="websiteCalendar"></div>
+    
+    <!-- Simplified Legend -->
+    <div class="calendar-legend">
+        <div class="legend-item">
+            <div class="legend-color available"></div>
+            <span>Available</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color booked"></div>
+            <span>Booked</span>
+        </div>
+    </div>
+</div>
 
     <!-- Booking Form -->
     <div class="booking-form">
@@ -1032,7 +1425,297 @@
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Add these CDN links for FullCalendar -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script>
+    /// Fixed Calendar Implementation
+    var calendarEl = document.getElementById('websiteCalendar');
+    var calendar;
+
+    // Initialize calendar with booking data
+    function initializeCalendar() {
+        if (calendar) {
+            calendar.destroy();
+        }
+
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth'
+            },
+            height: 'auto',
+            selectable: false,
+            eventDisplay: 'none',
+            dayMaxEvents: false,
+            events: [],
+            dayCellDidMount: function (info) {
+                // Add booking status to each day cell
+                addBookingStatus(info.el, info.date);
+            },
+            datesSet: function () {
+                // Refresh status when month changes
+                setTimeout(() => {
+                    document.querySelectorAll('.fc-daygrid-day').forEach(dayEl => {
+                        const dateStr = dayEl.getAttribute('data-date');
+                        if (dateStr) {
+                            const date = new Date(dateStr);
+                            addBookingStatus(dayEl, date);
+                        }
+                    });
+                }, 100);
+            }
+        });
+
+        calendar.render();
+        loadBookingData();
+    }
+
+    // Load booking data and update calendar
+    function loadBookingData() {
+        // Get ALL bookings from your model with home names
+        const allBookings = @Html.Raw(Json.Serialize(Model.Bookings.Select(b => new
+        {
+            id = b.Id,
+            homeId = b.HomeId,
+            homeName = Model.Homes.FirstOrDefault(h => h.Id == b.HomeId).Name ?? "Unknown Property",
+            dateFrom = b.BookingDateFrom.ToString("yyyy-MM-dd"),
+            dateTo = b.BookingDateTo.ToString("yyyy-MM-dd"),
+            isBooked = b.IsBooked,
+            paymentStatus = b.PaymentStatus ?? "pending"
+        })));
+
+        // Debug: Log all bookings
+        console.log('=== ALL BOOKINGS FROM SERVER ===');
+        allBookings.forEach((booking, index) => {
+            console.log(`Booking ${index + 1}:`, {
+                id: booking.id,
+                homeName: booking.homeName,
+                dateFrom: booking.dateFrom,
+                dateTo: booking.dateTo,
+                isBooked: booking.isBooked,
+                paymentStatus: booking.paymentStatus
+            });
+        });
+
+        // Filter for ONLY confirmed bookings (isBooked = true)
+        const confirmedBookings = allBookings.filter(booking => {
+            const isConfirmed = booking.isBooked === true;
+            console.log(`Booking ${booking.id} - isBooked: ${booking.isBooked} - Confirmed: ${isConfirmed}`);
+            return isConfirmed;
+        });
+
+        // Debug: Log filtered bookings
+        console.log('=== CONFIRMED BOOKINGS AFTER FILTER ===');
+        console.log('Total confirmed bookings:', confirmedBookings.length);
+        confirmedBookings.forEach((booking, index) => {
+            console.log(`Confirmed ${index + 1}:`, {
+                id: booking.id,
+                homeName: booking.homeName,
+                dateFrom: booking.dateFrom,
+                dateTo: booking.dateTo,
+                isBooked: booking.isBooked
+            });
+        });
+
+        // Process only confirmed booking data for calendar display
+        window.bookingCalendarData = processBookingDataWithNames(confirmedBookings);
+
+        // Update calendar display
+        updateCalendarDisplay();
+    }
+
+    // Process booking data with property names - IMPROVED VERSION
+    function processBookingDataWithNames(bookings) {
+        const dailyBookings = {};
+
+        console.log('Processing bookings:', bookings.length);
+
+        // Process each confirmed booking
+        bookings.forEach((booking, index) => {
+            console.log(`Processing booking ${index + 1}:`, {
+                id: booking.id,
+                homeName: booking.homeName,
+                dateFrom: booking.dateFrom,
+                dateTo: booking.dateTo,
+                isBooked: booking.isBooked
+            });
+
+            // Parse dates more reliably
+            const startDate = new Date(booking.dateFrom + 'T00:00:00');
+            const endDate = new Date(booking.dateTo + 'T00:00:00');
+
+            console.log(`Booking ${booking.id}: ${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]} (checkout excluded)`);
+
+            // Mark each day in the booking range - EXCLUDE checkout date
+            const currentDate = new Date(startDate);
+            while (currentDate < endDate) {
+                const dateKey = currentDate.toISOString().split('T')[0];
+
+                if (!dailyBookings[dateKey]) {
+                    dailyBookings[dateKey] = [];
+                }
+
+                // Check if this booking is already added for this date (prevent duplicates)
+                const existingBooking = dailyBookings[dateKey].find(b => b.id === booking.id);
+                if (!existingBooking) {
+                    // Add this booking to the date
+                    dailyBookings[dateKey].push({
+                        id: booking.id,
+                        homeId: booking.homeId,
+                        homeName: booking.homeName
+                    });
+                    console.log(`✓ Added booking ${booking.id} to date ${dateKey}`);
+                }
+
+                // Move to next day
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            console.log(`✓ Booking ${booking.id} processing complete - checkout date ${endDate.toISOString().split('T')[0]} is available`);
+        });
+
+        // Log the final result
+        console.log('Daily bookings result:', dailyBookings);
+        const totalEntries = Object.values(dailyBookings).reduce((sum, bookings) => sum + bookings.length, 0);
+        console.log('Total booking entries across all dates:', totalEntries);
+
+        return dailyBookings;
+    }
+
+    // Add booking status to calendar day cell with property names
+    function addBookingStatus(dayElement, date) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+        date.setHours(0, 0, 0, 0);
+
+        // Check if this date is before today
+        const isPastDate = date < today;
+
+        if (!window.bookingCalendarData) {
+            // If no data loaded yet, show as available (for future dates only)
+            dayElement.classList.remove('booked', 'available', 'past-date');
+            if (isPastDate) {
+                dayElement.classList.add('past-date');
+                dayElement.title = 'Past date';
+            } else {
+                dayElement.classList.add('available');
+                dayElement.title = 'Available for booking';
+            }
+            return;
+        }
+
+        const dateKey = date.toISOString().split('T')[0];
+        const dayBookings = window.bookingCalendarData[dateKey];
+
+        // Remove existing status classes
+        dayElement.classList.remove('booked', 'available', 'past-date');
+
+        // Remove any existing booking info
+        const existingInfo = dayElement.querySelector('.booking-info');
+        if (existingInfo) {
+            existingInfo.remove();
+        }
+
+        // Handle past dates - don't show booking information
+        if (isPastDate) {
+            dayElement.classList.add('past-date');
+            dayElement.title = 'Past date';
+            return;
+        }
+
+        // Handle future dates (today and onwards)
+        if (dayBookings && dayBookings.length > 0) {
+            // This date has confirmed bookings
+            dayElement.classList.add('booked');
+
+            // Create tooltip with property names
+            const propertyNames = [...new Set(dayBookings.map(b => b.homeName))];
+            const tooltipText = `Booked Properties:\n${propertyNames.join('\n')}`;
+            dayElement.title = tooltipText;
+
+            // Add visual indicator with property count if multiple
+            if (propertyNames.length > 1) {
+                const bookingInfo = document.createElement('div');
+                bookingInfo.className = 'booking-info';
+                bookingInfo.style.cssText = `
+                    position: absolute;
+                    top: 2px;
+                    left: 2px;
+                    background: rgba(255, 255, 255, 0.9);
+                    color: #495057;
+                    font-size: 10px;
+                    padding: 1px 4px;
+                    border-radius: 3px;
+                    font-weight: bold;
+                    z-index: 5;
+                `;
+                bookingInfo.textContent = `${propertyNames.length} properties`;
+                dayElement.style.position = 'relative';
+                dayElement.appendChild(bookingInfo);
+            } else {
+                // Single property - show property name
+                const bookingInfo = document.createElement('div');
+                bookingInfo.className = 'booking-info';
+                bookingInfo.style.cssText = `
+                    position: absolute;
+                    bottom: 2px;
+                    left: 2px;
+                    right: 2px;
+                    background: rgba(108, 117, 125, 0.9);
+                    color: white;
+                    font-size: 9px;
+                    padding: 1px 2px;
+                    border-radius: 2px;
+                    font-weight: 500;
+                    text-align: center;
+                    z-index: 5;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                `;
+                bookingInfo.textContent = propertyNames[0];
+                dayElement.style.position = 'relative';
+                dayElement.appendChild(bookingInfo);
+            }
+        } else {
+            // This date is available
+            dayElement.classList.add('available');
+            dayElement.title = 'Available for booking';
+        }
+    }
+
+    // Update calendar display
+    function updateCalendarDisplay() {
+        if (calendar) {
+            calendar.render();
+
+            // Force refresh of day cell status
+            setTimeout(() => {
+                document.querySelectorAll('.fc-daygrid-day').forEach(dayEl => {
+                    const dateStr = dayEl.getAttribute('data-date');
+                    if (dateStr) {
+                        const date = new Date(dateStr);
+                        addBookingStatus(dayEl, date);
+                    }
+                });
+            }, 100);
+        }
+    }
+
+    // Initialize calendar when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        // Small delay to ensure all data is loaded
+        setTimeout(initializeCalendar, 500);
+    });
+
+    // Refresh calendar when property selection changes
+    function refreshCalendarForProperty(propertyId) {
+        if (propertyId) {
+            updateCalendarDisplay();
+        }
+    }
         // Make model data available to JavaScript
         window.websiteData = {
             homes: @Html.Raw(Json.Serialize(Model.Homes.Select(h => new { 
