@@ -65,6 +65,11 @@
             color: var(--text-dark);
         }
 
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.1);
+        }
+
     .form-label {
         font-weight: 500;
         color: var(--text-dark);
@@ -212,6 +217,12 @@
         font-family: inherit;
     }
 
+    .character-count {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+    }
+
     /* Mobile Responsiveness */
     @@media (max-width: 768px) {
         .modal-body {
@@ -251,6 +262,7 @@
                     </label>
                     <input type="text" class="form-control" id="CustomerName" name="CustomerName"
                            placeholder="Enter full name" value="@Model?.CustomerName" required>
+                    <div id="CustomerName-feedback" class="invalid-feedback" style="display: none;"></div>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="CustomerEmail" class="form-label">
@@ -258,6 +270,7 @@
                     </label>
                     <input type="email" class="form-control" id="CustomerEmail" name="CustomerEmail"
                            placeholder="Enter email address" value="@Model?.CustomerEmail" required>
+                    <div id="CustomerEmail-feedback" class="invalid-feedback" style="display: none;"></div>
                 </div>
             </div>
 
@@ -268,13 +281,15 @@
                     </label>
                     <input type="tel" class="form-control" id="CustomerPhone" name="CustomerPhone"
                            placeholder="Enter phone number" value="@Model?.CustomerPhone" required>
+                    <div id="CustomerPhone-feedback" class="invalid-feedback" style="display: none;"></div>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="GuestNumbers" class="form-label">
                         <i class="fas fa-users mr-3"></i>Number of Guests *
                     </label>
                     <input type="number" class="form-control" id="GuestNumbers" name="GuestNumbers"
-                           placeholder="Enter number of guests" value="@Model?.GuestNumbers" min="1" required>
+                           placeholder="Enter number of guests" value="@Model?.GuestNumbers" min="1" max="50" required>
+                    <div id="GuestNumbers-feedback" class="invalid-feedback" style="display: none;"></div>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="Document" class="form-label">
@@ -282,6 +297,7 @@
                     </label>
                     <input type="file" class="form-control" id="Document" name="Document"
                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                    <div id="Document-feedback" class="invalid-feedback" style="display: none;"></div>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="BookingRange" class="form-label">
@@ -289,10 +305,12 @@
                     </label>
                     <div class="row">
                         <div class="col-6">
-                            <input type="date" class="form-control" id="BookingDateFrom" name="BookingDateFrom" value="" />
+                            <input type="date" class="form-control" id="BookingDateFrom" name="BookingDateFrom" value="" required />
+                            <div id="BookingDateFrom-feedback" class="invalid-feedback" style="display: none;"></div>
                         </div>
                         <div class="col-6">
-                            <input type="date" class="form-control" id="BookingDateTo" name="BookingDateTo" value="" />
+                            <input type="date" class="form-control" id="BookingDateTo" name="BookingDateTo" value="" required />
+                            <div id="BookingDateTo-feedback" class="invalid-feedback" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
@@ -324,6 +342,7 @@
                             }
                         }
                     </select>
+                    <div id="HomeId-feedback" class="invalid-feedback" style="display: none;"></div>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Room Selection</label>
@@ -349,7 +368,9 @@
                     <i class="fas fa-sticky-note"></i>Additional Notes
                 </label>
                 <textarea class="form-control textarea-professional" id="Message" name="Message" rows="4"
-                          placeholder="Description">@Model?.Message</textarea>
+                          placeholder="Description" maxlength="500">@Model?.Message</textarea>
+                <div id="Message-feedback" class="invalid-feedback" style="display: none;"></div>
+                <div id="Message-count" class="character-count">0/500 characters</div>
             </div>
         </div>
 
@@ -386,7 +407,311 @@
 <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/bundle.js"></script>
 
 <script>
+    // Validation functions - Only show errors, clear on valid input
+    function showValidationMessage(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const feedback = document.getElementById(fieldId + '-feedback');
+        
+        if (!field || !feedback) return;
+        
+        // Clear previous states
+        field.classList.remove('is-invalid');
+        feedback.style.display = 'none';
+        
+        // Only show error messages
+        if (message) {
+            field.classList.add('is-invalid');
+            feedback.textContent = message;
+            feedback.style.display = 'block';
+        }
+    }
+
+    function clearValidationMessage(fieldId) {
+        const field = document.getElementById(fieldId);
+        const feedback = document.getElementById(fieldId + '-feedback');
+        
+        if (!field || !feedback) return;
+        
+        field.classList.remove('is-invalid');
+        feedback.style.display = 'none';
+    }
+
+    function validateCustomerName() {
+        const name = document.getElementById('CustomerName').value.trim();
+        
+        if (!name) {
+            showValidationMessage('CustomerName', 'Customer name is required');
+            return false;
+        }
+        
+        if (name.length < 2) {
+            showValidationMessage('CustomerName', 'Name must be at least 2 characters long');
+            return false;
+        }
+        
+        if (name.length > 100) {
+            showValidationMessage('CustomerName', 'Name must not exceed 100 characters');
+            return false;
+        }
+        
+        if (!/^[a-zA-Z\s'-]+$/.test(name)) {
+            showValidationMessage('CustomerName', 'Name can only contain letters, spaces, hyphens and apostrophes');
+            return false;
+        }
+        
+        clearValidationMessage('CustomerName');
+        return true;
+    }
+
+    function validateEmail() {
+        const email = document.getElementById('CustomerEmail').value.trim();
+        
+        if (!email) {
+            showValidationMessage('CustomerEmail', 'Email address is required');
+            return false;
+        }
+        
+        const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$$/;
+        if (!emailRegex.test(email)) {
+            showValidationMessage('CustomerEmail', 'Please enter a valid email address');
+            return false;
+        }
+        
+        if (email.length > 255) {
+            showValidationMessage('CustomerEmail', 'Email address is too long');
+            return false;
+        }
+        
+        clearValidationMessage('CustomerEmail');
+        return true;
+    }
+
+    function validatePhone() {
+        const phone = document.getElementById('CustomerPhone').value.trim();
+        
+        if (!phone) {
+            showValidationMessage('CustomerPhone', 'Phone number is required');
+            return false;
+        }
+        
+        // Remove spaces, hyphens, and brackets for validation
+        const cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
+        
+        if (cleanPhone.length < 10) {
+            showValidationMessage('CustomerPhone', 'Phone number must be at least 10 digits');
+            return false;
+        }
+        
+        if (cleanPhone.length > 15) {
+            showValidationMessage('CustomerPhone', 'Phone number must not exceed 15 digits');
+            return false;
+        }
+        
+        if (!/^\d+$/.test(cleanPhone)) {
+            showValidationMessage('CustomerPhone', 'Phone number can only contain digits, spaces, hyphens, and brackets');
+            return false;
+        }
+        
+        clearValidationMessage('CustomerPhone');
+        return true;
+    }
+
+    function validateGuestNumbers() {
+        const guests = document.getElementById('GuestNumbers').value.trim();
+        
+        if (!guests) {
+            showValidationMessage('GuestNumbers', 'Number of guests is required');
+            return false;
+        }
+        
+        const guestCount = parseInt(guests);
+        
+        if (isNaN(guestCount) || guestCount < 1) {
+            showValidationMessage('GuestNumbers', 'At least 1 guest is required');
+            return false;
+        }
+        
+        if (guestCount > 50) {
+            showValidationMessage('GuestNumbers', 'Maximum 50 guests allowed');
+            return false;
+        }
+        
+        clearValidationMessage('GuestNumbers');
+        return true;
+    }
+
+    function validateDateRange() {
+        const startDate = document.getElementById('BookingDateFrom').value;
+        const endDate = document.getElementById('BookingDateTo').value;
+        const today = new Date().toISOString().split('T')[0];
+        
+        let isStartValid = true;
+        let isEndValid = true;
+        
+        // Validate start date
+        if (!startDate) {
+            showValidationMessage('BookingDateFrom', 'Check-in date is required');
+            isStartValid = false;
+        } else if (startDate < today) {
+            showValidationMessage('BookingDateFrom', 'Check-in date cannot be in the past');
+            isStartValid = false;
+        } else {
+            clearValidationMessage('BookingDateFrom');
+        }
+        
+        // Validate end date
+        if (!endDate) {
+            showValidationMessage('BookingDateTo', 'Check-out date is required');
+            isEndValid = false;
+        } else if (endDate < today) {
+            showValidationMessage('BookingDateTo', 'Check-out date cannot be in the past');
+            isEndValid = false;
+        } else if (startDate && endDate <= startDate) {
+            showValidationMessage('BookingDateTo', 'Check-out date must be after check-in date');
+            isEndValid = false;
+        } else {
+            // Calculate days and validate reasonable booking duration
+            if (startDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                
+                if (daysDiff > 365) {
+                    showValidationMessage('BookingDateTo', 'Booking duration cannot exceed 1 year');
+                    isEndValid = false;
+                } else {
+                    clearValidationMessage('BookingDateTo');
+                }
+            } else {
+                clearValidationMessage('BookingDateTo');
+            }
+        }
+        
+        return isStartValid && isEndValid;
+    }
+
+    function validatePropertySelection() {
+        const homeId = document.getElementById('HomeId').value;
+        
+        if (!homeId) {
+            showValidationMessage('HomeId', 'Please select a property');
+            return false;
+        }
+        
+        clearValidationMessage('HomeId');
+        return true;
+    }
+
+    function validateFileUpload() {
+        const fileInput = document.getElementById('Document');
+        const file = fileInput.files[0];
+        
+        if (file) {
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            
+            if (!allowedTypes.includes(file.type)) {
+                showValidationMessage('Document', 'Invalid file type. Please upload PDF, JPG, PNG, or DOC files');
+                fileInput.value = '';
+                return false;
+            }
+            
+            if (file.size > maxSize) {
+                showValidationMessage('Document', 'File size must be less than 5MB');
+                fileInput.value = '';
+                return false;
+            }
+            
+            clearValidationMessage('Document');
+        } else {
+            clearValidationMessage('Document');
+        }
+        
+        return true;
+    }
+
+    function validateMessage() {
+        const message = document.getElementById('Message').value.trim();
+        const maxLength = 500;
+        const counter = document.getElementById('Message-count');
+        
+        // Update character counter
+        if (counter) {
+            counter.textContent = `${message.length}/${maxLength} characters`;
+        }
+        
+        if (message.length > maxLength) {
+            showValidationMessage('Message', `Message must not exceed ${maxLength} characters`);
+            return false;
+        }
+        
+        clearValidationMessage('Message');
+        return true;
+    }
+
+    // Real-time validation event listeners
+    function initializeValidation() {
+        // Customer Name validation
+        document.getElementById('CustomerName').addEventListener('blur', validateCustomerName);
+        document.getElementById('CustomerName').addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                validateCustomerName();
+            } else {
+                clearValidationMessage('CustomerName');
+            }
+        });
+
+        // Email validation
+        document.getElementById('CustomerEmail').addEventListener('blur', validateEmail);
+        document.getElementById('CustomerEmail').addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                validateEmail();
+            } else {
+                clearValidationMessage('CustomerEmail');
+            }
+        });
+
+        // Phone validation
+        document.getElementById('CustomerPhone').addEventListener('blur', validatePhone);
+        document.getElementById('CustomerPhone').addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                validatePhone();
+            } else {
+                clearValidationMessage('CustomerPhone');
+            }
+        });
+
+        // Guest numbers validation
+        document.getElementById('GuestNumbers').addEventListener('blur', validateGuestNumbers);
+        document.getElementById('GuestNumbers').addEventListener('input', validateGuestNumbers);
+
+        // Date validation
+        document.getElementById('BookingDateFrom').addEventListener('change', validateDateRange);
+        document.getElementById('BookingDateTo').addEventListener('change', validateDateRange);
+
+        // Property selection validation
+        document.getElementById('HomeId').addEventListener('change', validatePropertySelection);
+
+        // File upload validation
+        document.getElementById('Document').addEventListener('change', validateFileUpload);
+
+        // Message validation with character counter
+        document.getElementById('Message').addEventListener('input', validateMessage);
+        document.getElementById('Message').addEventListener('blur', validateMessage);
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('BookingDateFrom').min = today;
+        document.getElementById('BookingDateTo').min = today;
+    }
+
     $(document).ready(function () {
+        // Initialize validation
+        initializeValidation();
+
+        // Initialize character counter
+        validateMessage();
+
         // Initialize date picker
         const picker = new Litepicker({
             element: document.getElementById('BookingRange'),
@@ -552,50 +877,43 @@
         updateBookingSummary();
     });
 
-    // Form validation
+    // Enhanced form validation - only check for errors
     function validateForm() {
         let isValid = true;
-        const form = document.getElementById('bookingForm');
-
-        // Clear previous validation states
-        form.querySelectorAll('.form-control, .form-select').forEach(field => {
-            field.classList.remove('is-invalid');
-        });
-
-        // Validate required fields
-        const requiredFields = [
-            'CustomerName', 'CustomerEmail', 'CustomerPhone', 'GuestNumbers',
-            'BookingDateFrom', 'BookingDateTo', 'HomeId'
+        
+        // Run all validations
+        const validations = [
+            validateCustomerName(),
+            validateEmail(),
+            validatePhone(),
+            validateGuestNumbers(),
+            validateDateRange(),
+            validatePropertySelection(),
+            validateFileUpload(),
+            validateMessage()
         ];
-
-        requiredFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (!field.value.trim()) {
-                field.classList.add('is-invalid');
-                isValid = false;
-            }
-        });
-
-        // Validate date range
-        const startDate = new Date(document.getElementById('BookingDateFrom').value);
-        const endDate = new Date(document.getElementById('BookingDateTo').value);
-        if (startDate >= endDate) {
-            document.getElementById('BookingDateFrom').classList.add('is-invalid');
-            document.getElementById('BookingDateTo').classList.add('is-invalid');
-            isValid = false;
-        }
-
+        
+        // Check if all validations passed
+        isValid = validations.every(validation => validation === true);
+        
         return isValid;
     }
 
-    // Form submission
+    // Form submission with enhanced validation
     function SaveBookingData() {
-        // Validate form
+        // Validate form with real-time validation
         if (!validateForm()) {
             if (window.showNotification) {
-                window.showNotification('Please fill in all required fields correctly.', 'error');
+                window.showNotification('Please correct the validation errors before submitting.', 'error');
             } else {
-                alert('Please fill in all required fields correctly.');
+                alert('Please correct the validation errors before submitting.');
+            }
+            
+            // Scroll to first invalid field
+            const firstInvalidField = document.querySelector('.is-invalid');
+            if (firstInvalidField) {
+                firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalidField.focus();
             }
             return;
         }
@@ -622,7 +940,7 @@
         };
 
         // Disable submit button to prevent double submission
-        const submitBtn = $('#ngBtn');
+        const submitBtn = $('#saveBookingBtn');
         const originalText = submitBtn.html();
         submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
 
@@ -640,31 +958,26 @@
             success: function (isBooked) {
                 debugger
                 // Show success message
-                if (isBooked) {
-                    const message = `Booking Created Successfully!\n\nDetails:\n` +
-                        `Customer: ${bookingData.CustomerName}\n` +
-                        `Property: ${$('#HomeId option:selected').text()}\n` +
-                        `Rooms: ${selectedRooms.length}\n` +
-                        `Dates: ${bookingData.BookingDateFrom} to ${bookingData.BookingDateTo}\n` +
-                        `Total: ₹${bookingData.TotalPrice}`;
-
-                    // if (window.showNotification) {
+                if (isBooked.success) {
                     window.showNotification('Booking saved successfully!', 'success');
                     // Close modal
                     $('#bookingModal').modal('hide');
-                    fetchAndDisplayBookings();
+                    
+                    // Use the new refresh function from scheduler
+                    if (window.refreshCalendarData) {
+                        window.refreshCalendarData();
+                    } else if (window.fetchAndDisplayBookings) {
+                        fetchAndDisplayBookings();
+                    }
+                    
                     // Clear form and selections
                     resetForm();
-                    //    } else {
-                    //      alert(message);
-                    // }
+                    
                     // Trigger custom event for calendar refresh
                     $(window).trigger('bookingSaved', [bookingData]);
-                }
-                else{
+                } else {
                     window.showNotification('Check availability for the date range you are selecting!', 'warning');
                 }
-              
             },
             error: function (xhr, status, error) {
                 console.error('Booking submission error:', error);
@@ -689,16 +1002,26 @@
         });
     }
 
-    // Reset form function
+    // Enhanced reset form function with validation clearing
     function resetForm() {
         localStorage.removeItem('selectedRoomData');
         localStorage.removeItem('bookingData');
         updateBookingSummary();
 
-        // Clear validation states
+        // Clear all validation states and feedback messages
         document.querySelectorAll('.form-control, .form-select').forEach(field => {
             field.classList.remove('is-invalid');
         });
+        
+        document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+            feedback.style.display = 'none';
+        });
+
+        // Reset form fields
+        document.getElementById('bookingForm').reset();
+
+        // Reset character counter
+        validateMessage();
 
         // Reset date picker
         if (window.currentDatePicker) {
