@@ -20,16 +20,16 @@ namespace Assignment6.Services
             {
                 var currentYear = DateTime.Now.Year;
 
-                var totalBookings = db.Bookings.Count();
+                var totalBookings = db.Bookings.Where(x=>x.IsBooked ==  true).Count();
                 var totalRevenue = db.Bookings
-                    .Where(b => b.PaymentStatus.ToLower() == "paid")
+                    .Where(b => b.PaymentStatus.ToLower() == "paid" || b.IsBooked == true)
                     .Sum(b => b.Price);
 
                 var totalProperties = db.Homes.Count();
                 var totalRooms = db.Rooms.Count();
 
                 var pendingBookings = db.Bookings
-                    .Count(b => b.PaymentStatus.ToLower() == "pending");
+                    .Count(b => b.PaymentStatus.ToLower() == "pending" || b.IsBooked == false);
 
                 var completedBookings = db.Bookings
                     .Count(b => b.PaymentStatus.ToLower() == "paid");
@@ -105,7 +105,7 @@ namespace Assignment6.Services
         {
             using (var db = new Assignment6Context(_dbconnection))
             {
-                var statusData = db.Bookings
+                var statusData = db.Bookings.Where(x => x.IsBooked == true)
                     .GroupBy(b => b.PaymentStatus)
                     .Select(g => new
                     {
@@ -134,7 +134,7 @@ namespace Assignment6.Services
         {
             using (var db = new Assignment6Context(_dbconnection))
             {
-                var propertyData = db.Bookings
+                var propertyData = db.Bookings.Where(x => x.IsBooked == true)
                     .Include(b => b.Home)
                     .GroupBy(b => new { b.HomeId, b.Home.Name })
                     .Select(g => new
@@ -161,7 +161,7 @@ namespace Assignment6.Services
         {
             using (var db = new Assignment6Context(_dbconnection))
             {
-                return db.Bookings
+                return db.Bookings.Where(x=>x.IsBooked == true)
                     .Include(b => b.Home)
                     .OrderByDescending(b => b.CreatedAt)
                     .Take(10)
@@ -195,7 +195,7 @@ namespace Assignment6.Services
         {
             using (var db = new Assignment6Context(_dbconnection))
             {
-                return db.Bookings
+                return db.Bookings.Where(x => x.IsBooked == true)
                     .Where(b => b.BookingDateFrom >= startDate &&
                                b.BookingDateTo <= endDate &&
                                b.PaymentStatus.ToLower() == "paid")
