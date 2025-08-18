@@ -524,7 +524,7 @@
                                 foreach (var layout in Model.Layouts)
                                 {
                                     var roomPrice = layout.Room?.PricePerDay ?? 0;
-                                    var isCommonArea = layout.Label.ToLower().Contains("hall") || layout.Label.ToLower().Contains("balcony") ||
+                                    var isCommonArea = layout.Label.ToLower().Contains("hall") || layout.Label.ToLower().Contains("lobby") ||
                                     layout.Label.ToLower().Contains("living room") || layout.Label.ToLower().Contains("lounge") ||
                                     layout.Label.ToLower().Contains("kitchen") || layout.Label.ToLower().Contains("dining room") ||
                                     layout.Label.ToLower().Contains("corridor");
