@@ -19,55 +19,254 @@
             color: #333;
             overflow-x: hidden;
         }
+    /* Header */
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    }
 
-       /* Header */
-.header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-}
+    .nav {
+        max-width: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        width: 100%;
+        position: relative;
+    }
 
-.nav {
-    max-width: 100%;
-    margin: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 2rem;
-    width: 100%;
-}
+    .logo {
+        font-size: 2rem;
+        font-weight: bold;
+        text-decoration: none;
+        color: white;
+        z-index: 1001;
+    }
 
-.logo {
-    font-size: 2rem;
-    font-weight: bold;
-    text-decoration: none;
-    color: white;
-    margin-right: auto; /* Push logo to far left */
-}
+    .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+        margin: 0;
+        padding: 0;
+        transition: all 0.3s ease;
+    }
 
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
-    margin: 0;
-    padding: 0;
-    margin-left: auto; /* Push nav links to far right */
-}
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+            padding: 0.5rem 0;
+        }
 
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    transition: opacity 0.3s;
-}
+            .nav-links a:hover {
+                opacity: 0.8;
+            }
 
-.nav-links a:hover {
-    opacity: 0.8;
-}
+    /* Hamburger Menu Icon */
+    .hamburger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        z-index: 1001;
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        position: relative;
+    }
 
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            transform-origin: center;
+            display: block;
+        }
+
+        /* Hamburger Animation */
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+    /* Overlay for mobile menu */
+    .nav-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 998;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+        .nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+    /* Desktop Navigation */
+    @@media (min-width: 769px) {
+        .hamburger
+
+    {
+        display: none !important;
+    }
+
+    .nav-links {
+        display: flex !important;
+        position: static !important;
+        height: auto !important;
+        width: auto !important;
+        background: transparent !important;
+        flex-direction: row !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        right: auto !important;
+    }
+
+    }
+
+    /* Mobile responsive */
+    @@media (max-width: 768px) {
+        .nav
+
+    {
+        padding: 1rem;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100vh;
+        width: 100%;
+        max-width: 300px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 80px;
+        gap: 2rem;
+        transition: right 0.3s ease;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    }
+
+        .nav-links.active {
+            right: 0;
+        }
+
+        .nav-links li {
+            width: 100%;
+            text-align: center;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+            .nav-links a:hover {
+                background: rgba(255,255,255,0.1);
+                opacity: 1;
+            }
+
+    /* Overlay for mobile menu */
+    .nav-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+        .nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+    }
+
+    @@media (max-width: 480px) {
+        .nav
+
+    {
+        padding: 0.75rem;
+    }
+
+    .logo {
+        font-size: 1.3rem;
+    }
+
+    .nav-links {
+        max-width: 280px;
+        padding-top: 70px;
+    }
+
+        .nav-links a {
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+        }
+
+    }
+
+    /* Large screens */
+    @@media (min-width: 1200px) {
+        .nav
+
+    {
+        padding: 1rem 3rem;
+    }
+
+    }
+
+    /* Demo content */
+    .demo-content {
+        height: 200vh;
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        padding: 2rem;
+        text-align: center;
+    }
+
+        .demo-content h1 {
+            margin-top: 2rem;
+            color: #333;
+        }
 /* Mobile responsive */
 @@media (max-width: 768px) {
     .nav {
@@ -104,7 +303,7 @@
             background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
             background-size: cover;
             background-position: center;
-            height: 80vh;
+            height: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -346,7 +545,7 @@
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
         }
 
@@ -695,7 +894,7 @@
             }
             
             .hero {
-                width: 80%;
+                height: 40%;
             }
 
             .nav-links {
@@ -1122,18 +1321,30 @@
     }
     </style>
     <!-- Header -->
-    <header class="header ml-0">
-        <nav class="nav">
-            <a href="#" class="logo">🏠 Radha HomeStay</a>
-            <ul class="nav-links">
-                <li><a href="#rooms">Rooms</a></li>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#testimonials">Reviews</a></li>
-                <li><a href="#contact">Contact</a></li>
-            <li><a asp-action="Login" asp-controller="Login" title="Admin Login"> 👤</a></li>
-            </ul>
-        </nav>
-    </header>
+<header class="header">
+    <nav class="nav">
+        <a href="#" class="logo">🏠 Radha HomeStay</a>
+
+        <!-- Hamburger Menu Icon -->
+        <button class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- Navigation Links -->
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#rooms">Rooms</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#testimonials">Reviews</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a asp-action="Login" asp-controller="Login" title="Admin Login">👤 Admin</a></li>
+        </ul>
+    </nav>
+
+    <!-- Overlay for mobile menu -->
+    <div class="nav-overlay" id="navOverlay"></div>
+</header>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -2900,6 +3111,54 @@
                     }
                 }
             });
+        }
+    });
+      const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    const navOverlay = document.getElementById('navOverlay');
+
+    function toggleMenu() {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+        navOverlay.classList.toggle('active');
+
+        // Prevent body scroll when menu is open
+        if (navLinks.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+
+    function closeMenu() {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('active');
+        navOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Event listeners
+    hamburger.addEventListener('click', toggleMenu);
+    navOverlay.addEventListener('click', closeMenu);
+
+    // Close menu when clicking on navigation links
+    navLinks.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+            closeMenu();
+        }
+    });
+
+    // Close menu on window resize if screen becomes large
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeMenu();
+        }
+    });
+
+    // Handle escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+            closeMenu();
         }
     });
 </script>
