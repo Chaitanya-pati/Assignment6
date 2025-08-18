@@ -1012,7 +1012,7 @@
         const elements = Array.from(document.querySelectorAll('.room-element')).map(el => {
             const roomId = parseInt(el.id);
             const type = el.getAttribute('data-type');
-
+            const price = parseInt(el.getAttribute('data-price')) || 0;
             rooms.push(roomId); // ✅ push only roomId here
 
             return {
@@ -1023,7 +1023,8 @@
                 label: el.querySelector('span').textContent,
                 type: type, // ✅ correctly captured
                 roomId: roomId,
-                homeId: localStorage.getItem('maxHomeId')
+                homeId: localStorage.getItem('maxHomeId'),
+                pricePerDay: price
             };
         });
 

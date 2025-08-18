@@ -1,4 +1,5 @@
 
+using Assignment6.Services;
 using DbService.Implementation;
 using DbService.Interface;
 using Hangfire;
@@ -21,6 +22,10 @@ builder.Services.AddSingleton<IConfigurationService, ConfigurationService>(provi
 builder.Services.AddSingleton<IWebService, WebService>(provide =>
 {
     return new WebService(builder.Configuration.GetConnectionString("Assignment6"));
+});
+builder.Services.AddSingleton<IDashboardService, DashboardService>(provide =>
+{
+    return new DashboardService(builder.Configuration.GetConnectionString("Assignment6"));
 });
 builder.Services.AddUserManagementServices(builder.Configuration);
 builder.Services.AddHangfire(cfg =>

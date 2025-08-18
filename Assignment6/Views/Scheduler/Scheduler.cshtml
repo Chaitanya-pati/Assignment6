@@ -991,36 +991,6 @@
         </div>
         <div id="calendar"></div>
     </div>
-
-    <!-- Booking Requests Modal -->
-    <div class="modal fade" id="bookingRequestsModal" tabindex="-1" aria-labelledby="bookingRequestsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content booking-requests-modal">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bookingRequestsModalLabel">
-                        <i class="fas fa-bell me-2"></i>Pending Booking Requests
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="bookingRequestsContent">
-                        <div class="text-center p-4">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <div class="mt-2">Loading booking requests...</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="refreshBookingRequests()">
-                        <i class="fas fa-sync me-2"></i>Refresh
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Loading Spinner -->
@@ -1060,198 +1030,19 @@
 <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
 
 <script>
-    // Booking Requests Functions
-    let pendingRequestsCount = 0;
 
-    function loadPendingBookingRequests() {
-        $.ajax({
-            url: '/Scheduler/GetPendingBookingRequests',
-            type: 'GET',
-            success: function (data) {
-                pendingRequestsCount = data.length;
-                updateNotificationBadge(pendingRequestsCount);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error loading pending requests:", error);
-            }
-        });
-    }
+   
 
-    function updateNotificationBadge(count) {
-        const badge = document.getElementById('notification-badge');
-        if (count > 0) {
-            badge.textContent = count;
-            badge.classList.remove('d-none');
-        } else {
-            badge.classList.add('d-none');
-        }
-    }
+ 
 
-    function showBookingRequests() {
-        showLoading('Loading booking requests...');
+   
 
-        $.ajax({
-            url: '/Scheduler/GetPendingBookingRequests',
-            type: 'GET',
-            success: function (data) {
-                debugger
-                displayBookingRequests(data);
-                $('#bookingRequestsModal').modal('show');
-            },
-            error: function (xhr, status, error) {
-                console.error("Error loading booking requests:", error);
-                showNotification('Error loading booking requests.', 'error');
-            },
-            complete: function () {
-                hideLoading();
-            }
-        });
-    }
-
-    function displayBookingRequests(requests) {
-        const container = document.getElementById('bookingRequestsContent');
-
-        if (requests.length === 0) {
-            container.innerHTML = `
-                <div class="text-center p-4">
-                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                    <h5>No Pending Requests</h5>
-                    <p class="text-muted">All booking requests have been processed.</p>
-                </div>
-            `;
-            return;
-        }
-
-        let tableHtml = `
-            <div class="table-responsive">
-                <table class="table table-hover booking-requests-table">
-                    <thead>
-                        <tr>
-                            <th>Customer</th>
-                            <th>Contact</th>
-                            <th>Property</th>
-                            <th>Check-in</th>
-                            <th>Check-out</th>
-                            <th>Guests</th>
-                            <th>Price</th>
-                            <th>Requested</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-        requests.forEach(request => {
-            const homeName = getHomeName(request.homeId);
-            const requestDate = new Date(request.createdAt).toLocaleDateString();
-            const checkinDate = new Date(request.bookingDateFrom).toLocaleDateString();
-            const checkoutDate = new Date(request.bookingDateTo).toLocaleDateString();
-
-            tableHtml += `
-                <tr id="request-row-${request.id}">
-                    <td>
-                        <strong>${request.customerName}</strong>
-                        ${request.message ? `<br><small class="text-muted">${request.message.substring(0, 50)}${request.message.length > 50 ? '...' : ''}</small>` : ''}
-                    </td>
-                    <td>
-                        <small>
-                            <i class="fas fa-envelope"></i> ${request.customerEmail}<br>
-                            <i class="fas fa-phone"></i> ${request.customerPhone}
-                        </small>
-                    </td>
-                    <td>${homeName}</td>
-                    <td>${checkinDate}</td>
-                    <td>${checkoutDate}</td>
-                    <td>${request.guestNumbers}</td>
-                        <td><strong>₹${request.price}</strong></td>
-                    <td><small>${requestDate}</small></td>
-                    <td>
-                        <button class="approve-btn" onclick="approveBookingRequest(${request.id}, '${request.customerName}')" id="approve-btn-${request.id}">
-                            <i class="fas fa-check me-1"></i>Approve
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
-
-        tableHtml += `
-                    </tbody>
-                </table>
-            </div>
-        `;
-
-        container.innerHTML = tableHtml;
-    }
-
-    function approveBookingRequest(bookingId, customerName) {
-        if (!confirm(`Approve booking request from ${customerName}?`)) {
-            return;
-        }
-
-        const approveBtn = document.getElementById(`approve-btn-${bookingId}`);
-        const originalText = approveBtn.innerHTML;
-        approveBtn.disabled = true;
-        approveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Approving...';
-
-        $.ajax({
-            url: '/Scheduler/ApproveBookingRequest',
-            type: 'POST',
-            data: { bookingId: bookingId },
-            success: function (response) {
-                if (response.success) {
-                    showNotification(`Booking approved for ${customerName}!`, 'success');
-
-                    // Remove the row from table
-                    const row = document.getElementById(`request-row-${bookingId}`);
-                    if (row) {
-                        row.style.transition = 'opacity 0.3s ease';
-                        row.style.opacity = '0';
-                        setTimeout(() => {
-                            row.remove();
-
-                            // Update badge count
-                            pendingRequestsCount--;
-                            updateNotificationBadge(pendingRequestsCount);
-
-                            // Check if no more requests
-                            const tbody = document.querySelector('.booking-requests-table tbody');
-                            if (tbody && tbody.children.length === 0) {
-                                displayBookingRequests([]);
-                            }
-                        }, 300);
-                    }
-
-                    // Refresh calendar to show new booking
-                    fetchAndDisplayBookings();
-                } else {
-                    showNotification(response.message || 'Failed to approve booking.', 'error');
-                    approveBtn.disabled = false;
-                    approveBtn.innerHTML = originalText;
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error approving booking:", error);
-                showNotification('Error approving booking. Please try again.', 'error');
-                approveBtn.disabled = false;
-                approveBtn.innerHTML = originalText;
-            }
-        });
-    }
-
-    function refreshBookingRequests() {
-        showBookingRequests();
-        loadPendingBookingRequests();
-    }
+   
 
     // Add to your existing $(document).ready function:
     $(document).ready(function () {
-        // ... your existing code ...
-
-        // Load pending requests on page load
-        loadPendingBookingRequests();
-
-        // Refresh pending requests every 30 seconds
-        setInterval(loadPendingBookingRequests, 30000);
+        fetchAndDisplayBookings();
+        syncAirbnb();
     });
 
     var calendarEl = document.getElementById('calendar');
@@ -1604,6 +1395,7 @@
             showLoading('Loading room layout...');
             $.get(`/Scheduler/GetHomeDrawing?homeId=${homeId}`)
                 .done(function (html) {
+                    debugger
                     $('#homeDrawingContainer').html(html);
 
                     // Show the home drawing modal
