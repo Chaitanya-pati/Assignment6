@@ -2999,43 +2999,43 @@
         });
     });
 
-    function validateIndividualRoomBookingDates() {
-        const checkinInput = document.getElementById('BookingDateFrom');
-        const checkoutInput = document.getElementById('BookingDateTo');
+    // function validateIndividualRoomBookingDates() {
+    //     const checkinInput = document.getElementById('BookingDateFrom');
+    //     const checkoutInput = document.getElementById('BookingDateTo');
 
-        if (!checkinInput.value || !checkoutInput.value) {
-            showNotification('Please select check-in and check-out dates first before choosing individual rooms.', 'error');
-            return false;
-        }
+    //     if (!checkinInput.value || !checkoutInput.value) {
+    //         showNotification('Please select check-in and check-out dates first before choosing individual rooms.', 'error');
+    //         return false;
+    //     }
 
-        const checkinDate = new Date(checkinInput.value);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Reset time to start of day
-        checkinDate.setHours(0, 0, 0, 0);
+    //     const checkinDate = new Date(checkinInput.value);
+    //     const today = new Date();
+    //     today.setHours(0, 0, 0, 0); // Reset time to start of day
+    //     checkinDate.setHours(0, 0, 0, 0);
 
-        // Calculate the difference in days
-        const timeDiff = checkinDate.getTime() - today.getTime();
-        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    //     // Calculate the difference in days
+    //     const timeDiff = checkinDate.getTime() - today.getTime();
+    //     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-        if (daysDiff > 3) {
-            const maxBookingDate = new Date(checkinDate);
-            maxBookingDate.setDate(maxBookingDate.getDate() - 3);
+    //     if (daysDiff > 3) {
+    //         const maxBookingDate = new Date(checkinDate);
+    //         maxBookingDate.setDate(maxBookingDate.getDate() - 3);
 
-            showNotification(
-                `Individual room booking for ${checkinDate.toDateString()} is only available from ${maxBookingDate.toDateString()} onwards. For earlier booking, please select "Book Entire Property".`,
-                'error',
-                8000
-            );
-            return false;
-        }
+    //         showNotification(
+    //             `Individual room booking for ${checkinDate.toDateString()} is only available from ${maxBookingDate.toDateString()} onwards. For earlier booking, please select "Book Entire Property".`,
+    //             'error',
+    //             8000
+    //         );
+    //         return false;
+    //     }
 
-        if (daysDiff < 0) {
-            showNotification('Cannot book for past dates.', 'error');
-            return false;
-        }
+    //     if (daysDiff < 0) {
+    //         showNotification('Cannot book for past dates.', 'error');
+    //         return false;
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
     function validateBookingDates() {
         const checkinInput = document.getElementById('checkin');
@@ -3069,9 +3069,55 @@
     }
 
     // Update the date change event listeners
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     const checkinInput = document.getElementById('checkin');
+    //     const checkoutInput = document.getElementById('checkout');
+
+    //     if (checkinInput) {
+    //         checkinInput.addEventListener('change', function () {
+    //             // Update minimum checkout date
+    //             const checkinDate = this.value;
+    //             if (checkoutInput) {
+    //                 checkoutInput.setAttribute('min', checkinDate);
+    //             }
+
+    //             // If individual rooms are selected, validate the 3-day rule
+    //             const selectiveRadio = document.getElementById('selectiveRooms');
+    //             if (selectiveRadio && selectiveRadio.checked) {
+    //                 if (!validateIndividualRoomBookingDates()) {
+    //                     // Switch back to entire property
+    //                     document.getElementById('entireProperty').checked = true;
+    //                     const roomCheckboxes = document.getElementById('roomCheckboxes');
+    //                     if (roomCheckboxes) {
+    //                         roomCheckboxes.style.display = 'none';
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+
+    //     if (checkoutInput) {
+    //         checkoutInput.addEventListener('change', function () {
+    //             // If individual rooms are selected, validate the 3-day rule
+    //             const selectiveRadio = document.getElementById('selectiveRooms');
+    //             if (selectiveRadio && selectiveRadio.checked) {
+    //                 if (!validateIndividualRoomBookingDates()) {
+    //                     // Switch back to entire property
+    //                     document.getElementById('entireProperty').checked = true;
+    //                     const roomCheckboxes = document.getElementById('roomCheckboxes');
+    //                     if (roomCheckboxes) {
+    //                         roomCheckboxes.style.display = 'none';
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+    // });
+
     document.addEventListener('DOMContentLoaded', function () {
-        const checkinInput = document.getElementById('checkin');
-        const checkoutInput = document.getElementById('checkout');
+        // Use consistent element IDs - assuming the correct ones are 'BookingDateFrom' and 'BookingDateTo'
+        const checkinInput = document.getElementById('BookingDateFrom');
+        const checkoutInput = document.getElementById('BookingDateTo');
 
         if (checkinInput) {
             checkinInput.addEventListener('change', function () {
@@ -3080,8 +3126,7 @@
                 if (checkoutInput) {
                     checkoutInput.setAttribute('min', checkinDate);
                 }
-
-                // If individual rooms are selected, validate the 3-day rule
+                // If individual rooms are selected, validate the booking rules
                 const selectiveRadio = document.getElementById('selectiveRooms');
                 if (selectiveRadio && selectiveRadio.checked) {
                     if (!validateIndividualRoomBookingDates()) {
@@ -3098,7 +3143,7 @@
 
         if (checkoutInput) {
             checkoutInput.addEventListener('change', function () {
-                // If individual rooms are selected, validate the 3-day rule
+                // If individual rooms are selected, validate the booking rules
                 const selectiveRadio = document.getElementById('selectiveRooms');
                 if (selectiveRadio && selectiveRadio.checked) {
                     if (!validateIndividualRoomBookingDates()) {
@@ -3113,6 +3158,52 @@
             });
         }
     });
+
+    function validateIndividualRoomBookingDates() {
+        const checkinInput = document.getElementById('BookingDateFrom');
+        const checkoutInput = document.getElementById('BookingDateTo');
+
+        if (!checkinInput.value || !checkoutInput.value) {
+            showNotification('Please select check-in and check-out dates first before choosing individual rooms.', 'error');
+            return false;
+        }
+
+        const checkinDate = new Date(checkinInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+        checkinDate.setHours(0, 0, 0, 0);
+
+        // Calculate the difference in days
+        const timeDiff = checkinDate.getTime() - today.getTime();
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+        // Check if booking is for today (same day)
+        if (daysDiff === 0) {
+            showNotification("You can't book individual rooms for today. Please select 'Book Entire Property' or choose a future date.", 'error', 6000);
+            return false;
+        }
+
+        // Check if booking is for past dates
+        if (daysDiff < 0) {
+            showNotification('Cannot book for past dates.', 'error');
+            return false;
+        }
+
+        // Check if booking is more than 3 days in advance
+        if (daysDiff > 3) {
+            const maxBookingDate = new Date(checkinDate);
+            maxBookingDate.setDate(maxBookingDate.getDate() - 3);
+            showNotification(
+                `Individual room booking for ${checkinDate.toDateString()} is only available from ${maxBookingDate.toDateString()} onwards. For earlier booking, please select "Book Entire Property".`,
+                'error',
+                8000
+            );
+            return false;
+        }
+
+        return true;
+    }
+
       const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
     const navOverlay = document.getElementById('navOverlay');
@@ -3160,5 +3251,5 @@
         if (e.key === 'Escape' && navLinks.classList.contains('active')) {
             closeMenu();
         }
-    });
+        });
 </script>
