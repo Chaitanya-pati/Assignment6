@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Ical.Net;
+using Ical.Net.CalendarComponents;
 
 namespace DbService.Interface
 {
@@ -31,6 +33,11 @@ namespace DbService.Interface
         public bool CheckBookingsAlternative(DateTime startDate, DateTime endDate, int homeId);
         public bool SaveBookingAlternative(Booking bookingData, List<Room> rooms);
         public BookingViewModel GetBookingForm(DateTime date);
+
+        Task<int> SyncAirbnbBookings(IList<Ical.Net.CalendarComponents.CalendarEvent> calendarEvents, int homeId);
+        // Optional: Method to clean up old Airbnb bookings that are no longer in the calendar
+        Task<int> CleanupOldAirbnbBookings(int homeId, DateTime cutoffDate);
+
     }
 
 }

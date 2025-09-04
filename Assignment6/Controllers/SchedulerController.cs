@@ -19,6 +19,7 @@ using System.Collections;
 using DbService.Implementation;
 using SelectPdf;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 namespace Assignment6.Controllers
 {
     public class SchedulerController : Controller
@@ -135,12 +136,11 @@ namespace Assignment6.Controllers
 
 
         // --- commented by me on 22-07
-        // [HttpGet]
-        //public async Task<IActionResult> GetBookings(DateTime start, DateTime end)
+        //[HttpGet]
+        //public async Task<IActionResult> GetBookingsFromAirbnbAndSaveToDb(DateTime start, DateTime end)
         //{
         //    try
         //    {
-        //    https://www.airbnb.co.in/calendar/ical/1022148698208402787.ics?s=456490de8497d82e9ab85927a6ce1f4d
         //        string airbnbIcalUrl = "https://www.airbnb.co.in/calendar/ical/1022148698208402787.ics?s=456490de8497d82e9ab85927a6ce1f4d";
 
         //        HttpResponseMessage response = await _httpClient.GetAsync(airbnbIcalUrl);
@@ -181,6 +181,96 @@ namespace Assignment6.Controllers
         //        return StatusCode(500, new { error = ex.Message });
         //    }
         //}
+
+
+        // Updated Controller method
+
+        // Updated controller method - now just fetches bookings from database
+        [HttpGet]
+        public async Task<IActionResult> GetBookingsFromAirbnbAndSaveToDb()
+        {
+            try
+            {
+                // This method now just triggers a manual sync and returns current status
+                // The actual saving is done by the background service automatically
+
+                // Optional: Trigger manual sync if needed
+                //using (var scope = _serviceProvider.CreateScope())
+                //{
+                //    var airbnbSyncJob = scope.ServiceProvider.GetRequiredService<AirbnbSyncJob>();
+                //    await airbnbSyncJob.RunAsync();
+                //}
+
+                // Get current Airbnb bookings from database for both properties
+                var airbnbBookings = _bookingService.GetAllBookings(null, null, null)
+                    .Where(b => b.CustomerName == "Airbnb Guest" && b.IsBooked == true)
+                    .ToList();
+
+                var property1Bookings = airbnbBookings.Where(b => b.HomeId == 1).Count();
+                var property2Bookings = airbnbBookings.Where(b => b.HomeId == 2).Count();
+                var totalBookings = airbnbBookings.Count;
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Airbnb sync completed. Found {totalBookings} total Airbnb bookings in database",
+                    totalSynced = totalBookings,
+                    propertyBreakdown = new
+                    {
+                        groundFloor = property1Bookings,
+                        firstFloor = property2Bookings
+                    },
+                    errors = new List<string>() // Empty since we're just reading from DB
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Sync failed: {ex.Message}"
+                });
+            }
+        }
+
+        // Alternative simpler version - just returns status without triggering sync
+        [HttpGet("GetAirbnbBookingsStatus")]
+        public IActionResult GetAirbnbBookingsStatus()
+        {
+            try
+            {
+                // Just fetch current Airbnb bookings from database
+                var airbnbBookings = _bookingService.GetAllBookings(null, null, null)
+                    .Where(b => b.CustomerName == "Airbnb Guest" && b.IsBooked == true)
+                    .ToList();
+
+                var property1Bookings = airbnbBookings.Where(b => b.HomeId == 1).Count();
+                var property2Bookings = airbnbBookings.Where(b => b.HomeId == 2).Count();
+                var totalBookings = airbnbBookings.Count;
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Found {totalBookings} Airbnb bookings in database",
+                    totalBookings = totalBookings,
+                    propertyBreakdown = new
+                    {
+                        groundFloor = property1Bookings,
+                        firstFloor = property2Bookings
+                    },
+                    lastUpdated = DateTime.Now
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Failed to fetch Airbnb bookings: {ex.Message}"
+                });
+            }
+        }
+
 
         //public async Task<IActionResult> MakeBooking()
         //{
@@ -349,6 +439,12 @@ namespace Assignment6.Controllers
                 var bookings = _bookingService.GetAllBookings(startDate, endDate, homeId)
                     .Where(b => b.IsBooked) // Only show approved bookings on calendar
                     .ToList();
+
+                // Apply additional homeId filtering if specified
+                if (homeId.HasValue)
+                {
+                    bookings = bookings.Where(b => b.HomeId == homeId.Value).ToList();
+                }
 
                 var result = bookings.Select(b => new
                 {

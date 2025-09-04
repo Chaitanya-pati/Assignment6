@@ -1030,21 +1030,8 @@
 <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
 
 <script>
-
-   
-
- 
-
-   
-
-   
-
-    // Add to your existing $(document).ready function:
-    $(document).ready(function () {
-        fetchAndDisplayBookings();
-        syncAirbnb();
-    });
-
+    // Add this right after your existing script tag opens
+    var currentPropertyFilter = null;
     var calendarEl = document.getElementById('calendar');
     var calendar;
 
@@ -1067,8 +1054,15 @@
             const selectedStart = new Date(selectInfo.startStr);
             const selectedEnd = new Date(selectInfo.endStr);
 
-            // Check if any day in selection overlaps with existing bookings
-            const hasConflict = calendar.getEvents().some(event => {
+            // Only check conflicts for the selected property if filtered
+            const eventsToCheck = calendar.getEvents().filter(event => {
+                if (currentPropertyFilter) {
+                    return event.extendedProps.homeId === currentPropertyFilter;
+                }
+                return true;
+            });
+
+            const hasConflict = eventsToCheck.some(event => {
                 const eventStart = new Date(event.startStr);
                 const eventEnd = new Date(event.endStr);
 
@@ -1080,16 +1074,40 @@
         },
 
         // Handle date clicking - allow both booking creation and detail viewing
+        // dateClick: function (info) {
+        //     const clickedDate = new Date(info.dateStr);
+
+        //     // Check if clicked date has any booking
+        //     const bookedEvent = calendar.getEvents().find(event => {
+        //         const eventStart = new Date(event.startStr);
+        //         const eventEnd = new Date(event.endStr);
+
+        //         // Date has booking if it falls within booking period (excluding checkout day)
+        //         return clickedDate >= eventStart && clickedDate < eventEnd;
+        //     });
+
+        //     if (bookedEvent) {
+        //         // Show booking details if date is booked
+        //         showEventDetails(bookedEvent);
+        //     } else {
+        //         // Allow new booking if date is available
+        //         handleDateClick(info.dateStr);
+        //     }
+        // },
+
         dateClick: function (info) {
             const clickedDate = new Date(info.dateStr);
 
-            // Check if clicked date has any booking
+            // Find booked events for the clicked date (respect property filter)
             const bookedEvent = calendar.getEvents().find(event => {
                 const eventStart = new Date(event.startStr);
                 const eventEnd = new Date(event.endStr);
+                const isInDateRange = clickedDate >= eventStart && clickedDate < eventEnd;
 
-                // Date has booking if it falls within booking period (excluding checkout day)
-                return clickedDate >= eventStart && clickedDate < eventEnd;
+                if (currentPropertyFilter) {
+                    return isInDateRange && event.extendedProps.homeId === currentPropertyFilter;
+                }
+                return isInDateRange;
             });
 
             if (bookedEvent) {
@@ -1102,50 +1120,102 @@
         },
 
         // Custom styling for booked days
+        // eventDidMount: function (info) {
+        //     if (info.event.display === 'background') {
+        //         const dayEl = info.el.closest('.fc-daygrid-day');
+        //         if (dayEl) {
+        //             const eventDate = new Date(info.event.startStr);
+        //             const today = new Date();
+        //             today.setHours(0, 0, 0, 0);
+
+        //             // Style the entire day cell
+        //             dayEl.style.backgroundColor = info.event.backgroundColor;
+        //             dayEl.style.color = 'white';
+        //             dayEl.style.cursor = 'pointer';
+        //             dayEl.style.position = 'relative';
+
+        //             // Add booking details overlay
+        //             const overlay = document.createElement('div');
+        //             overlay.className = 'booking-overlay';
+        //             overlay.innerHTML = `
+        //                 <div class="booking-customer">${info.event.title}</div>
+        //                 <div class="booking-property">${info.event.extendedProps.homeName}</div>
+        //                 <div class="booking-price">₹${info.event.extendedProps.price}</div>
+        //             `;
+
+        //             dayEl.appendChild(overlay);
+
+        //             // Add click handler for booking details
+        //             dayEl.addEventListener('click', function (e) {
+        //                 e.preventDefault();
+        //                 e.stopPropagation();
+        //                 showEventDetails(info.event);
+        //             });
+
+        //             // Add tooltip only for future bookings or today's bookings
+        //             if (eventDate >= today) {
+        //                 $(info.el).tooltip({
+        //                     title: `Click to view details: ${info.event.title} - ${info.event.extendedProps.homeName} (₹${info.event.extendedProps.price})`,
+        //                     placement: 'top',
+        //                     trigger: 'hover',
+        //                     container: 'body'
+        //                 });
+        //             }
+        //             // No tooltip for past bookings
+        //         }
+        //     }
+        // },
         eventDidMount: function (info) {
             if (info.event.display === 'background') {
                 const dayEl = info.el.closest('.fc-daygrid-day');
                 if (dayEl) {
+                    const eventDate = new Date(info.event.startStr);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
                     // Style the entire day cell
                     dayEl.style.backgroundColor = info.event.backgroundColor;
                     dayEl.style.color = 'white';
-                    dayEl.style.cursor = 'pointer'; // Keep cursor pointer for clicking
+                    dayEl.style.cursor = 'pointer';
                     dayEl.style.position = 'relative';
 
-                    // Add booking details overlay
+                    // Add booking details overlay with Airbnb indicator
                     const overlay = document.createElement('div');
                     overlay.className = 'booking-overlay';
-                    // In the eventDidMount function, replace the overlay innerHTML:
+
+                    const isAirbnb = info.event.extendedProps.isAirbnbBooking;
+                    const airbnbIndicator = isAirbnb ? '<div class="airbnb-indicator">🏠 Airbnb</div>' : '';
+
                     overlay.innerHTML = `
-                            <div class="booking-customer">${info.event.title}</div>
-                            <div class="booking-property">${info.event.extendedProps.homeName}</div>
-                            <div class="booking-price">₹${info.event.extendedProps.price}</div>
-                        `;
+                    ${airbnbIndicator}
+                    <div class="booking-customer">${info.event.title}</div>
+                    <div class="booking-property">${info.event.extendedProps.homeName}</div>
+                    <div class="booking-price">₹${info.event.extendedProps.price}</div>
+                `;
 
                     dayEl.appendChild(overlay);
 
-                    // Add click handler directly to the day cell for booking details
+                    // Add click handler for booking details
                     dayEl.addEventListener('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
                         showEventDetails(info.event);
                     });
 
-
+                    // Add tooltip only for future bookings or today's bookings
+                    if (eventDate >= today) {
+                        const bookingType = isAirbnb ? 'Airbnb' : 'Manual';
+                        $(info.el).tooltip({
+                            title: `${bookingType} Booking: ${info.event.title} - ${info.event.extendedProps.homeName} (₹${info.event.extendedProps.price})`,
+                            placement: 'top',
+                            trigger: 'hover',
+                            container: 'body'
+                        });
+                    }
+                    // No tooltip for past bookings
                 }
             }
-
-            // Add tooltip
-            // Add tooltip with Indian Rupee
-            $(info.el).tooltip({
-                title: `Click to view details: ${info.event.title} - ${info.event.extendedProps.homeName} (₹${info.event.extendedProps.price})`,
-                placement: 'top',
-                trigger: 'hover',
-                container: 'body'
-            });
         },
-
-        // Keep the original eventClick for backup
         eventClick: function (info) {
             showEventDetails(info.event);
         },
@@ -1169,6 +1239,96 @@
             fetchAndDisplayBookings();
         }
     });
+
+    const additionalCSS = `
+    <style>
+    /* Updated hover effects - only for future available dates */
+    .fc-daygrid-day.fc-day-future:not(:has(.booking-overlay)):hover {
+        background-color: rgba(44, 62, 80, 0.1) !important;
+        cursor: pointer !important;
+        transition: background-color 0.2s ease !important;
+    }
+
+    .fc-daygrid-day.fc-day-future:not(:has(.booking-overlay)):hover::before {
+        content: "Click to book" !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        background: rgba(44, 62, 80, 0.9) !important;
+        color: white !important;
+        padding: 4px 8px !important;
+        border-radius: 4px !important;
+        font-size: 0.7rem !important;
+        z-index: 10 !important;
+        pointer-events: none !important;
+    }
+
+    /* Remove hover effects from past dates without bookings */
+    .fc-daygrid-day.fc-day-past:not(:has(.booking-overlay)) {
+        cursor: default !important;
+        opacity: 0.6 !important;
+    }
+
+    .fc-daygrid-day.fc-day-past:not(:has(.booking-overlay)):hover {
+        background-color: transparent !important;
+        cursor: default !important;
+    }
+
+    .fc-daygrid-day.fc-day-past:not(:has(.booking-overlay)):hover::before {
+        display: none !important;
+    }
+
+    /* Keep hover effects for booked dates (both past and future) */
+    .fc-daygrid-day:has(.booking-overlay):hover {
+        opacity: 0.9 !important;
+        transform: scale(1.01) !important;
+        transition: all 0.2s ease !important;
+        z-index: 10 !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+    }
+
+    .fc-daygrid-day:has(.booking-overlay):hover::before {
+        content: "Click to view details" !important;
+        position: absolute !important;
+        bottom: 2px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        background: rgba(0,0,0,0.8) !important;
+        color: white !important;
+        padding: 2px 6px !important;
+        border-radius: 3px !important;
+        font-size: 0.6rem !important;
+        z-index: 10 !important;
+        pointer-events: none !important;
+    }
+
+    /* Ensure today can still be clicked for booking */
+    .fc-daygrid-day.fc-day-today:not(:has(.booking-overlay)):hover {
+        background-color: rgba(44, 62, 80, 0.1) !important;
+        cursor: pointer !important;
+    }
+
+    .fc-daygrid-day.fc-day-today:not(:has(.booking-overlay)):hover::before {
+        content: "Click to book" !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        background: rgba(44, 62, 80, 0.9) !important;
+        color: white !important;
+        padding: 4px 8px !important;
+        border-radius: 4px !important;
+        font-size: 0.7rem !important;
+        z-index: 10 !important;
+        pointer-events: none !important;
+    }
+    </style>
+    `;
+
+    // Inject the CSS into the document
+    document.head.insertAdjacentHTML('beforeend', additionalCSS);
+
     // Event Listeners
   //  document.getElementById("test-button").addEventListener("click", syncAirbnb);
     document.getElementById("book").addEventListener("click", fetchAndDisplayBookings);
@@ -1256,12 +1416,20 @@
 
     function fetchAndDisplayBookings() {
         showLoading('Loading bookings...');
+
+        // Build URL with optional property filter
+        let url = '/Scheduler/GetBookings';
+        if (currentPropertyFilter) {
+            url += `?homeId=${currentPropertyFilter}`;
+        }
+
         $.ajax({
-            url: '/Scheduler/GetBookings',
+            url: url,
             type: 'GET',
             success: function (data) {
                 console.log("Get Bookings Success:", data);
                 console.log("Number of bookings received:", data.length);
+                console.log("Property filter applied:", currentPropertyFilter);
 
                 // Clear existing events first
                 calendar.removeAllEvents();
@@ -1275,19 +1443,20 @@
                 const events = data.map(booking => {
                     const homeName = getHomeName(booking.homeId);
                     const roomCount = booking.bookingRooms ? booking.bookingRooms.length : 0;
+                    const isAirbnb = booking.isAirbnbBooking || booking.customerName === "Airbnb Guest";
 
                     // Use actual dates without manipulation
                     const startDate = booking.bookingDateFrom; // Already in YYYY-MM-DD format
                     const endDate = booking.bookingDateTo;     // Already in YYYY-MM-DD format
 
-                    console.log(`Booking ${booking.id}: ${startDate} to ${endDate}`);
+                    console.log(`Booking ${booking.id}: ${startDate} to ${endDate} - Property: ${homeName} - Type: ${isAirbnb ? 'Airbnb' : 'Manual'}`);
 
                     return {
                         id: booking.id,
                         title: `${booking.customerName}`,
                         start: startDate,
                         end: endDate,
-                        color: getBookingColor(booking.paymentStatus),
+                        color: isAirbnb ? '#FF6B35' : getBookingColor(booking.paymentStatus), // Orange for Airbnb
                         allDay: true,
                         display: 'background', // This colors the entire day cell
                         extendedProps: {
@@ -1300,7 +1469,8 @@
                             homeId: booking.homeId,
                             homeName: homeName,
                             roomCount: roomCount,
-                            bookingRooms: booking.bookingRooms
+                            bookingRooms: booking.bookingRooms,
+                            isAirbnbBooking: isAirbnb
                         }
                     };
                 });
@@ -1313,7 +1483,15 @@
                 // Force calendar to re-render
                 calendar.render();
 
-                showNotification(`${events.length} bookings loaded successfully!`, 'success');
+                // Update success message with booking breakdown
+                const airbnbCount = events.filter(e => e.extendedProps.isAirbnbBooking).length;
+                const manualCount = events.length - airbnbCount;
+                const propertyText = currentPropertyFilter ? ` for ${getHomeName(currentPropertyFilter)}` : '';
+
+                showNotification(
+                    `${events.length} bookings loaded${propertyText} (${airbnbCount} Airbnb, ${manualCount} manual)!`,
+                    'success'
+                );
             },
             error: function (xhr, status, error) {
                 console.error("Get Bookings Error:", error);
@@ -1382,8 +1560,28 @@
     // jQuery Ready Function
     $(document).ready(function () {
         // Handle Home dropdown change
-        fetchAndDisplayBookings();
-       // syncAirbnb();
+        // Add this inside your existing $(document).ready function
+        $('#homeSelector').on('change', function () {
+            const selectedHomeId = parseInt($(this).val());
+
+            if (selectedHomeId) {
+                currentPropertyFilter = selectedHomeId;
+                console.log(`Filtering calendar for property: ${selectedHomeId} (${getHomeName(selectedHomeId)})`);
+
+                // Update calendar title to show selected property
+                $('.calendar-title').html(`<i class="fas fa-calendar-week me-2"></i>Booking Calendar - ${getHomeName(selectedHomeId)}`);
+
+                // Show notification about the filter
+                showNotification(`Showing bookings for: ${getHomeName(selectedHomeId)}`, 'info', 3000);
+            } else {
+                currentPropertyFilter = null;
+                $('.calendar-title').html('<i class="fas fa-calendar-week me-2"></i>Booking Calendar - All Properties');
+                showNotification('Showing all property bookings', 'info', 3000);
+            }
+
+            // Refresh calendar with new filter
+            fetchAndDisplayBookings();
+        });
         $(document).on('change', '#HomeId', function () {
             const homeId = $(this).val();
             if (!homeId) return;
@@ -1445,25 +1643,25 @@
     });
 
     // Sync Airbnb function
-    function syncAirbnb() {
-        showLoading('Syncing with Airbnb...');
-        $.ajax({
-            url: '/Scheduler/SyncAirbnb',
-            type: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                showNotification("Airbnb sync completed successfully!", 'success');
-                calendar.refetchEvents();
-            },
-            error: function (xhr, status, error) {
-                console.error("Airbnb sync failed:", error);
-                showNotification("Failed to sync with Airbnb. Please try again.", 'error');
-            },
-            complete: function () {
-                hideLoading();
-            }
-        });
-    }
+    // function syncAirbnb() {
+    //     showLoading('Syncing with Airbnb...');
+    //     $.ajax({
+    //         url: '/Scheduler/GetBookingsFromAirbnbAndSaveToDb',
+    //         type: 'GET',
+    //         dataType: 'json',
+    //         success: function (data) {
+    //             showNotification("Airbnb sync completed successfully!", 'success');
+    //             calendar.refetchEvents();
+    //         },
+    //         error: function (xhr, status, error) {
+    //             console.error("Airbnb sync failed:", error);
+    //             showNotification("Failed to sync with Airbnb. Please try again.", 'error');
+    //         },
+    //         complete: function () {
+    //             hideLoading();
+    //         }
+    //     });
+    // }
 
     // Updated search booking function in your JavaScript
     // Updated search booking function in your JavaScript
@@ -1753,6 +1951,124 @@
             },
             complete: function () {
                 hideLoading();
+            }
+        });
+
+    }
+
+    function syncAirbnb() {
+        showLoading('Syncing with Airbnb properties...');
+
+        // Show initial progress notification
+        showNotification('Starting Airbnb sync for both properties...', 'info', 3000);
+
+        $.ajax({
+            url: '/Scheduler/GetBookingsFromAirbnbAndSaveToDb',
+            type: 'GET',
+            dataType: 'json',
+            timeout: 45000, // 45 seconds timeout for large sync operations
+            cache: false, // Prevent caching to ensure fresh data
+            success: function (response) {
+                console.log("Airbnb sync response:", response);
+
+                if (response.success) {
+                    // Build detailed success message
+                    let message = `Airbnb sync completed successfully!`;
+                    let details = [];
+
+                    if (response.totalSynced > 0) {
+                        details.push(`${response.totalSynced} new bookings synced`);
+                    } else {
+                        details.push('No new bookings to sync');
+                    }
+
+                    // Add error details if any
+                    if (response.errors && response.errors.length > 0) {
+                        details.push(`${response.errors.length} properties had issues`);
+                        console.warn("Sync errors:", response.errors);
+
+                        // Show errors in console for debugging
+                        response.errors.forEach(error => {
+                            console.error("Property sync error:", error);
+                        });
+                    }
+
+                    if (details.length > 0) {
+                        message += `\n${details.join(', ')}.`;
+                    }
+
+                    // Show success notification
+                    showNotification(message, 'success', 6000);
+
+                    // Refresh calendar to show new bookings with a delay
+                    setTimeout(() => {
+                        console.log("Refreshing calendar after Airbnb sync...");
+                        fetchAndDisplayBookings();
+                    }, 1500);
+
+                    // Optional: Show breakdown by property if available
+                    if (response.propertyBreakdown) {
+                        console.log("Property sync breakdown:", response.propertyBreakdown);
+                    }
+
+                } else {
+                    // Handle sync failure
+                    const errorMessage = response.message || 'Unknown error occurred during sync';
+                    showNotification(`Airbnb sync failed: ${errorMessage}`, 'error', 8000);
+                    console.error("Sync failed with message:", errorMessage);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Airbnb sync AJAX error:", {
+                    status: status,
+                    error: error,
+                    responseText: xhr.responseText,
+                    statusCode: xhr.status
+                });
+
+                let errorMessage = "Failed to sync with Airbnb";
+                let errorDetails = "";
+
+                // Provide specific error messages based on the type of error
+                if (status === 'timeout') {
+                    errorDetails = "The sync operation timed out. This might happen with large amounts of data.";
+                    errorMessage += " (Timeout)";
+                } else if (xhr.status === 500) {
+                    errorDetails = "Server encountered an internal error. Please check server logs.";
+                    errorMessage += " (Server Error)";
+                } else if (xhr.status === 404) {
+                    errorDetails = "Sync endpoint not found. Please check your routing.";
+                    errorMessage += " (Not Found)";
+                } else if (xhr.status === 0) {
+                    errorDetails = "Network connection failed or request was cancelled.";
+                    errorMessage += " (Network Error)";
+                } else if (xhr.status >= 400 && xhr.status < 500) {
+                    errorDetails = "Client request error occurred.";
+                    errorMessage += ` (Error ${xhr.status})`;
+                } else {
+                    errorDetails = "An unexpected error occurred during the sync process.";
+                }
+
+                // Try to parse error response for more details
+                try {
+                    const errorResponse = JSON.parse(xhr.responseText);
+                    if (errorResponse.message) {
+                        errorDetails = errorResponse.message;
+                    }
+                } catch (e) {
+                    // Response is not JSON, use default error details
+                }
+
+                // Show error notification with details
+                showNotification(
+                    `${errorMessage}${errorDetails ? '\n' + errorDetails : ''}`,
+                    'error',
+                    10000
+                );
+            },
+            complete: function () {
+                hideLoading();
+                console.log("Airbnb sync operation completed");
             }
         });
     }

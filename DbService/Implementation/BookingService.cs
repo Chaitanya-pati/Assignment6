@@ -9,6 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Ical.Net;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
 
 namespace DbService.Implementation
 {
@@ -185,6 +188,192 @@ namespace DbService.Implementation
                  );
             }
         }
+
+
+        //airbnb
+        // Helper method to safely convert CalDateTime to DateTime
+
+
+        // Updated SyncAirbnbBookings method using the helper
+        public async Task<int> SyncAirbnbBookings(IList<CalendarEvent> calendarEvents, int homeId)
+        {
+            var syncedCount = 0;
+
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                try
+                {
+                    // Get all rooms for this home to book all of them
+                    var homeRooms = db.Rooms.Where(r => r.HomeId == homeId).ToList();
+
+                    // Get existing Airbnb bookings to avoid duplicates
+                    var existingAirbnbBookings = db.Bookings
+                        .Where(b => b.HomeId == homeId && b.CustomerName == "Airbnb Guest")
+                        .ToList();
+
+                    foreach (var calendarEvent in calendarEvents)
+                    {
+                        try
+                        {
+                            // Simple datetime extraction - just use .Value property
+                            DateTime eventStartDate;
+                            DateTime eventEndDate;
+
+                            // Handle Start date
+                            if (calendarEvent.Start?.Value != null)
+                            {
+                                eventStartDate = calendarEvent.Start.Value.Date;
+                            }
+                            else
+                            {
+                                continue; // Skip if we can't get start date
+                            }
+
+                            // Handle End date
+                            if (calendarEvent.End?.Value != null)
+                            {
+                                eventEndDate = calendarEvent.End.Value.Date;
+                            }
+                            else
+                            {
+                                continue; // Skip if we can't get end date
+                            }
+
+                            // Skip if end date is not after start date
+                            if (eventEndDate <= eventStartDate)
+                                continue;
+
+                            // Check if this booking already exists
+                            bool bookingExists = existingAirbnbBookings.Any(b =>
+                                b.BookingDateFrom.Date == eventStartDate &&
+                                b.BookingDateTo.Date == eventEndDate);
+
+                            if (bookingExists)
+                                continue;
+
+                            // Check for conflicts using the SAME logic as your SaveBookingAlternative method
+                            bool hasConflict = db.Bookings.Any(x =>
+                                x.HomeId == homeId &&
+                                x.IsBooked == true && // Only check approved bookings
+                                x.BookingDateFrom.Date < eventEndDate &&
+                                x.BookingDateTo.Date.AddDays(-1) >= eventStartDate);
+
+                            if (hasConflict)
+                                continue;
+
+                            // Get home data for pricing
+                            var home = db.Homes.FirstOrDefault(h => h.Id == homeId);
+                            int days = (eventEndDate - eventStartDate).Days;
+                            long totalPrice = 0;
+
+                            if (home != null)
+                            {
+                                totalPrice = (long)((home.PricePerDay ?? 0) * days);
+                            }
+
+                            // Create new Airbnb booking
+                            var newBooking = new Booking
+                            {
+                                CustomerName = "Airbnb Guest",
+                                CustomerEmail = "airbnb@guest.com",
+                                CustomerPhone = "N/A",
+                                Message = $"Airbnb booking - {calendarEvent.Summary ?? "Reserved"}",
+                                BookingDateFrom = eventStartDate.Date.AddHours(12),
+                                BookingDateTo = eventEndDate.Date.AddHours(13),
+                                HomeId = homeId,
+                                PaymentStatus = "pending",
+                                CreatedAt = DateTime.Now,
+                                Price = totalPrice,
+                                GuestNumbers = 1,
+                                Document = null,
+                                IsBooked = true,
+                                CheckOut = false
+                            };
+
+                            // Add booking to database
+                            db.Bookings.Add(newBooking);
+                            db.SaveChanges();
+
+                            // Book all rooms for this home
+                            foreach (var room in homeRooms)
+                            {
+                                var bookingRoom = new BookingRoom
+                                {
+                                    BookingId = newBooking.Id,
+                                    RoomId = room.Id
+                                };
+                                db.BookingRooms.Add(bookingRoom);
+                            }
+
+                            db.SaveChanges();
+                            syncedCount++;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error processing calendar event: {ex.Message}");
+                            System.Diagnostics.Debug.WriteLine($"Calendar event error details: {ex}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Failed to sync Airbnb bookings for home {homeId}: {ex.Message}");
+                }
+            }
+
+            return syncedCount;
+        }
+
+
+        // Optional: Add this method to handle cleanup of old Airbnb bookings
+        public async Task<int> CleanupOldAirbnbBookings(int homeId, DateTime cutoffDate)
+        {
+            var deletedCount = 0;
+
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                try
+                {
+                    // Find old Airbnb bookings that are no longer relevant
+                    var oldAirbnbBookings = db.Bookings
+                        .Where(b => b.HomeId == homeId &&
+                                   b.CustomerName == "Airbnb Guest" &&
+                                   b.BookingDateTo < cutoffDate)
+                        .ToList();
+
+                    foreach (var booking in oldAirbnbBookings)
+                    {
+                        // Remove associated booking rooms first
+                        var bookingRooms = db.BookingRooms.Where(br => br.BookingId == booking.Id);
+                        db.BookingRooms.RemoveRange(bookingRooms);
+
+                        // Remove the booking
+                        db.Bookings.Remove(booking);
+                        deletedCount++;
+                    }
+
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Failed to cleanup old Airbnb bookings: {ex.Message}");
+                }
+            }
+
+            return deletedCount;
+        }
+
+        // Enhanced sync method that also includes cleanup (optional)
+        public async Task<int> SyncAirbnbBookingsWithCleanup(IList<Ical.Net.CalendarComponents.CalendarEvent> calendarEvents, int homeId)
+        {
+            // First cleanup old bookings (older than 30 days)
+            var cutoffDate = DateTime.Now.AddDays(-30);
+            await CleanupOldAirbnbBookings(homeId, cutoffDate);
+
+            // Then sync new bookings
+            return await SyncAirbnbBookings(calendarEvents, homeId);
+        }
+
 
         public bool SaveBookingAlternative(Booking bookingData, List<Room> rooms)
         {
