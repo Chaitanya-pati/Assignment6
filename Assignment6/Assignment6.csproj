@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\cpatil\.nuget\packages\select.htmltopdf.netcore\25.2.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\cpatil\.nuget\packages\select.htmltopdf\25.2.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\cpatil\.nuget\packages\select.pdf\23.1.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\cpatil\.nuget\packages\select.pdf\23.1.0\contentFiles\any\any\Select.Tools.dep" />
     <Content Remove="C:\Users\kgomannache\.nuget\packages\select.htmltopdf.netcore\25.2.0\contentFiles\any\any\Select.Html.dep" />
     <Content Remove="C:\Users\kgomannache\.nuget\packages\select.htmltopdf\25.2.0\contentFiles\any\any\Select.Html.dep" />
     <Content Remove="C:\Users\kgomannache\.nuget\packages\select.pdf\23.1.0\contentFiles\any\any\Select.Html.dep" />
@@ -26,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Chaitanya-pati\UserManagement\UserManagement.Lib\UserManagement.Lib.csproj" />
+    <ProjectReference Include="..\..\UserManagement\UserManagement.Lib\UserManagement.Lib.csproj" />
     <ProjectReference Include="..\DbService\DbService.csproj" />
   </ItemGroup>
 

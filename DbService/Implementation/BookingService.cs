@@ -12,16 +12,19 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
-
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
+using DbService.SignalR;
 namespace DbService.Implementation
 {
     public class BookingService : IBookingService
     {
         private readonly DbContextOptions<Assignment6Context> _dbconnection;
-
-        public BookingService(string conn)
+        private readonly IServiceProvider _serviceProvider;
+        public BookingService(string conn, IServiceProvider serviceProvider )
         {
             _dbconnection = new DbContextOptionsBuilder<Assignment6Context>().UseSqlServer(conn).Options;
+            _serviceProvider = serviceProvider;
         }
 
         public Home GetHomeDrawing(int homeId)
@@ -289,7 +292,8 @@ namespace DbService.Implementation
                                 IsBooked = true,
                                 CheckOut = false
                             };
-
+                            var hubContext = _serviceProvider.GetRequiredService<IHubContext<SignalRService>>();
+                            hubContext.Clients.All.SendAsync("BindBookingFromAirbnb", newBooking);
                             // Add booking to database
                             db.Bookings.Add(newBooking);
                             db.SaveChanges();

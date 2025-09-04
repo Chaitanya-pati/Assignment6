@@ -1,19 +1,22 @@
 
 using Assignment6.Services;
+using DbService.SignalR;
 using DbService.Implementation;
 using DbService.Interface;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Newtonsoft.Json;
 using UserManagement.Lib;
+using Assignment6;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 //builder.Services.AddUserManagementServices(builder.Configuration);
-builder.Services.AddSingleton<IBookingService, BookingService>(provide =>
+builder.Services.AddSingleton<IBookingService, BookingService>(sp =>
 {
-    return new BookingService(builder.Configuration.GetConnectionString("Assignment6"));
+    var conn = builder.Configuration.GetConnectionString("Assignment6");
+    return new BookingService(conn, sp);
 });
 builder.Services.AddSingleton<IConfigurationService, ConfigurationService>(provide =>
 {
@@ -39,15 +42,16 @@ builder.Services.AddControllersWithViews()
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
     });
 builder.Services.AddHttpClient();
+builder.Services.AddSignalR();
 builder.Services.AddScoped<AirbnbSyncJob>();
 var app = builder.Build();
 app.UseHangfireDashboard("/hangfire");
 
 //Schedule Airbnb sync every minute
-//RecurringJob.AddOrUpdate<AirbnbSyncJob>(
-//    "sync-airbnb",
-//   job => job.RunAsync(),
-//   Cron.Minutely);
+RecurringJob.AddOrUpdate<AirbnbSyncJob>(
+    "sync-airbnb",
+   job => job.RunAsync(),
+   Cron.Minutely);
 
 //app.MapGet("/", () => "Hangfire Airbnb Sync Running (No History)...");
 //Configure the HTTP request pipeline.
@@ -60,6 +64,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.MapHub<SignalRService>("/signalR");
 
 app.UseRouting();
 
@@ -68,6 +73,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Website}/{action=Website}/{id?}");
-   //pattern: "{controller=Login}/{action=Login}/{id?}");
+//pattern: "{controller=Login}/{action=Login}/{id?}");
 
 app.Run();

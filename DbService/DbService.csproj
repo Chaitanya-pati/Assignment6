@@ -7,7 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\cpatil\.nuget\packages\select.pdf\23.1.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\cpatil\.nuget\packages\select.pdf\23.1.0\contentFiles\any\any\Select.Tools.dep" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Ical.Net" Version="5.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.16" />
     <PackageReference Include="Select.Pdf" Version="23.1.0" />
   </ItemGroup>
