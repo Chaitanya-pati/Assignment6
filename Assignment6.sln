@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Assignment6", "Assignment6\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbService", "DbService\DbService.csproj", "{0DC47059-6D77-4B34-933F-F2F75C919FEB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserManagement.Lib", "..\Chaitanya-pati\UserManagement\UserManagement.Lib\UserManagement.Lib.csproj", "{C0911F2D-105F-44EA-8C2A-E0F9CD7E317C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserManagement.Lib", "..\Chaitanya-pati\UserManagement\UserManagement.Lib\UserManagement.Lib.csproj", "{57A5450E-E47C-468E-8CB6-2C7133AFBB29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{0DC47059-6D77-4B34-933F-F2F75C919FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DC47059-6D77-4B34-933F-F2F75C919FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DC47059-6D77-4B34-933F-F2F75C919FEB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C0911F2D-105F-44EA-8C2A-E0F9CD7E317C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C0911F2D-105F-44EA-8C2A-E0F9CD7E317C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C0911F2D-105F-44EA-8C2A-E0F9CD7E317C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C0911F2D-105F-44EA-8C2A-E0F9CD7E317C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57A5450E-E47C-468E-8CB6-2C7133AFBB29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57A5450E-E47C-468E-8CB6-2C7133AFBB29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57A5450E-E47C-468E-8CB6-2C7133AFBB29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57A5450E-E47C-468E-8CB6-2C7133AFBB29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

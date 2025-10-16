@@ -1,0 +1,370 @@
+﻿@model DbService.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Payment Gateway";
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+            .payment-header h1 {
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+
+            .payment-header p {
+                opacity: 0.9;
+                font-size: 14px;
+            }
+
+        .payment-body {
+            padding: 40px;
+        }
+
+        .booking-summary {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+            .summary-item:last-child {
+                border-bottom: none;
+            }
+
+        .summary-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .total-amount {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .total-amount-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .total-amount-value {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .pay-button {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        }
+
+            .pay-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 15px 40px rgba(40, 167, 69, 0.4);
+            }
+
+            .pay-button:active {
+                transform: translateY(0);
+            }
+
+        .security-badge {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 13px;
+        }
+
+            .security-badge i {
+                color: #28a745;
+                margin-right: 5px;
+            }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .loading-overlay.active {
+                display: flex;
+            }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .payment-body {
+                padding: 30px 20px;
+            }
+
+            .payment-header h1 {
+                font-size: 24px;
+            }
+
+            .total-amount-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-header">
+            <h1><i class="fas fa-shield-alt"></i> Secure Payment</h1>
+            <p>Complete your booking with Razorpay</p>
+        </div>
+
+        <div class="payment-body">
+            <div class="booking-summary">
+                <div class="summary-title">
+                    <i class="fas fa-file-invoice"></i>
+                    Booking Summary
+                </div>
+
+                <div class="summary-item">
+                    <span class="summary-label">Customer Name</span>
+                    <span class="summary-value">@Model.CustomerName</span>
+                </div>
+
+                <div class="summary-item">
+                    <span class="summary-label">Email</span>
+                    <span class="summary-value">@Model.CustomerEmail</span>
+                </div>
+
+                <div class="summary-item">
+                    <span class="summary-label">Phone</span>
+                    <span class="summary-value">@Model.CustomerPhone</span>
+                </div>
+
+                <div class="summary-item">
+                    <span class="summary-label">Property</span>
+                    <span class="summary-value">@Model.BookingDetails.Home?.Name</span>
+                </div>
+
+                <div class="summary-item">
+                    <span class="summary-label">Check-in</span>
+                    <span class="summary-value">@Model.BookingDetails.BookingDateFrom.ToString("MMM dd, yyyy")</span>
+                </div>
+
+                <div class="summary-item">
+                    <span class="summary-label">Check-out</span>
+                    <span class="summary-value">@Model.BookingDetails.BookingDateTo.ToString("MMM dd, yyyy")</span>
+                </div>
+
+                <div class="summary-item">
+                    <span class="summary-label">Guests</span>
+                    <span class="summary-value">@Model.BookingDetails.GuestNumbers</span>
+                </div>
+            </div>
+
+            <div class="total-amount">
+                <div class="total-amount-label">Total Amount to Pay</div>
+                <div class="total-amount-value">₹@Model.Amount.ToString("N2")</div>
+            </div>
+
+            <button type="button" id="payButton" class="pay-button">
+                <i class="fas fa-lock"></i> Pay Now
+            </button>
+
+            <div class="security-badge">
+                <i class="fas fa-shield-alt"></i>
+                Your payment is secured with 256-bit SSL encryption
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        const paymentData = {
+            bookingId: @Model.BookingId,
+            amount: @Model.Amount,
+            currency: "@Model.Currency",
+            orderId: "@Model.RazorpayOrderId",
+            keyId: "@Model.RazorpayKeyId",
+            customerName: "@Model.CustomerName",
+            customerEmail: "@Model.CustomerEmail",
+            customerPhone: "@Model.CustomerPhone"
+        };
+
+        document.getElementById('payButton').addEventListener('click', function () {
+            initiatePayment();
+        });
+
+        function initiatePayment() {
+            const options = {
+                key: paymentData.keyId,
+                amount: paymentData.amount * 100, // Amount in paise
+                currency: paymentData.currency,
+                name: "Vernekar HomeStays",
+                description: "Booking Payment",
+                order_id: paymentData.orderId,
+                prefill: {
+                    name: paymentData.customerName,
+                    email: paymentData.customerEmail,
+                    contact: paymentData.customerPhone
+                },
+                theme: {
+                    color: "#667eea"
+                },
+                handler: function (response) {
+                    handlePaymentSuccess(response);
+                },
+                modal: {
+                    ondismiss: function () {
+                        hideLoading();
+                    }
+                }
+            };
+
+            showLoading();
+            const rzp = new Razorpay(options);
+            rzp.open();
+            hideLoading();
+        }
+
+        function handlePaymentSuccess(response) {
+            showLoading();
+
+            const verificationData = {
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature,
+                bookingId: paymentData.bookingId
+            };
+
+            $.ajax({
+                url: '/Payment/VerifyPayment',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(verificationData),
+                success: function (result) {
+                    hideLoading();
+                    if (result.success) {
+                        window.location.href = `/Payment/PaymentSuccess?bookingId=${paymentData.bookingId}`;
+                    } else {
+                        alert(result.message);
+                        window.location.href = `/Payment/PaymentFailed?bookingId=${paymentData.bookingId}`;
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    console.error('Verification error:', error);
+                    alert('Payment verification failed. Please contact support.');
+                    window.location.href = `/Payment/PaymentFailed?bookingId=${paymentData.bookingId}`;
+                }
+            });
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

@@ -394,7 +394,12 @@ namespace Assignment6.Controllers
                 }
 
                 bool resultSaved = _bookingService.SaveBookingAlternative(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
-                return Json(new { success = resultSaved, message = resultSaved ? "Booking saved successfully" : "Failed to save booking" });
+                return Json(new
+                {
+                    success = resultSaved,
+                    message = resultSaved ? "Booking saved successfully" : "Failed to save booking",
+                    bookingId = bookingSaveModel.BookingData.Id
+                });
             }
             catch (Exception ex)
             {

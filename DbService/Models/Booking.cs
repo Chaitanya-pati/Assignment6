@@ -7,7 +7,7 @@ namespace DbService.Models;
 
 public partial class Booking
 {
-    public int Id { get; set; } 
+    public int Id { get; set; }
 
     public string CustomerName { get; set; }
 
@@ -40,4 +40,6 @@ public partial class Booking
     public virtual ICollection<BookingRoom> BookingRooms { get; set; } = new List<BookingRoom>();
 
     public virtual Home Home { get; set; }
+
+    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }

@@ -2615,22 +2615,17 @@
     }
 
     function saveBookingData() {
-        // Use the enhanced validation
         if (!validateForm()) {
             showNotification('Please correct the validation errors before submitting.', 'error');
             return;
         }
 
-        // Get selected rooms data (if any) - for full property booking, this will be empty
         const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
-
-        // Disable submit button to prevent double submission
         const submitBtn = document.getElementById('saveBookingBtn');
         const originalText = submitBtn.innerHTML;
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
-        // Clean AJAX call as you were using before
         $.ajax({
             url: '/Scheduler/SaveBooking',
             type: 'POST',
@@ -2654,46 +2649,31 @@
             },
             success: function (response) {
                 if (response.success) {
-                    showNotification('Booking request submitted successfully! We will contact you soon.', 'success');
+                    showNotification('Booking saved! Redirecting to payment...', 'success');
+                    $('#bookingModal').modal('hide');
+
+                    // Redirect to payment page after 1.5 seconds
+                    setTimeout(function () {
+                        window.location.href = `/Payment/InitiatePayment?bookingId=${response.bookingId}`;
+                    }, 1500);
                 } else {
                     showNotification(response.message || 'Failed to save booking.', 'error');
-                }
-
-                // Close modal
-                $('#bookingModal').modal('hide');
-                resetForm();
-
-                // Remove booking button
-                const bookingActions = document.querySelector('.availability-actions');
-                if (bookingActions) {
-                    bookingActions.remove();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
                 }
             },
             error: function (xhr, status, error) {
                 console.error('Booking submission error:', error);
                 let errorMessage = 'Error saving booking. Please try again.';
-
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMessage = xhr.responseJSON.message;
-                } else if (xhr.responseText) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        errorMessage = response.message || errorMessage;
-                    } catch (e) {
-                        errorMessage = xhr.responseText || errorMessage;
-                    }
                 }
-
                 showNotification(errorMessage, 'error');
-            },
-            complete: function () {
-                // Re-enable submit button
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
             }
         });
     }
-
     function resetForm() {
         document.getElementById('bookingForm').reset();
         

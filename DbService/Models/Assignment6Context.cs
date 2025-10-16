@@ -21,6 +21,8 @@ public partial class Assignment6Context : DbContext
 
     public virtual DbSet<LayoutElement> LayoutElements { get; set; }
 
+    public virtual DbSet<Payment> Payments { get; set; }
+
     public virtual DbSet<Room> Rooms { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -100,6 +102,33 @@ public partial class Assignment6Context : DbContext
             entity.HasOne(d => d.Room).WithMany(p => p.LayoutElements)
                 .HasForeignKey(d => d.RoomId)
                 .HasConstraintName("FK__LayoutEle__RoomI__3F466844");
+        });
+
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.ToTable("Payment");
+
+            entity.HasIndex(e => e.BookingId, "IX_Payment_BookingId");
+
+            entity.HasIndex(e => e.RazorpayOrderId, "IX_Payment_RazorpayOrderId");
+
+            entity.HasIndex(e => e.Status, "IX_Payment_Status");
+
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.Currency)
+                .IsRequired()
+                .HasMaxLength(10);
+            entity.Property(e => e.RazorpayOrderId).HasMaxLength(100);
+            entity.Property(e => e.RazorpayPaymentId).HasMaxLength(100);
+            entity.Property(e => e.RazorpaySignature).HasMaxLength(500);
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.HasOne(d => d.Booking).WithMany(p => p.Payments)
+                .HasForeignKey(d => d.BookingId)
+                .HasConstraintName("FK_Payment_Booking");
         });
 
         modelBuilder.Entity<Room>(entity =>
