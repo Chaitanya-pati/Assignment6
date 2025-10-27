@@ -21,9 +21,8 @@
         }
     /* Header */
     .header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        position: sticky;
+        background: transparent !important;
+        color: #000;
         top: 0;
         z-index: 1000;
         box-shadow: 0 2px 20px rgba(0,0,0,0.1);
@@ -44,7 +43,7 @@
         font-size: 2rem;
         font-weight: bold;
         text-decoration: none;
-        color: white;
+        color: #000;
         z-index: 1001;
     }
 
@@ -58,7 +57,7 @@
     }
 
         .nav-links a {
-            color: white;
+            color: #000;
             text-decoration: none;
             font-weight: 500;
             transition: opacity 0.3s;
@@ -1475,11 +1474,6 @@
                 <p>Live like a local with our carefully selected homestay properties</p>
             </div>
             <div class="feature-card">
-                @* <div class="feature-icon">🍳</div>
-                <h3>Home-Cooked Meals</h3>
-                <p>Enjoy delicious local cuisine prepared by your hosts</p> *@
-            </div>
-            <div class="feature-card">
                 <div class="feature-icon">🗺️</div>
                 <h3>Local Guidance</h3>
                 <p>Get insider tips and recommendations from knowledgeable hosts</p>
@@ -1492,30 +1486,6 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="section">
-        <h2>What Our Guests Say</h2>
-        <div class="testimonials-grid">
-            <div class="testimonial-card">
-                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=1887&q=80" alt="Sarah Johnson" class="testimonial-avatar">
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"Absolutely wonderful experience! The hosts were incredibly welcoming and the room was spotless. Felt like staying with family."</p>
-                <p class="testimonial-author">- Sarah Johnson, USA</p>
-            </div>
-            <div class="testimonial-card">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1887&q=80" alt="Michael Chen" class="testimonial-avatar">
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"The location was perfect and the breakfast was amazing. Our host gave us great recommendations for local attractions. Highly recommend!"</p>
-                <p class="testimonial-author">- Michael Chen, Canada</p>
-            </div>
-            <div class="testimonial-card">
-                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1890&q=80" alt="Emma Williams" class="testimonial-avatar">
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"Clean, comfortable, and authentic. The host family made us feel so welcome. This is how travel should be!"</p>
-                <p class="testimonial-author">- Emma Williams, UK</p>
-            </div>
-        </div>
-    </section>
 
     <!-- Booking Modal -->
     <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
@@ -1705,14 +1675,10 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" id="contact">
         <div class="footer-content">
-            <div class="footer-links">
-                <a href="#privacy">Privacy Policy</a>
-                <a href="#terms">Terms of Service</a>
-            </div>
         <p>&copy; 2025 Vernekar's Radha Heritage Home Stay. All rights reserved.</p>
-            <p>📧 info@Radha.com | 📞 +1-234-567-8900</p>
+        <p>📧 Vaibsv1@yahoo.com | 📞 +919845352106</p>
         </div>
     </footer>
 
@@ -2982,43 +2948,6 @@
         });
     });
 
-    // function validateIndividualRoomBookingDates() {
-    //     const checkinInput = document.getElementById('BookingDateFrom');
-    //     const checkoutInput = document.getElementById('BookingDateTo');
-
-    //     if (!checkinInput.value || !checkoutInput.value) {
-    //         showNotification('Please select check-in and check-out dates first before choosing individual rooms.', 'error');
-    //         return false;
-    //     }
-
-    //     const checkinDate = new Date(checkinInput.value);
-    //     const today = new Date();
-    //     today.setHours(0, 0, 0, 0); // Reset time to start of day
-    //     checkinDate.setHours(0, 0, 0, 0);
-
-    //     // Calculate the difference in days
-    //     const timeDiff = checkinDate.getTime() - today.getTime();
-    //     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-    //     if (daysDiff > 3) {
-    //         const maxBookingDate = new Date(checkinDate);
-    //         maxBookingDate.setDate(maxBookingDate.getDate() - 3);
-
-    //         showNotification(
-    //             `Individual room booking for ${checkinDate.toDateString()} is only available from ${maxBookingDate.toDateString()} onwards. For earlier booking, please select "Book Entire Property".`,
-    //             'error',
-    //             8000
-    //         );
-    //         return false;
-    //     }
-
-    //     if (daysDiff < 0) {
-    //         showNotification('Cannot book for past dates.', 'error');
-    //         return false;
-    //     }
-
-    //     return true;
-    // }
 
     function validateBookingDates() {
         const checkinInput = document.getElementById('checkin');
@@ -3051,52 +2980,7 @@
         return true;
     }
 
-    // Update the date change event listeners
-    // document.addEventListener('DOMContentLoaded', function () {
-    //     const checkinInput = document.getElementById('checkin');
-    //     const checkoutInput = document.getElementById('checkout');
-
-    //     if (checkinInput) {
-    //         checkinInput.addEventListener('change', function () {
-    //             // Update minimum checkout date
-    //             const checkinDate = this.value;
-    //             if (checkoutInput) {
-    //                 checkoutInput.setAttribute('min', checkinDate);
-    //             }
-
-    //             // If individual rooms are selected, validate the 3-day rule
-    //             const selectiveRadio = document.getElementById('selectiveRooms');
-    //             if (selectiveRadio && selectiveRadio.checked) {
-    //                 if (!validateIndividualRoomBookingDates()) {
-    //                     // Switch back to entire property
-    //                     document.getElementById('entireProperty').checked = true;
-    //                     const roomCheckboxes = document.getElementById('roomCheckboxes');
-    //                     if (roomCheckboxes) {
-    //                         roomCheckboxes.style.display = 'none';
-    //                     }
-    //                 }
-    //             }
-    //         });
-    //     }
-
-    //     if (checkoutInput) {
-    //         checkoutInput.addEventListener('change', function () {
-    //             // If individual rooms are selected, validate the 3-day rule
-    //             const selectiveRadio = document.getElementById('selectiveRooms');
-    //             if (selectiveRadio && selectiveRadio.checked) {
-    //                 if (!validateIndividualRoomBookingDates()) {
-    //                     // Switch back to entire property
-    //                     document.getElementById('entireProperty').checked = true;
-    //                     const roomCheckboxes = document.getElementById('roomCheckboxes');
-    //                     if (roomCheckboxes) {
-    //                         roomCheckboxes.style.display = 'none';
-    //                     }
-    //                 }
-    //             }
-    //         });
-    //     }
-    // });
-
+  
     document.addEventListener('DOMContentLoaded', function () {
         // Use consistent element IDs - assuming the correct ones are 'BookingDateFrom' and 'BookingDateTo'
         const checkinInput = document.getElementById('BookingDateFrom');
