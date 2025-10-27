@@ -1323,8 +1323,9 @@
     <!-- Header -->
 <header class="header">
     <nav class="nav">
-        <a href="#" class="logo">🏠 Radha HomeStay</a>
-        <a asp-action="Login" asp-controller="Login" title="Admin Login">👤</a>
+        <a href="#" class="logo">
+            🏠 Vernekar's Radha Heritage Home Stay
+        </a>
         <!-- Hamburger Menu Icon -->
         <button class="hamburger" id="hamburger">
             <span></span>
@@ -1338,7 +1339,9 @@
             <li><a href="#features">Features</a></li>
             <li><a href="#testimonials">Reviews</a></li>
             <li><a href="#contact">Contact</a></li>
-            <li></li>
+            <li>
+                <a asp-action="Login" asp-controller="Login" title="Admin Login">👤</a>
+            </li>
         </ul>
     </nav>
 
@@ -1349,8 +1352,10 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h1>Experience Authentic Homestays</h1>
-            <p>Discover comfortable, welcoming homes away from home with personalized hospitality</p>
+        <h1>A Heritage Stay That Feels Like Home.</h1>
+        <p>
+            Enjoy comfort and a warm welcome in every stay.
+        </p>
         </div>
     </section>
 
@@ -1361,7 +1366,7 @@
         <h3 class="calendar-title">
             <i class="fas fa-calendar-week me-2"></i>Booking Calendar
         </h3>
-        <p class="text-muted mb-0">Check availability across all properties</p>
+        <p class="text-muted mb-0">Reserve Your Stay</p>
     </div>
     <div id="websiteCalendar"></div>
     
@@ -1462,7 +1467,7 @@
 
     <!-- Features Section -->
     <section id="features" class="section features">
-        <h2>Why Choose Radha HomeStay?</h2>
+    <h2>Vernekar's Radha Heritage Home Stay</h2>
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">🏡</div>
@@ -1470,9 +1475,9 @@
                 <p>Live like a local with our carefully selected homestay properties</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🍳</div>
+                @* <div class="feature-icon">🍳</div>
                 <h3>Home-Cooked Meals</h3>
-                <p>Enjoy delicious local cuisine prepared by your hosts</p>
+                <p>Enjoy delicious local cuisine prepared by your hosts</p> *@
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🗺️</div>
@@ -1703,12 +1708,10 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-links">
-                <a href="#about">About Us</a>
                 <a href="#privacy">Privacy Policy</a>
                 <a href="#terms">Terms of Service</a>
-                <a href="#contact">Contact</a>
             </div>
-            <p>&copy; 2025 Radha Homestays. All rights reserved.</p>
+        <p>&copy; 2025 Vernekar's Radha Heritage Home Stay. All rights reserved.</p>
             <p>📧 info@Radha.com | 📞 +1-234-567-8900</p>
         </div>
     </footer>
@@ -2198,7 +2201,7 @@
         bookingActions.className = 'availability-actions';
         bookingActions.innerHTML = `
             <button class="book-now-btn" onclick="openBookingModal('${propertyId}', '${checkin}', '${checkout}', '${homeName}')">
-                <i class="fas fa-calendar-plus"></i> Book This Property
+                    <i class="fas fa-calendar-plus"></i> Book Your Stay
             </button>
         `;
 

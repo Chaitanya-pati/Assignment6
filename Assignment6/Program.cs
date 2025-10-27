@@ -7,6 +7,8 @@ using Hangfire.MemoryStorage;
 using Newtonsoft.Json;
 using UserManagement.Lib;
 using Assignment6;
+using Twilio;
+using Assignment6.twillio;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,19 @@ builder.Services.AddSingleton<IPaymentService>(provider =>
     var config = provider.GetRequiredService<IConfiguration>();
     return new PaymentService(connectionString, config);
 });
+
+builder.Services.Configure<WhatsappService>(builder.Configuration.GetSection("Twilio"));
+
+// after Configure<WhatsappService>
+builder.Services.AddSingleton<TwilioSmsService>();
+// or AddScoped<TwilioSmsService>(); depending on your needs
+
+
+// Initialize Twilio client using env vars or config
+var accountSid = builder.Configuration["Twilio:AccountSid"];
+var authToken = builder.Configuration["Twilio:AuthToken"];
+//TwilioClient.Init(accountSid, authToken);
+
 
 builder.Services.AddUserManagementServices(builder.Configuration);
 

@@ -20,21 +20,30 @@ using DbService.Implementation;
 using SelectPdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using Assignment6.twillio;
+using Twilio.TwiML.Messaging;
 namespace Assignment6.Controllers
 {
     public class SchedulerController : Controller
     {
         private readonly HttpClient _httpClient;
         private readonly IBookingService _bookingService;
+        private readonly TwilioSmsService _sms;
         //private readonly DbContextOptions<Assignment6Context> _dbconnection;
 
-        public SchedulerController(IBookingService bookingService)//,string conn)
+        public SchedulerController(IBookingService bookingService, TwilioSmsService sms)
         {
-            //_dbconnection = new DbContextOptionsBuilder<Assignment6Context>().UseSqlServer(conn).Options;
             _bookingService = bookingService;
             _httpClient = new HttpClient();
-            //GetWebsiteIcal();
+            _sms = sms;
+            //SendWhatsappMsg();
         }
+
+        public  async void SendWhatsappMsg()
+        {
+            var msg = await _sms.SendSmsAsync("+918748040423", "Hiii from twillio");
+        }
+
         public IActionResult Index()
         {
             return View();
