@@ -299,7 +299,7 @@
 }
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
             background-size: cover;
             background-position: center;
             height: 50%;
@@ -472,71 +472,284 @@
             animation: slideOut 0.3s ease-in;
         }
 
-        /* Sections */
-        .section {
-            padding: 5rem 0;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding-left: 2rem;
-            padding-right: 2rem;
-        }
+       .section {
+    max-width: 1400px;
+    margin: 0 auto 3rem auto;
+    padding: 1rem 2rem;
+}
 
-        .section h2 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: #333;
-        }
+.section-title {
+    text-align: center;
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
 
-        /* Rooms Gallery */
-        .rooms-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
+.section-subtitle {
+    text-align: center;
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
 
-        .room-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
+.floor-title {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 2rem;
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
 
-        .room-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
+    /* Category Cards Grid - FORCE 1 column on mobile */
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
 
-        .room-image {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-        }
+/* Common Sitting Area - Full Width Card */
+.common-area-grid {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+}
 
-        .room-info {
-            padding: 1.5rem;
-        }
+.category-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-        .room-info h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
 
-        .room-info p {
-            color: #666;
-            margin-bottom: 1rem;
-        }
+.common-area-card {
+    width: 100%;
+    max-width: 700px;
+}
 
-        .room-price {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #667eea;
-            font-family: 'Segoe UI', sans-serif;
-        }
+/* Image Carousel Container */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+}
 
+.carousel-images {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-images img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Card Content */
+.card-content {
+    padding: 1rem;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.card-count {
+    display: none; /* Hide room counts */
+}
+
+.card-description {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+/* Large Desktop (1400px and above) - 4 cards per row */
+@@media (min-width: 1400px) {
+    .category-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Desktop (1200px to 1399px) - 4 cards per row */
+@@media (min-width: 1200px) and (max-width: 1399px) {
+    .category-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.2rem;
+    }
+    
+    .carousel-container {
+        height: 180px;
+    }
+}
+
+/* Laptop/Tablet Landscape (992px to 1199px) - 3 cards per row */
+@@media (min-width: 992px) and (max-width: 1199px) {
+    .category-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+    }
+    
+    .section {
+        padding: 1rem 1.5rem;
+    }
+    
+    .carousel-container {
+        height: 180px;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+    }
+}
+
+/* Tablet (768px to 991px) - 2 cards per row */
+@@media (min-width: 768px) and (max-width: 991px) {
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .section {
+        padding: 1rem;
+    }
+    
+    .carousel-container {
+        height: 200px;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    .floor-title {
+        font-size: 1.5rem;
+        padding: 0.8rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .card-description {
+        font-size: 0.85rem;
+    }
+}
+
+/* Mobile - ALL screens below 768px get 1 card per row */
+@@media (max-width: 767px) {
+    .category-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem;
+    }
+    
+    .section {
+        padding: 1rem;
+    }
+    
+    .carousel-container {
+        height: 250px;
+    }
+    
+    .common-area-card .carousel-container {
+        height: 280px;
+    }
+    
+    .section-title {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+    }
+    
+    .section-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .floor-title {
+        font-size: 1.3rem;
+        padding: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-content {
+        padding: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-description {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+    
+    .common-area-grid {
+        padding: 0 1rem;
+    }
+}
+
+/* Extra Small Mobile (up to 375px) */
+@@media (max-width: 375px) {
+    .category-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .section {
+        padding: 1rem 0.75rem;
+    }
+    
+    .carousel-container {
+        height: 220px;
+    }
+    
+    .common-area-card .carousel-container {
+        height: 250px;
+    }
+    
+    .section-title {
+        font-size: 1.4rem;
+    }
+    
+    .floor-title {
+        font-size: 1.15rem;
+        padding: 0.7rem;
+    }
+    
+    .card-title {
+        font-size: 1.05rem;
+    }
+    
+    .card-description {
+        font-size: 0.8rem;
+    }
+}
+
+/* Touch device optimization */
+@@media (hover: none) and (pointer: coarse) {
+    .category-card:hover {
+        transform: none;
+    }
+    
+    .category-card:active {
+        transform: scale(0.98);
+    }
+}
         /* Features */
         .features {
             background: #f8f9fa;
@@ -1410,59 +1623,174 @@
     </div>
 
     <!-- Rooms Section -->
-    <section id="rooms" class="section">
-        <h2>Our Beautiful Rooms</h2>
-        <div class="rooms-grid">
-            <div class="room-card">
-                <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Deluxe Suite" class="room-image">
-                <div class="room-info">
-                    <h3>Deluxe Garden Suite</h3>
-                    <p>Spacious room with garden view, private bathroom, and modern amenities. Perfect for couples.</p>
-                        
+<section class="section">
+    <h2 class="section-title">Welcome to Radha Stays</h2>
+    <p class="section-subtitle">Experience Comfort & Luxury</p>
+
+    <div class="common-area-grid">
+        <div class="category-card common-area-card" data-carousel="common-sitting">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                   <img src="~/images/radha_classic/siitingarea1.jpg" />
+                    <img src="~/images/radha_classic/siitingarea2.jpg" />
+                    <img src="~/images/radha_classic/siitingarea3.jpg" />
                 </div>
             </div>
-            <div class="room-card">
-                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2058&q=80" alt="Family Room" class="room-image">
-                <div class="room-info">
-                    <h3>Family Comfort Room</h3>
-                    <p>Large room accommodating up to 4 guests with twin beds and family-friendly amenities.</p>
-                    @* <div class="room-price">₹9,600/night</div> *@
-                </div>
-            </div>
-            <div class="room-card">
-                <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80" alt="Standard Room" class="room-image">
-                <div class="room-info">
-                    <h3>Cozy Standard Room</h3>
-                    <p>Comfortable single room with all essential amenities. Ideal for solo travelers.</p>
-                    @* <div class="room-price">₹4,400/night</div> *@
-                </div>
-            </div>
-            <div class="room-card">
-                <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Premium Suite" class="room-image">
-                <div class="room-info">
-                    <h3>Premium Master Suite</h3>
-                    <p>Luxurious suite with king bed, separate living area, and stunning mountain views.</p>
-                    @* <div class="room-price">₹12,000/night</div> *@
-                </div>
-            </div>
-            <div class="room-card">
-                <img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Budget Room" class="room-image">
-                <div class="room-info">
-                    <h3>Budget Friendly Room</h3>
-                    <p>Clean, comfortable accommodation with shared facilities. Great value for money.</p>
-                   @*  <div class="room-price">₹2,800/night</div> *@
-                </div>
-            </div>
-            <div class="room-card">
-                <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80" alt="Studio Apartment" class="room-image">
-                <div class="room-info">
-                    <h3>Modern Studio</h3>
-                    <p>Self-contained studio with kitchenette, perfect for extended stays and business travelers.</p>
-                    @* <div class="room-price">₹7,600/night</div> *@
-                </div>
+            <div class="card-content">
+                <h3 class="card-title">Common Sitting Area</h3>
+                <p class="card-description">Relax and unwind in our beautifully designed outdoor sitting areas. Perfect for morning coffee or evening gatherings.</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
+<!-- Radha Classic Section -->
+<section class="section">
+    <h2 class="floor-title">🏛️ Radha Classic - Ground Floor</h2>
+    <div class="category-grid">
+        <!-- Bedrooms Card -->
+        <div class="category-card" data-carousel="classic-bedrooms">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                    <img src="Images/Radha_Classic/BedRoom1.jpg" alt="Bedroom 1">
+                    <img src="Images/Radha_Classic/BedRoom2.jpg" alt="Bedroom 2">
+                    <img src="Images/Radha_Classic/BedRoom3.jpg" alt="Bedroom 3">
+                    <img src="Images/Radha_Classic/BedRoom4.jpg" alt="Bedroom 4">
+                    <img src="Images/Radha_Classic/BedRoom5.jpg" alt="Bedroom 5">
+                    <img src="Images/Radha_Classic/BedRoom6.jpg" alt="Bedroom 6">
+                    <img src="Images/Radha_Classic/BedRoom7.jpg" alt="Bedroom 7">
+                    <img src="Images/Radha_Classic/BedRoom8.jpg" alt="Bedroom 8">
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Bedrooms</h3>
+                <p class="card-description">Spacious and well-appointed bedrooms with modern amenities for a restful stay.</p>
+            </div>
+        </div>
+
+        <!-- Halls Card -->
+        <div class="category-card" data-carousel="classic-halls">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                    <img src="Images/Radha_Classic/Hall1.jpg" alt="Hall 1">
+                    <img src="Images/Radha_Classic/Hall2.jpg" alt="Hall 2">
+                    <img src="Images/Radha_Classic/Hall3.jpg" alt="Hall 3">
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Living Halls</h3>
+                <p class="card-description">Comfortable living spaces perfect for family gatherings and relaxation.</p>
+            </div>
+        </div>
+
+        <!-- Kitchen Area Card -->
+        <div class="category-card" data-carousel="classic-kitchen">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                    <img src="Images/Radha_Classic/KitchenArea1.jpg" alt="Kitchen 1">
+                    <img src="Images/Radha_Classic/KitchenArea2.jpg" alt="Kitchen 2">
+                    <img src="Images/Radha_Classic/KitchenArea3.jpg" alt="Kitchen 3">
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Kitchen Areas</h3>
+                <p class="card-description">Fully equipped modern kitchens for your culinary needs and convenience.</p>
+            </div>
+        </div>
+
+        <!-- Toilets Card -->
+        <div class="category-card" data-carousel="classic-toilets">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                    <img src="Images/Radha_Classic/Toilet1.jpg" alt="Toilet 1">
+                    <img src="Images/Radha_Classic/Toilet2.jpg" alt="Toilet 2">
+                    <img src="Images/Radha_Classic/Toilet3.jpg" alt="Toilet 3">
+                    <img src="Images/Radha_Classic/Toilet4.jpg" alt="Toilet 4">
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Bathrooms</h3>
+                <p class="card-description">Clean and modern bathroom facilities with premium fixtures.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Radha Heritage Section -->
+<section class="section">
+    <h2 class="floor-title">🏰 Radha Heritage - First Floor</h2>
+    <div class="category-grid">
+        <!-- Bedrooms Card -->
+        <div class="category-card" data-carousel="heritage-bedrooms">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                    <img src="Images/Radha_Heritage/BedRoom1.jpg" alt="Bedroom 1">
+                    <img src="Images/Radha_Heritage/BedRoom10.jpg" alt="Bedroom 10">
+                    <img src="Images/Radha_Heritage/BedRoom11.jpg" alt="Bedroom 11">
+                    <img src="Images/Radha_Heritage/BedRoom2.jpg" alt="Bedroom 2">
+                    <img src="Images/Radha_Heritage/BedRoom3.jpg" alt="Bedroom 3">
+                    <img src="Images/Radha_Heritage/BedRoom4.jpg" alt="Bedroom 4">
+                    <img src="Images/Radha_Heritage/BedRoom5.jpg" alt="Bedroom 5">
+                    <img src="Images/Radha_Heritage/BedRoom6.jpg" alt="Bedroom 6">
+                    <img src="Images/Radha_Heritage/BedRoom7.jpg" alt="Bedroom 7">
+                    <img src="Images/Radha_Heritage/BedRoom8.jpg" alt="Bedroom 8">
+                    <img src="Images/Radha_Heritage/BedRoom9.jpg" alt="Bedroom 9">
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Bedrooms</h3>
+                <p class="card-description">Heritage-style bedrooms combining traditional charm with modern comfort.</p>
+            </div>
+        </div>
+
+        <!-- Halls Card -->
+        <div class="category-card" data-carousel="heritage-halls">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                    <img src="Images/Radha_Heritage/Hall1.jpg" alt="Hall 1">
+                    <img src="Images/Radha_Heritage/Hall2.jpg" alt="Hall 2">
+                    <img src="Images/Radha_Heritage/Hall3.jpg" alt="Hall 3">
+                    <img src="Images/Radha_Heritage/Hall4.jpg" alt="Hall 4">
+                    <img src="Images/Radha_Heritage/Hall5.jpg" alt="Hall 5">
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Living Halls</h3>
+                <p class="card-description">Elegant living spaces with heritage architecture and comfortable seating.</p>
+            </div>
+        </div>
+
+        <!-- Dining Area Card -->
+        <div class="category-card" data-carousel="heritage-dining">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                    <img src="Images/Radha_Heritage/Dinning1.jpg" alt="Dining 1">
+                    <img src="Images/Radha_Heritage/Dinning2.jpg" alt="Dining 2">
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Dining Areas</h3>
+                <p class="card-description">Spacious dining areas perfect for family meals and special occasions.</p>
+            </div>
+        </div>
+
+        <!-- Toilets Card -->
+        <div class="category-card" data-carousel="heritage-toilets">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                    <img src="Images/Radha_Heritage/Toilet1.jpg" alt="Toilet 1">
+                    <img src="Images/Radha_Heritage/Toilet2.jpg" alt="Toilet 2">
+                    <img src="Images/Radha_Heritage/Toilet3.jpg" alt="Toilet 3">
+                    <img src="Images/Radha_Heritage/Toilet4.jpg" alt="Toilet 4">
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Bathrooms</h3>
+                <p class="card-description">Well-maintained bathrooms with modern amenities and elegant design.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
     <!-- Features Section -->
     <section id="features" class="section features">
@@ -3119,4 +3447,61 @@
             closeMenu();
         }
         });
+
+    // Auto-sliding carousel functionality
+    class Carousel {
+        constructor(element) {
+            this.card = element;
+            this.container = element.querySelector('.carousel-images');
+            this.images = element.querySelectorAll('.carousel-images img');
+            this.currentIndex = 0;
+            this.interval = null;
+            this.isHovered = false;
+
+            this.init();
+        }
+
+        init() {
+            // Start auto-sliding
+            this.startAutoSlide();
+
+            // Pause on hover
+            this.card.addEventListener('mouseenter', () => {
+                this.isHovered = true;
+                this.stopAutoSlide();
+            });
+
+            // Resume on mouse leave
+            this.card.addEventListener('mouseleave', () => {
+                this.isHovered = false;
+                this.startAutoSlide();
+            });
+        }
+
+        slide() {
+            this.currentIndex = (this.currentIndex + 1) % this.images.length;
+            const offset = -this.currentIndex * 100;
+            this.container.style.transform = `translateX(${offset}%)`;
+        }
+
+        startAutoSlide() {
+            if (this.interval) return;
+            // Slide every 2.5 seconds
+            this.interval = setInterval(() => this.slide(), 2500);
+        }
+
+        stopAutoSlide() {
+            if (this.interval) {
+                clearInterval(this.interval);
+                this.interval = null;
+            }
+        }
+    }
+
+    // Initialize all carousels
+    document.addEventListener('DOMContentLoaded', () => {
+        const carouselCards = document.querySelectorAll('.category-card');
+        carouselCards.forEach(card => new Carousel(card));
+    });
+
 </script>
