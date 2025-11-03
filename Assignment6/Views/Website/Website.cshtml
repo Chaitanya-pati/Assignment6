@@ -6,7 +6,7 @@
 }
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
+     <style>
         * {
             margin: 0;
             padding: 0;
@@ -19,6 +19,22 @@
             color: #333;
             overflow-x: hidden;
         }
+
+        /* Optimize image loading */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .carousel-images img,
+        .award-image {
+            object-fit: cover;
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
     /* Header */
     .header {
         background: transparent !important;
@@ -83,7 +99,7 @@
         .hamburger span {
             width: 25px;
             height: 3px;
-            background: white;
+            background: #000;
             margin: 3px 0;
             transition: all 0.3s ease;
             transform-origin: center;
@@ -123,59 +139,60 @@
         }
 
     /* Desktop Navigation */
-    @@media (min-width: 769px) {
-        .hamburger
+   @@media (min-width: 769px) {
+        .hamburger {
+            display: none !important;
+        }
 
-    {
-        display: none !important;
+        .nav-links {
+            display: flex !important;
+            position: static !important;
+            height: auto !important;
+            width: auto !important;
+            background: transparent !important;
+            flex-direction: row !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            right: auto !important;
+        }
     }
 
-    .nav-links {
-        display: flex !important;
-        position: static !important;
-        height: auto !important;
-        width: auto !important;
-        background: transparent !important;
-        flex-direction: row !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        right: auto !important;
-    }
+    /* Mobile responsive - IMPROVED */
+   @@media (max-width: 768px) {
+        .nav {
+            padding: 1rem;
+        }
 
-    }
+        .logo {
+            font-size: 1.3rem;
+            line-height: 1.2;
+            max-width: 70%;
+        }
 
-    /* Mobile responsive */
-    @@media (max-width: 768px) {
-        .nav
+        .hamburger {
+            display: flex;
+        }
 
-    {
-        padding: 1rem;
-    }
+        .hamburger span {
+            background: #000;
+        }
 
-    .logo {
-        font-size: 1.5rem;
-    }
-
-    .hamburger {
-        display: flex;
-    }
-
-    .nav-links {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        height: 100vh;
-        width: 100%;
-        max-width: 300px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        padding-top: 80px;
-        gap: 2rem;
-        transition: right 0.3s ease;
-        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-    }
+        .nav-links {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            height: 100vh;
+            width: 100%;
+            max-width: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding-top: 80px;
+            gap: 2rem;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        }
 
         .nav-links.active {
             right: 0;
@@ -193,144 +210,85 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             width: 100%;
             transition: all 0.3s ease;
+            color: #fff;
         }
 
-            .nav-links a:hover {
-                background: rgba(255,255,255,0.1);
-                opacity: 1;
-            }
-
-    /* Overlay for mobile menu */
-    .nav-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: rgba(0,0,0,0.5);
-        z-index: 999;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-    }
-
-        .nav-overlay.active {
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
             opacity: 1;
-            visibility: visible;
+        }
+    }
+
+   @@media (max-width: 480px) {
+        .nav {
+            padding: 0.75rem;
         }
 
-    }
+        .logo {
+            font-size: 1.1rem;
+        }
 
-    @@media (max-width: 480px) {
-        .nav
-
-    {
-        padding: 0.75rem;
-    }
-
-    .logo {
-        font-size: 1.3rem;
-    }
-
-    .nav-links {
-        max-width: 280px;
-        padding-top: 70px;
-    }
+        .nav-links {
+            max-width: 280px;
+            padding-top: 70px;
+        }
 
         .nav-links a {
             font-size: 1rem;
             padding: 0.75rem 1.5rem;
         }
-
     }
 
     /* Large screens */
-    @@media (min-width: 1200px) {
-        .nav
-
-    {
-        padding: 1rem 3rem;
-    }
-
-    }
-
-    /* Demo content */
-    .demo-content {
-        height: 200vh;
-        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-        padding: 2rem;
-        text-align: center;
-    }
-
-        .demo-content h1 {
-            margin-top: 2rem;
-            color: #333;
+   @@media (min-width: 1200px) {
+        .nav {
+            padding: 1rem 3rem;
         }
-/* Mobile responsive */
-@@media (max-width: 768px) {
-    .nav {
-        padding: 0 1rem;
     }
-    
-    .logo {
-        font-size: 1.5rem;
-    }
-    
-    .nav-links {
-        display: none; /* Hide nav links on mobile, or implement hamburger menu */
-    }
-}
 
-@@media (max-width: 480px) {
-    .nav {
-        padding: 0 0.5rem;
-    }
-    
-    .logo {
-        font-size: 1.3rem;
-    }
-}
-
-/* Large screens */
-@@media (min-width: 1200px) {
-    .nav {
-        padding: 0 3rem;
-    }
-}
-        /* Hero Section */
+        /* Hero Section - IMPROVED */
         .hero {
-        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
             background-size: cover;
             background-position: center;
-            height: 50%;
+            min-height: 60vh;
+            height: auto;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             color: white;
             position: relative;
+            padding: 2rem 1rem;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            width: 100%;
+            padding: 0 1rem;
         }
 
         .hero-content h1 {
-            font-size: 3.5rem;
+            font-size: clamp(2rem, 5vw, 3.5rem);
             margin-bottom: 1rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         .hero-content p {
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
             margin-bottom: 2rem;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
 
-        /* Booking Form */
+        /* Booking Form - IMPROVED */
         .booking-form {
             background: white;
             padding: 2rem;
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             max-width: 1000px;
-            margin: -100px auto 0;
+            width: 90%;
+            margin: -50px auto 2rem;
             position: relative;
             z-index: 100;
         }
@@ -351,6 +309,7 @@
             font-weight: 600;
             margin-bottom: 0.5rem;
             color: #555;
+            font-size: 0.9rem;
         }
 
         .form-group select,
@@ -378,6 +337,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
         }
 
         .search-btn:hover {
@@ -446,7 +406,7 @@
             opacity: 1;
         }
 
-        @@keyframes slideIn {
+       @@keyframes slideIn {
             from {
                 transform: translateX(100%);
                 opacity: 0;
@@ -457,7 +417,7 @@
             }
         }
 
-        @@keyframes slideOut {
+       @@keyframes slideOut {
             from {
                 transform: translateX(0);
                 opacity: 1;
@@ -480,20 +440,20 @@
 
 .section-title {
     text-align: center;
-    font-size: 10rem;
+    font-size: clamp(2rem, 5vw, 3.1rem);
     color: black;
     margin-bottom: 1.5rem;
 }
 
 .section-subtitle {
     text-align: center;
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2vw, 1rem);
     color: #666;
     margin-bottom: 2rem;
 }
 
 .floor-title {
-    font-size: 1.8rem;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
     color: #333;
     margin-bottom: 2rem;
     text-align: center;
@@ -502,7 +462,7 @@
     border-radius: 10px;
 }
 
-    /* Category Cards Grid - FORCE 1 column on mobile */
+    /* Category Cards Grid - IMPROVED RESPONSIVE */
     .category-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -570,7 +530,7 @@
 }
 
 .card-count {
-    display: none; /* Hide room counts */
+    display: none;
 }
 
 .card-description {
@@ -578,14 +538,17 @@
     font-size: 0.9rem;
     line-height: 1.5;
 }
-/* Large Desktop (1400px and above) - 4 cards per row */
+
+/* IMPROVED RESPONSIVE BREAKPOINTS */
+
+/* Large Desktop (1400px and above) */
 @@media (min-width: 1400px) {
     .category-grid {
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
-/* Desktop (1200px to 1399px) - 4 cards per row */
+/* Desktop (1200px to 1399px) */
 @@media (min-width: 1200px) and (max-width: 1399px) {
     .category-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -593,11 +556,11 @@
     }
     
     .carousel-container {
-        height: 180px;
+        height: 220px;
     }
 }
 
-/* Laptop/Tablet Landscape (992px to 1199px) - 3 cards per row */
+/* Laptop/Tablet Landscape (992px to 1199px) */
 @@media (min-width: 992px) and (max-width: 1199px) {
     .category-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -609,15 +572,11 @@
     }
     
     .carousel-container {
-        height: 180px;
-    }
-    
-    .section-title {
-        font-size: 1.8rem;
+        height: 200px;
     }
 }
 
-/* Tablet (768px to 991px) - 2 cards per row */
+/* Tablet (768px to 991px) */
 @@media (min-width: 768px) and (max-width: 991px) {
     .category-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -629,16 +588,7 @@
     }
     
     .carousel-container {
-        height: 200px;
-    }
-    
-    .section-title {
-        font-size: 1.8rem;
-    }
-    
-    .floor-title {
-        font-size: 1.5rem;
-        padding: 0.8rem;
+        height: 220px;
     }
     
     .card-title {
@@ -650,7 +600,7 @@
     }
 }
 
-/* Mobile - ALL screens below 768px get 1 card per row */
+/* Mobile - ALL screens below 768px */
 @@media (max-width: 767px) {
     .category-grid {
         grid-template-columns: 1fr !important;
@@ -662,27 +612,11 @@
     }
     
     .carousel-container {
-        height: 250px;
-    }
-    
-    .common-area-card .carousel-container {
         height: 280px;
     }
     
-    .section-title {
-        font-size: 1.6rem;
-        margin-bottom: 1rem;
-    }
-    
-    .section-subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .floor-title {
-        font-size: 1.3rem;
-        padding: 0.75rem;
-        margin-bottom: 1.5rem;
+    .common-area-card .carousel-container {
+        height: 300px;
     }
     
     .card-content {
@@ -690,13 +624,13 @@
     }
     
     .card-title {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         margin-bottom: 0.5rem;
     }
     
     .card-description {
-        font-size: 0.85rem;
-        line-height: 1.5;
+        font-size: 0.9rem;
+        line-height: 1.6;
     }
     
     .common-area-grid {
@@ -704,39 +638,26 @@
     }
 }
 
-/* Extra Small Mobile (up to 375px) */
-@@media (max-width: 375px) {
-    .category-grid {
-        grid-template-columns: 1fr !important;
+/* Extra Small Mobile (up to 480px) */
+@@media (max-width: 480px) {
+    .carousel-container {
+        height: 250px;
+    }
+    
+    .common-area-card .carousel-container {
+        height: 270px;
     }
     
     .section {
         padding: 1rem 0.75rem;
     }
     
-    .carousel-container {
-        height: 220px;
-    }
-    
-    .common-area-card .carousel-container {
-        height: 250px;
-    }
-    
-    .section-title {
-        font-size: 1.4rem;
-    }
-    
-    .floor-title {
-        font-size: 1.15rem;
-        padding: 0.7rem;
-    }
-    
     .card-title {
-        font-size: 1.05rem;
+        font-size: 1.1rem;
     }
     
     .card-description {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
     }
 }
 
@@ -751,7 +672,7 @@
     }
 }
 
-        /* Awards Section Styles */
+        /* Awards Section Styles - IMPROVED MOBILE */
         .awards-section {
             background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);
             padding: 4rem 2rem;
@@ -771,14 +692,15 @@
             justify-content: center;
             gap: 1.5rem;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .trophy-icon {
-            font-size: 3rem;
+            font-size: clamp(2rem, 4vw, 3rem);
             animation: bounce 2s ease-in-out infinite;
         }
 
-        @@keyframes bounce {
+       @@keyframes bounce {
             0%, 100% {
                 transform: translateY(0);
             }
@@ -792,7 +714,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
             font-weight: 700;
             margin: 0;
             text-transform: uppercase;
@@ -804,17 +726,18 @@
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            font-size: 1.3rem;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
             color: #667eea;
             font-weight: 600;
+            flex-wrap: wrap;
         }
 
         .star-icon {
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
             animation: sparkle 1.5s ease-in-out infinite;
         }
 
-        @@keyframes sparkle {
+       @@keyframes sparkle {
             0%, 100% {
                 opacity: 1;
                 transform: scale(1);
@@ -830,7 +753,7 @@
             margin: 0 auto;
         }
 
-        /* Awards Carousel */
+        /* Awards Carousel - IMPROVED HEIGHT MANAGEMENT */
         .awards-carousel-container {
             position: relative;
             width: 100%;
@@ -849,8 +772,9 @@
         .award-image {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             flex-shrink: 0;
+            background: #f8f9fa;
         }
 
         .carousel-controls {
@@ -924,7 +848,7 @@
         }
 
         .award-property-name {
-            font-size: 1.8rem;
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
             color: #333;
             margin-bottom: 1.5rem;
             font-weight: 700;
@@ -936,7 +860,7 @@
         }
 
         .award-message .lead {
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 2vw, 1.1rem);
             line-height: 1.8;
             margin-bottom: 2rem;
         }
@@ -959,55 +883,59 @@
             align-items: center;
             gap: 1rem;
             padding: 0.75rem 0;
-            font-size: 1.05rem;
+            font-size: clamp(0.95rem, 2vw, 1.05rem);
             color: #333;
             font-weight: 500;
         }
 
         .feature-icon {
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
             flex-shrink: 0;
         }
 
-        /* Awards Section Responsive */
-        @@media (max-width: 991px) {
-            .awards-title {
-                font-size: 2rem;
+        /* Awards Section Responsive - IMPROVED */
+       @@media (max-width: 991px) {
+            .awards-section {
+                padding: 3rem 1.5rem;
             }
 
-            .award-subtitle {
-                font-size: 1.1rem;
+            .awards-carousel-container {
+                height: 400px;
+                margin-bottom: 2rem;
+            }
+
+            .award-image {
+                object-fit: contain;
+            }
+
+            .carousel-btn {
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+       @@media (max-width: 767px) {
+            .awards-section {
+                padding: 2.5rem 1rem;
+                margin-bottom: 3rem;
+            }
+
+            .awards-header {
+                margin-bottom: 2rem;
+            }
+
+            .award-badge {
+                gap: 1rem;
             }
 
             .awards-carousel-container {
                 height: 350px;
-                margin-bottom: 2rem;
+                border-radius: 15px;
             }
 
-            .award-property-name {
-                font-size: 1.5rem;
-            }
-        }
-
-        @@media (max-width: 767px) {
-            .awards-section {
-                padding: 3rem 1rem;
-            }
-
-            .trophy-icon {
-                font-size: 2rem;
-            }
-
-            .awards-title {
-                font-size: 1.5rem;
-            }
-
-            .award-subtitle {
-                font-size: 1rem;
-            }
-
-            .awards-carousel-container {
-                height: 300px;
+            .award-image {
+                object-fit: contain;
+                padding: 1rem;
             }
 
             .carousel-btn {
@@ -1019,39 +947,21 @@
                 font-size: 1rem;
             }
 
+            .carousel-controls {
+                padding: 0 0.5rem;
+            }
+
+            .indicator-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .indicator-dot.active {
+                width: 25px;
+            }
+
             .award-description {
                 padding: 1.5rem;
-            }
-
-            .award-property-name {
-                font-size: 1.3rem;
-            }
-
-            .award-message .lead {
-                font-size: 1rem;
-            }
-
-            .award-features li {
-                font-size: 0.95rem;
-            }
-
-            .feature-icon {
-                font-size: 1.2rem;
-            }
-        }
-
-        @@media (max-width: 480px) {
-            .award-badge {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .awards-title {
-                font-size: 1.2rem;
-            }
-
-            .awards-carousel-container {
-                height: 250px;
             }
 
             .recognition-list {
@@ -1059,15 +969,64 @@
             }
         }
 
+       @@media (max-width: 480px) {
+            .awards-section {
+                padding: 2rem 0.75rem;
+            }
+
+            .award-badge {
+                gap: 0.75rem;
+            }
+
+            .awards-carousel-container {
+                height: 300px;
+                border-radius: 12px;
+            }
+
+            .award-image {
+                padding: 0.75rem;
+            }
+
+            .carousel-btn {
+                width: 35px;
+                height: 35px;
+            }
+
+            .carousel-btn i {
+                font-size: 0.9rem;
+            }
+
+            .award-description {
+                padding: 1.25rem;
+            }
+
+            .recognition-list {
+                padding: 1.25rem;
+            }
+
+            .indicator-dot {
+                width: 8px;
+                height: 8px;
+                gap: 8px;
+            }
+
+            .indicator-dot.active {
+                width: 20px;
+            }
+        }
+
         /* Features */
         .features {
             background: #f8f9fa;
+            padding: 3rem 2rem;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .feature-card {
@@ -1078,7 +1037,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
 
-        .feature-icon {
+        .feature-card .feature-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
         }
@@ -1127,13 +1086,18 @@
             background: #333;
             color: white;
             text-align: center;
-            padding: 3rem 0;
+            padding: 3rem 1rem;
         }
 
         .footer-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 2rem;
+            padding: 0 1rem;
+        }
+
+        .footer-content p {
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
         }
 
         .footer-links {
@@ -1141,6 +1105,7 @@
             justify-content: center;
             gap: 2rem;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
 
         .footer-links a {
@@ -1164,7 +1129,7 @@
 
         .modal-title {
             font-weight: 600;
-            font-size: 1.25rem;
+            font-size: clamp(1.1rem, 2.5vw, 1.25rem);
         }
 
         .btn-close {
@@ -1182,13 +1147,14 @@
             font-weight: 600;
             color: #495057;
             margin-bottom: 1rem;
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 2vw, 1.1rem);
         }
 
         .form-label {
             font-weight: 500;
             color: #495057;
             margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .form-control {
@@ -1196,6 +1162,7 @@
             border-radius: 8px;
             padding: 0.75rem;
             transition: border-color 0.3s;
+            font-size: 0.95rem;
         }
 
         .form-control:focus {
@@ -1211,7 +1178,7 @@
         }
 
         .price-display {
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
             font-weight: bold;
             color: #667eea;
             text-align: center;
@@ -1339,7 +1306,6 @@
             border-color: #6c757d !important;
         }
 
-        /* Additional CSS for better price display */
         .booking-detail-item {
             display: flex;
             justify-content: space-between;
@@ -1375,7 +1341,6 @@
             color: #28a745;
         }
 
-        /* Badge styling for Indian Rupees */
         .badge.bg-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         }
@@ -1384,7 +1349,6 @@
             background: #6c757d !important;
         }
 
-        /* Price highlight in booking summary */
         .total-price-highlight {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
@@ -1392,44 +1356,60 @@
             border-radius: 10px;
             text-align: center;
             margin: 1rem 0;
-            font-size: 1.25rem;
+            font-size: clamp(1.1rem, 2.5vw, 1.25rem);
             font-weight: bold;
         }
 
-        /* Room selection pricing */
         .room-selection-price {
             font-size: 0.9rem;
             color: #28a745;
             font-weight: 600;
         }
 
-        /* Mobile responsive */
-        @@media (max-width: 768px) {
+        .invalid-feedback {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .character-count {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        /* Mobile responsive - IMPROVED */
+       @@media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
             
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero {
-                height: 40%;
-            }
-
-            .nav-links {
-                display: none;
+            .booking-form {
+                padding: 1.5rem;
+                margin: -30px 1rem 2rem;
+                width: calc(100% - 2rem);
             }
 
             .notification {
-                left: 20px;
-                right: 20px;
+                left: 10px;
+                right: 10px;
                 max-width: none;
+                padding: 0.875rem 1rem;
+                font-size: 0.9rem;
             }
 
             .price-display {
-                font-size: 1.2rem;
                 padding: 0.75rem;
             }
             
@@ -1442,9 +1422,54 @@
                 min-width: auto;
                 margin-bottom: 0.25rem;
             }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            .form-section {
+                padding: 0.875rem;
+            }
+
+            .features {
+                padding: 2rem 1rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
         }
 
- /* Calendar Styles - Updated to match website theme */
+       @@media (max-width: 480px) {
+            .booking-form {
+                padding: 1.25rem;
+                margin: -20px 0.75rem 1.5rem;
+                width: calc(100% - 1.5rem);
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+            }
+
+            .form-group select,
+            .form-group input {
+                padding: 0.7rem;
+                font-size: 0.9rem;
+            }
+
+            .search-btn {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.95rem;
+            }
+
+            .notification {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+            }
+        }
+
+ /* Calendar Styles - IMPROVED MOBILE */
 .calendar-container {
     background: white;
     padding: 2rem;
@@ -1468,7 +1493,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-size: 1.8rem;
+    font-size: clamp(1.5rem, 3vw, 1.8rem);
     font-weight: 600;
     margin: 0;
 }
@@ -1476,10 +1501,9 @@
 .calendar-header p {
     color: #6c757d;
     margin: 0.5rem 0 0 0;
-    font-size: 0.95rem;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
 }
 
-/* FullCalendar custom styles */
 .fc {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -1490,7 +1514,7 @@
 }
 
 .fc-toolbar-title {
-    font-size: 1.5rem !important;
+    font-size: clamp(1.2rem, 3vw, 1.5rem) !important;
     font-weight: 600 !important;
     color: #495057 !important;
 }
@@ -1522,7 +1546,6 @@
     box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
 }
 
-/* Calendar day cells */
 .fc-daygrid-day {
     position: relative;
     border: 1px solid #dee2e6 !important;
@@ -1536,7 +1559,6 @@
     z-index: 10;
 }
 
-/* Available dates - White background */
 .fc-daygrid-day.available {
     background-color: #ffffff !important;
     border-color: #e9ecef !important;
@@ -1546,7 +1568,6 @@
     background-color: #f8f9fa !important;
 }
 
-/* Booked dates - Gray background matching your website */
 .fc-daygrid-day.booked {
     background-color: #6c757d !important;
     border-color: #495057 !important;
@@ -1556,7 +1577,6 @@
     background-color: #5a6268 !important;
 }
 
-/* Day number styling */
 .fc-daygrid-day-number {
     padding: 4px 6px;
     font-weight: 500;
@@ -1572,7 +1592,6 @@
     font-weight: 600;
 }
 
-/* Today highlighting */
 .fc-day-today.available {
     background-color: #e3f2fd !important;
     border-color: #667eea !important;
@@ -1588,7 +1607,6 @@
     border-color: #343a40 !important;
 }
 
-/* Past dates styling */
 .fc-day-past.available {
     background-color: #f8f9fa !important;
     opacity: 0.6;
@@ -1598,7 +1616,6 @@
     color: #adb5bd;
 }
 
-/* Header row styling */
 .fc-col-header-cell {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-color: #dee2e6 !important;
@@ -1613,7 +1630,6 @@
     text-decoration: none;
 }
 
-/* Legend - Updated to match theme */
 .calendar-legend {
     display: flex;
     justify-content: center;
@@ -1628,7 +1644,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2vw, 1rem);
     color: #495057;
     font-weight: 500;
 }
@@ -1651,7 +1667,6 @@
     border-color: #495057;
 }
 
-/* Month view specific adjustments */
 .fc-daygrid {
     border: 1px solid #dee2e6;
     border-radius: 10px;
@@ -1659,7 +1674,6 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-/* Scrollbar styling for calendar */
 .fc-scroller::-webkit-scrollbar {
     width: 6px;
 }
@@ -1674,19 +1688,16 @@
     border-radius: 10px;
 }
 
-/* Mobile responsive for calendar */
+/* Mobile responsive for calendar - IMPROVED */
 @@media (max-width: 768px) {
     .calendar-container {
         margin: 1rem;
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
     }
     
     .calendar-header {
         margin-bottom: 1rem;
-    }
-    
-    .calendar-title {
-        font-size: 1.5rem;
+        padding-bottom: 0.75rem;
     }
     
     .calendar-legend {
@@ -1698,11 +1709,12 @@
         flex-direction: column;
         gap: 1rem;
         text-align: center;
+        margin-bottom: 1rem;
     }
     
     .fc-toolbar-title {
-        font-size: 1.2rem !important;
         order: 1;
+        margin: 0.5rem 0;
     }
     
     .fc-toolbar-chunk:first-child {
@@ -1712,19 +1724,27 @@
     .fc-toolbar-chunk:last-child {
         order: 3;
     }
-    
-    .legend-item {
-        font-size: 0.9rem;
+
+    .fc-button {
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.875rem !important;
     }
     
     .fc-daygrid-day-number {
         font-size: 0.8rem;
+        padding: 2px 4px;
+    }
+
+    .fc-col-header-cell {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.85rem;
     }
 }
 
 @@media (max-width: 480px) {
     .calendar-container {
-        padding: 1rem;
+        padding: 1rem 0.75rem;
+        margin: 0.75rem;
     }
     
     .calendar-legend {
@@ -1733,15 +1753,36 @@
         align-items: center;
     }
     
+    .legend-item {
+        font-size: 0.9rem;
+    }
+
+    .legend-color {
+        width: 18px;
+        height: 18px;
+    }
+
     .fc-button {
-        padding: 0.4rem 0.8rem !important;
-        font-size: 0.875rem !important;
+        padding: 0.35rem 0.7rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.1rem !important;
+    }
+
+    .fc-daygrid-day-number {
+        font-size: 0.75rem;
+    }
+
+    .fc-col-header-cell {
+        padding: 0.4rem 0.2rem;
+        font-size: 0.75rem;
     }
 }
 
-/* Booking info display on calendar */
 .booking-info {
-    pointer-events: none; /* Don't interfere with calendar interactions */
+    pointer-events: none;
     line-height: 1.2;
 }
 
@@ -1754,19 +1795,16 @@
     to { opacity: 1; }
 }
 
-/* Ensure proper positioning for booking info */
 .fc-daygrid-day {
     position: relative !important;
 }
 
-/* Improve hover effect for booked dates */
 .fc-daygrid-day.booked:hover .booking-info {
     background: rgba(73, 80, 87, 0.95) !important;
     transform: scale(1.05);
     transition: all 0.2s ease;
 }
 
-/* Mobile responsive booking info */
 @@media (max-width: 768px) {
     .booking-info {
         font-size: 8px !important;
@@ -1774,72 +1812,42 @@
     }
 }
 
-    /* Past dates styling */
-    .fc-daygrid-day.past-date {
-        background-color: #f8f9fa !important;
-        opacity: 0.5;
-        border-color: #dee2e6 !important;
-    }
+.fc-daygrid-day.past-date {
+    background-color: #f8f9fa !important;
+    opacity: 0.5;
+    border-color: #dee2e6 !important;
+}
 
-        .fc-daygrid-day.past-date .fc-daygrid-day-number {
-            color: #adb5bd !important;
-            font-weight: 400;
-        }
+.fc-daygrid-day.past-date .fc-daygrid-day-number {
+    color: #adb5bd !important;
+    font-weight: 400;
+}
 
-        .fc-daygrid-day.past-date:hover {
-            background-color: #f8f9fa !important;
-            border-color: #dee2e6 !important;
-            box-shadow: none !important;
-            transform: none !important;
-        }
+.fc-daygrid-day.past-date:hover {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
 
-    /* Ensure today's date is clearly visible */
-    .fc-day-today {
-        border-color: #667eea !important;
-        box-shadow: inset 0 0 0 2px #667eea;
-    }
+.fc-day-today {
+    border-color: #667eea !important;
+    box-shadow: inset 0 0 0 2px #667eea;
+}
 
-        .fc-day-today.available {
-            background-color: #e3f2fd !important;
-        }
+.fc-day-today.available {
+    background-color: #e3f2fd !important;
+}
 
-        .fc-day-today.booked {
-            background-color: #495057 !important;
-            border-color: #343a40 !important;
-        }
+.fc-day-today.booked {
+    background-color: #495057 !important;
+    border-color: #343a40 !important;
+}
 
-        .fc-day-today .fc-daygrid-day-number {
-            color: #667eea !important;
-            font-weight: 700 !important;
-        }
-
-    .invalid-feedback {
-        display: block;
-        background: #f8d7da;
-        color: #721c24;
-        padding: 0.5rem;
-        border-radius: 4px;
-        border: 1px solid #f5c6cb;
-        margin-top: 0.25rem;
-        font-size: 0.875rem;
-    }
-
-    .form-control.is-invalid, .form-select.is-invalid {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-    }
-
-    .character-count {
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin-top: 0.25rem;
-    }
-
-    .file-upload-label.has-file {
-        border-color: #28a745;
-        background: #d4edda;
-        border-style: solid;
-    }
+.fc-day-today .fc-daygrid-day-number {
+    color: #667eea !important;
+    font-weight: 700 !important;
+}
     </style>
     <!-- Header -->
 <header class="header">
@@ -1912,7 +1920,7 @@
                 <label for="property">Select Property</label>
                 <select id="property" name="property">
                     <option value="">Select a Property</option>
-                    @foreach (var home in Model.Homes)
+                   @foreach (var home in Model.Homes)
                     {
                         <option value="@home.Id">@home.Name</option>
                     }
