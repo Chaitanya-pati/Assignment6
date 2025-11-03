@@ -299,7 +299,7 @@
 }
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
+        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
             background-size: cover;
             background-position: center;
             height: 50%;
@@ -480,8 +480,8 @@
 
 .section-title {
     text-align: center;
-    font-size: 2rem;
-    color: #333;
+    font-size: 10rem;
+    color: black;
     margin-bottom: 1.5rem;
 }
 
@@ -750,6 +750,315 @@
         transform: scale(0.98);
     }
 }
+
+        /* Awards Section Styles */
+        .awards-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);
+            padding: 4rem 2rem;
+            margin-bottom: 4rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .awards-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .award-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .trophy-icon {
+            font-size: 3rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @@keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .awards-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .award-subtitle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            font-size: 1.3rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .star-icon {
+            font-size: 1.5rem;
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        @@keyframes sparkle {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1.2);
+            }
+        }
+
+        .awards-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Awards Carousel */
+        .awards-carousel-container {
+            position: relative;
+            width: 100%;
+            height: 650px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .awards-carousel-images {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .award-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 1rem;
+            z-index: 10;
+        }
+
+        .carousel-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .carousel-btn i {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: white;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        /* Award Description */
+        .award-description {
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            height: 100%;
+        }
+
+        .award-property-name {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .award-message {
+            color: #555;
+        }
+
+        .award-message .lead {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .recognition-list {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .award-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .award-features li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            font-size: 1.05rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        /* Awards Section Responsive */
+        @@media (max-width: 991px) {
+            .awards-title {
+                font-size: 2rem;
+            }
+
+            .award-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .awards-carousel-container {
+                height: 350px;
+                margin-bottom: 2rem;
+            }
+
+            .award-property-name {
+                font-size: 1.5rem;
+            }
+        }
+
+        @@media (max-width: 767px) {
+            .awards-section {
+                padding: 3rem 1rem;
+            }
+
+            .trophy-icon {
+                font-size: 2rem;
+            }
+
+            .awards-title {
+                font-size: 1.5rem;
+            }
+
+            .award-subtitle {
+                font-size: 1rem;
+            }
+
+            .awards-carousel-container {
+                height: 300px;
+            }
+
+            .carousel-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            .carousel-btn i {
+                font-size: 1rem;
+            }
+
+            .award-description {
+                padding: 1.5rem;
+            }
+
+            .award-property-name {
+                font-size: 1.3rem;
+            }
+
+            .award-message .lead {
+                font-size: 1rem;
+            }
+
+            .award-features li {
+                font-size: 0.95rem;
+            }
+
+            .feature-icon {
+                font-size: 1.2rem;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .award-badge {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .awards-title {
+                font-size: 1.2rem;
+            }
+
+            .awards-carousel-container {
+                height: 250px;
+            }
+
+            .recognition-list {
+                padding: 1.5rem;
+            }
+        }
+
         /* Features */
         .features {
             background: #f8f9fa;
@@ -1548,6 +1857,7 @@
         <!-- Navigation Links -->
         <ul class="nav-links" id="navLinks">
             <li><a href="#rooms">Rooms</a></li>
+            <li><a href="#awards">Awards</a></li>
             <li><a href="#features">Features</a></li>
             <li><a href="#testimonials">Reviews</a></li>
             <li><a href="#contact">Contact</a></li>
@@ -1623,8 +1933,8 @@
     </div>
 
     <!-- Rooms Section -->
-<section class="section">
-    <h2 class="section-title">Welcome to Radha Stays</h2>
+<section class="section" style="padding:10px;">
+    <h2 class="section-title" style="font-size:3.1rem;">Our Beutiful Rooms</h2>
     <p class="section-subtitle">Experience Comfort & Luxury</p>
 
     <div class="common-area-grid">
@@ -1791,6 +2101,76 @@
         </div>
     </div>
 </section>
+
+    <!-- Awards Section -->
+    <section id="awards" class="section awards-section">
+        <div class="awards-header">
+            <div class="award-badge">
+                <span class="trophy-icon">🏆</span>
+                <h2 class="awards-title">BRAND OF INDIA 2025</h2>
+                <span class="trophy-icon">🏆</span>
+            </div>
+            <div class="award-subtitle">
+                <span class="star-icon">✨</span>
+                <span>Excellence in Indian Hospitality</span>
+                <span class="star-icon">✨</span>
+            </div>
+        </div>
+
+        <div class="awards-content">
+            <div class="row align-items-center">
+                <!-- Award Images Carousel -->
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="awards-carousel-container">
+                        <div class="awards-carousel-images">
+                            <img src="~/Images/Awards/award1.jpg" alt="Brand of India Award 2025" class="award-image">
+                            <img src="~/Images/Awards/award2.jpg" alt="Excellence Award" class="award-image">
+                            <img src="~/Images/Awards/award3.jpg" alt="Hospitality Recognition" class="award-image">
+                            <img src="~/Images/Awards/award4.jpg" alt="Heritage Homestay Award" class="award-image">
+                        </div>
+                        <div class="carousel-controls">
+                            <button class="carousel-btn prev-btn" onclick="moveAwardSlide(-1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="carousel-btn next-btn" onclick="moveAwardSlide(1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="carousel-indicators" id="awardIndicators"></div>
+                    </div>
+                </div>
+
+                <!-- Award Description -->
+                <div class="col-lg-6">
+                    <div class="award-description">
+                        <h3 class="award-property-name">Vernekar's<br>RADHA CLASSIC HERITAGE HOMESTAY<br>Belagavi, Karnataka</h3>
+                        
+                        <div class="award-message">
+                            <p class="lead">We are proud to share that <strong>Radha Classic Heritage</strong> has been honoured as the <strong>Best Homestay – 2025</strong> under the prestigious Brand of India Awards!</p>
+                            
+                            <div class="recognition-list">
+                                <p class="mb-3">This recognition celebrates our unwavering commitment to:</p>
+                                <ul class="award-features">
+                                    <li>
+                                        <span class="feature-icon">🌟</span>
+                                        <span>Exceptional Hospitality</span>
+                                    </li>
+                                    <li>
+                                        <span class="feature-icon">🌟</span>
+                                        <span>Impeccable Customer Service</span>
+                                    </li>
+                                    <li>
+                                        <span class="feature-icon">🌟</span>
+                                        <span>Luxurious Ambience with a Heritage Touch</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Features Section -->
     <section id="features" class="section features">
@@ -2022,7 +2402,67 @@
         
         // Initialize validation
         initializeWebsiteValidation();
+        
+        // Initialize awards carousel
+        initializeAwardsCarousel();
     });
+
+
+    // Awards Carousel Functionality
+    let currentAwardSlide = 0;
+    const awardImages = document.querySelectorAll('.awards-carousel-images .award-image');
+    const totalAwardSlides = awardImages ? awardImages.length : 0;
+
+    function initializeAwardsCarousel() {
+        if (totalAwardSlides === 0) return;
+        
+        // Create indicators
+        const indicatorsContainer = document.getElementById('awardIndicators');
+        if (indicatorsContainer) {
+            for (let i = 0; i < totalAwardSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = `indicator-dot ${i === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToAwardSlide(i);
+                indicatorsContainer.appendChild(dot);
+            }
+        }
+        
+        // Auto-advance every 5 seconds
+        setInterval(() => {
+            moveAwardSlide(1);
+        }, 5000);
+    }
+
+    function moveAwardSlide(direction) {
+        currentAwardSlide += direction;
+        
+        if (currentAwardSlide >= totalAwardSlides) {
+            currentAwardSlide = 0;
+        } else if (currentAwardSlide < 0) {
+            currentAwardSlide = totalAwardSlides - 1;
+        }
+        
+        updateAwardCarousel();
+    }
+
+    function goToAwardSlide(index) {
+        currentAwardSlide = index;
+        updateAwardCarousel();
+    }
+
+    function updateAwardCarousel() {
+        const carouselImages = document.querySelector('.awards-carousel-images');
+        if (carouselImages) {
+            const offset = -currentAwardSlide * 100;
+            carouselImages.style.transform = `translateX(${offset}%)`;
+        }
+        
+        // Update indicators
+        const indicators = document.querySelectorAll('.indicator-dot');
+        indicators.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentAwardSlide);
+        });
+    }
 
     /// Fixed Calendar Implementation
     var calendarEl = document.getElementById('websiteCalendar');
@@ -2669,7 +3109,7 @@
             return false;
         }
         
-        const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$$/;
+        const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
         if (!emailRegex.test(email)) {
             showValidationMessage('CustomerEmail', 'Please enter a valid email address');
             return false;
