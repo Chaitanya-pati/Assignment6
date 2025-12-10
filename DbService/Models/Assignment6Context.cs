@@ -35,6 +35,7 @@ public partial class Assignment6Context : DbContext
             entity.Property(e => e.BookingDateTo).HasColumnType("datetime");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Bookings__Create__4316F928")
                 .HasColumnType("datetime");
             entity.Property(e => e.CustomerEmail).HasMaxLength(100);
             entity.Property(e => e.CustomerName)
@@ -45,8 +46,11 @@ public partial class Assignment6Context : DbContext
                 .HasMaxLength(20);
             entity.Property(e => e.Document)
                 .IsRequired()
-                .HasDefaultValue("");
-            entity.Property(e => e.GuestNumbers).HasColumnName("Guest_Numbers");
+                .HasDefaultValue("")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Bookings__Docume__778AC167");
+            entity.Property(e => e.GuestNumbers)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Bookings__Guest___76969D2E")
+                .HasColumnName("Guest_Numbers");
             entity.Property(e => e.IsBooked).HasColumnName("isBooked");
             entity.Property(e => e.PaymentStatus)
                 .IsRequired()

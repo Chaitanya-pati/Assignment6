@@ -37,6 +37,8 @@ public partial class Booking
 
     public bool CheckOut { get; set; }
 
+    public long? AdvancePrice { get; set; }
+
     public virtual ICollection<BookingRoom> BookingRooms { get; set; } = new List<BookingRoom>();
 
     public virtual Home Home { get; set; }
