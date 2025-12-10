@@ -689,5 +689,20 @@ namespace DbService.Implementation
             }
             return model;
         }
+
+        public string GetRoomDetailsByRoomId(int roomId)
+        {
+            try
+            {
+                using (var db = new Assignment6Context(_dbconnection))
+                {
+                    return db.Rooms.Where(x => x.Id == roomId).Select(y => y.Name).FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }

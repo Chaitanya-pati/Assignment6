@@ -1203,6 +1203,12 @@ namespace Assignment6.Controllers
                 return Json(new { success = false, message = "An unexpected error occurred" });
             }
         }
+
+        public IActionResult GetRoomDetailsById(int roomId)
+        {
+            string name = _bookingService.GetRoomDetailsByRoomId(roomId);
+            return Json(name);
+        }
     }
 
 

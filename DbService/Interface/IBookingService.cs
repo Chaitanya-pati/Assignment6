@@ -37,7 +37,7 @@ namespace DbService.Interface
         Task<int> SyncAirbnbBookings(IList<Ical.Net.CalendarComponents.CalendarEvent> calendarEvents, int homeId);
         // Optional: Method to clean up old Airbnb bookings that are no longer in the calendar
         Task<int> CleanupOldAirbnbBookings(int homeId, DateTime cutoffDate);
-
+        public string GetRoomDetailsByRoomId(int roomId);
     }
 
 }

@@ -4,1005 +4,182 @@
     ViewData["Title"] = "Website";
     Layout = "";
 }
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
-
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    html, body { 
-        overflow-x: hidden; 
-        width: 100%;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        overflow-x: hidden;
-    }
-
-    /* ===== PERFORMANCE OPTIMIZATIONS ===== */
-    img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        loading: lazy;
-    }
-
-    .carousel-images img,
-    .award-image {
-        object-fit: contain;
-        will-change: transform;
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-        loading: lazy;
-    }
-
-    /* Smooth image rendering */
-    img, .carousel-images img, .award-image {
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
-        filter: contrast(1.05) brightness(1.02) saturate(1.03);
-        transition: filter 0.2s ease;
-    }
-
-    /* ===== RESPONSIVE TYPOGRAPHY ===== */
-    h1, h2, h3, .floor-title, .section-title {
-        font-size: clamp(1.1rem, 4vw, 3rem);
-        word-wrap: break-word;
-    }
-
-    /* ===== RESPONSIVE CONTAINERS ===== */
-    .section, .category-card, .card-content, .hero-content {
-        width: 100%;
-        max-width: 100vw;
-        padding-left: min(5vw, 20px);
-        padding-right: min(5vw, 20px);
-    }
-
-    /* ===== HEADER ===== */
-    .header {
-        background: transparent !important;
-        color: #000;
-        top: 0;
-        z-index: 1000;
-        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-    }
-
-    .nav {
-        max-width: 100%;
-        margin: 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: clamp(0.75rem, 2vw, 1rem) clamp(0.5rem, 3vw, 2rem);
-        width: 100%;
-        position: relative;
-    }
-
-    .logo {
-        font-size: clamp(1.3rem, 4vw, 2rem);
-        font-weight: bold;
-        text-decoration: none;
-        color: #000;
-        z-index: 1001;
-        white-space: nowrap;
-    }
-
-    .nav-links {
-        display: flex;
-        list-style: none;
-        gap: clamp(1rem, 3vw, 2rem);
-        margin: 0;
-        padding: 0;
-        transition: all 0.3s ease;
-    }
-
-    .nav-links a {
-        color: #000;
-        text-decoration: none;
-        font-weight: 500;
-        transition: opacity 0.3s;
-        padding: 0.5rem 0;
-        font-size: clamp(0.9rem, 2vw, 1rem);
-    }
-
-    .nav-links a:hover {
-        opacity: 0.8;
-    }
-
-    /* Hamburger Menu Icon */
-    .hamburger {
-        display: none;
-        flex-direction: column;
-        cursor: pointer;
-        z-index: 1001;
-        background: none;
-        border: none;
-        padding: 0.5rem;
-        position: relative;
-    }
-
-    .hamburger span {
-        width: 25px;
-        height: 3px;
-        background: white;
-        margin: 3px 0;
-        transition: all 0.3s ease;
-        transform-origin: center;
-        display: block;
-    }
-
-    .hamburger.active span:nth-child(1) {
-        transform: rotate(45deg) translate(8px, 8px);
-    }
-
-    .hamburger.active span:nth-child(2) {
-        opacity: 0;
-    }
-
-    .hamburger.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(8px, -8px);
-    }
-
-    /* Overlay for mobile menu */
-    .nav-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: rgba(0,0,0,0.5);
-        z-index: 998;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-    }
-
-    .nav-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    @@media (min-width: 769px) {
-        .hamburger {
-            display: none !important;
-        }
-        .nav-links {
-            display: flex !important;
-            position: static !important;
-            height: auto !important;
-            width: auto !important;
-            background: transparent !important;
-            flex-direction: row !important;
-            padding: 0 !important;
-            box-shadow: none !important;
-            right: auto !important;
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .nav {
-            padding: clamp(0.5rem, 2vw, 1rem) clamp(0.5rem, 2vw, 1rem);
-        }
-
-        .logo {
-            font-size: clamp(1.1rem, 3.5vw, 1.5rem);
-        }
-
-        .hamburger {
-            display: flex;
-        }
-
-        .nav-links {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            height: 100vh;
-            width: 100%;
-            max-width: 300px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            padding-top: 80px;
-            gap: 2rem;
-            transition: right 0.3s ease;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-        }
-
-        .nav-links.active {
-            right: 0;
-        }
-
-        .nav-links li {
-            width: 100%;
-            text-align: center;
-        }
-
-        .nav-links a {
-            display: block;
-            padding: 1rem 2rem;
-            font-size: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            width: 100%;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .nav-links a:hover {
-            background: rgba(255,255,255,0.1);
-            opacity: 1;
-        }
-    }
-
-    /* Hero Section */
-    .hero {
-        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
-        background-size: cover;
-        background-position: center;
-        height: clamp(300px, 50vh, 600px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        color: white;
-        position: relative;
-    }
-
-    .hero-content h1 {
-        font-size: clamp(1.5rem, 5vw, 3.5rem);
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-
-    .hero-content p {
-        font-size: clamp(1rem, 3vw, 1.2rem);
-        margin-bottom: 2rem;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-
-    /* Booking Form */
-    .booking-form {
-        background: white;
-        padding: clamp(1.5rem, 4vw, 2rem);
-        border-radius: 15px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        max-width: 1000px;
-        margin: -50px auto 2rem;
-        position: relative;
-        z-index: 100;
-        width: 90%;
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: clamp(0.75rem, 2vw, 1.5rem);
-        align-items: end;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .form-group label {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #555;
-        font-size: clamp(0.85rem, 2vw, 1rem);
-    }
-
-    .form-group select,
-    .form-group input {
-        padding: clamp(0.6rem, 1.5vw, 0.8rem);
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: clamp(0.85rem, 2vw, 1rem);
-        transition: border-color 0.3s;
-    }
-
-    .form-group select:focus,
-    .form-group input:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-
-    .search-btn {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: clamp(0.6rem, 1.5vw, 0.8rem) clamp(1rem, 3vw, 2rem);
-        border-radius: 8px;
-        font-size: clamp(0.85rem, 2vw, 1rem);
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.3s, box-shadow 0.3s;
-        white-space: nowrap;
-    }
-
-    .search-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    @@media (max-width: 768px) {
-        .form-row {
-            grid-template-columns: 1fr;
-        }
-        .booking-form {
-            margin: -40px 1rem 2rem 1rem;
-            padding: 1.5rem 1rem;
-        }
-    }
-
-    /* ===== AWARDS SECTION - MOBILE RESPONSIVE ===== */
-    .awards-section {
-        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);
-        padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem);
-        margin-bottom: 4rem;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-    }
-
-    .awards-header {
-        text-align: center;
-        margin-bottom: clamp(1.5rem, 3vw, 3rem);
-    }
-
-    .award-badge {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: clamp(0.75rem, 2vw, 1.5rem);
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-    }
-
-    .trophy-icon {
-        font-size: clamp(1.5rem, 4vw, 3rem);
-        animation: bounce 2s ease-in-out infinite;
-    }
-
-    @@keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
-
-    .awards-title {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-size: clamp(1.3rem, 4vw, 2.5rem);
-        font-weight: 700;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        word-wrap: break-word;
-    }
-
-    .award-subtitle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        font-size: clamp(0.9rem, 3vw, 1.3rem);
-        color: #667eea;
-        font-weight: 600;
-        flex-wrap: wrap;
-    }
-
-    .star-icon {
-        font-size: clamp(1rem, 3vw, 1.5rem);
-        animation: sparkle 1.5s ease-in-out infinite;
-    }
-
-    @@keyframes sparkle {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.6; transform: scale(1.2); }
-    }
-
-    .awards-content {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    /* ===== AWARDS CAROUSEL - OPTIMIZED FOR MOBILE ===== */
-    .awards-carousel-container {
-        position: relative;
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16 / 9;
-        min-height: 200px;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.2);
-        margin-bottom: 2rem;
-    }
-
-    @@media (max-width: 1200px) {
-        .awards-carousel-container {
-            aspect-ratio: 4 / 3;
-            min-height: 250px;
-        }
-    }
-
-    @@media (max-width: 992px) {
-        .awards-carousel-container {
-            aspect-ratio: 1 / 1;
-            min-height: 300px;
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .awards-carousel-container {
-            aspect-ratio: 4 / 5;
-            min-height: 280px;
-        }
-    }
-
-    @@media (max-width: 480px) {
-        .awards-carousel-container {
-            aspect-ratio: 3 / 4;
-            min-height: 220px;
-            border-radius: 15px;
-        }
-    }
-
-    @@media (max-width: 360px) {
-        .awards-carousel-container {
-            aspect-ratio: 9 / 12;
-            min-height: 180px;
-        }
-    }
-
-    .awards-carousel-images {
-        display: flex;
-        height: 100%;
-        width: 100%;
-        transition: transform 0.5s cubic-bezier(.5,1.5,.5,1.05);
-        will-change: transform;
-    }
-
-    .award-image {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        background: #fafafc;
-        flex-shrink: 0;
-        display: block;
-        loading: lazy;
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
-        backface-visibility: hidden;
-    }
-
-    .carousel-controls {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        padding: clamp(0.5rem, 2vw, 1rem);
-        z-index: 10;
-    }
-
-    .carousel-btn {
-        background: rgba(255, 255, 255, 0.9);
-        border: none;
-        width: clamp(35px, 8vw, 50px);
-        height: clamp(35px, 8vw, 50px);
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        min-width: 35px;
-        min-height: 35px;
-    }
-
-    .carousel-btn:hover {
-        background: white;
-        transform: scale(1.1);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-    }
-
-    .carousel-btn i {
-        color: #667eea;
-        font-size: clamp(0.8rem, 2vw, 1.2rem);
-    }
-
-    .carousel-indicators {
-        position: absolute;
-        bottom: clamp(0.75rem, 2vw, 1.5rem);
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: clamp(0.5rem, 1.5vw, 0.75rem);
-        z-index: 10;
-    }
-
-    .indicator-dot {
-        width: clamp(8px, 1.5vw, 12px);
-        height: clamp(8px, 1.5vw, 12px);
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .indicator-dot.active {
-        background: white;
-        width: clamp(20px, 4vw, 30px);
-        border-radius: 6px;
-    }
-
-    .award-description {
-        padding: clamp(1.5rem, 3vw, 2rem);
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        height: 100%;
-    }
-
-    .award-property-name {
-        font-size: clamp(1.1rem, 3.5vw, 1.8rem);
-        color: #333;
-        margin-bottom: 1.5rem;
-        font-weight: 700;
-        line-height: 1.4;
-    }
-
-    .award-message .lead {
-        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-        line-height: 1.8;
-        margin-bottom: 2rem;
-    }
-
-    .recognition-list {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: clamp(1rem, 2vw, 2rem);
-        border-radius: 15px;
-        border-left: 4px solid #667eea;
-    }
-
-    .award-features {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .award-features li {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: clamp(0.5rem, 1vw, 0.75rem) 0;
-        font-size: clamp(0.9rem, 2vw, 1.05rem);
-        color: #333;
-        font-weight: 500;
-    }
-
-    .feature-icon {
-        font-size: clamp(1rem, 2vw, 1.5rem);
-        flex-shrink: 0;
-    }
-
-    @@media (max-width: 991px) {
-        .awards-title {
-            font-size: clamp(1.1rem, 3.5vw, 2rem);
-        }
-        .award-subtitle {
-            font-size: clamp(0.85rem, 2.5vw, 1.1rem);
-        }
-        .award-property-name {
-            font-size: clamp(1rem, 3vw, 1.5rem);
-        }
-    }
-
-    @@media (max-width: 767px) {
-        .awards-section {
-            padding: clamp(1.5rem, 3vw, 3rem) clamp(0.75rem, 2vw, 1rem);
-        }
-        .award-description {
-            padding: clamp(1rem, 2vw, 1.5rem);
-            margin-top: 1.5rem;
-        }
-        .award-property-name {
-            font-size: clamp(1rem, 3vw, 1.3rem);
-        }
-        .award-message .lead {
-            font-size: clamp(0.85rem, 2vw, 1rem);
-        }
-        .recognition-list {
-            padding: clamp(0.75rem, 1.5vw, 1.5rem);
-        }
-        .award-features li {
-            font-size: clamp(0.85rem, 1.8vw, 0.95rem);
-            padding: clamp(0.4rem, 0.8vw, 0.5rem) 0;
-        }
-    }
-
-    @@media (max-width: 480px) {
-        .awards-section {
-            padding: clamp(1.2rem, 2vw, 2rem) clamp(0.5rem, 1.5vw, 1rem);
-            margin-bottom: 2rem;
-        }
-        .award-badge {
-            gap: clamp(0.5rem, 1.5vw, 1rem);
-        }
-        .trophy-icon {
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
-        }
-        .awards-title {
-            font-size: clamp(1rem, 3vw, 1.5rem);
-            letter-spacing: 1px;
-        }
-        .award-subtitle {
-            font-size: clamp(0.8rem, 2vw, 1rem);
-        }
-        .award-description {
-            padding: clamp(0.75rem, 1.5vw, 1rem);
-        }
-        .award-property-name {
-            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
-        }
-    }
-
-    /* Category Cards */
-    .category-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: clamp(1rem, 2vw, 1.5rem);
-        margin-bottom: 2rem;
-    }
-
-    @@media (min-width: 1400px) {
-        .category-grid {
-            grid-template-columns: repeat(4, 1fr);
-        }
-    }
-
-    @@media (min-width: 1200px) and (max-width: 1399px) {
-        .category-grid {
-            grid-template-columns: repeat(4, 1fr);
-        }
-    }
-
-    @@media (min-width: 992px) and (max-width: 1199px) {
-        .category-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-
-    @@media (min-width: 768px) and (max-width: 991px) {
-        .category-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @@media (max-width: 767px) {
-        .category-grid {
-            grid-template-columns: 1fr !important;
-        }
-    }
-
-    .category-card {
-        background: white;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        width: 100%;
-    }
-
-    .category-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-    }
-
-    /* Image Carousel Container */
-    .carousel-container {
-        position: relative;
-        width: 100%;
-        height: clamp(180px, 50vw, 300px);
-        overflow: hidden;
-    }
-
-    @@media (max-width: 768px) {
-        .carousel-container {
-            height: clamp(150px, 60vw, 250px);
-        }
-    }
-
-    @@media (max-width: 480px) {
-        .carousel-container {
-            height: clamp(120px, 70vw, 200px);
-        }
-    }
-
-    .carousel-images {
-        display: flex;
-        height: 100%;
-        transition: transform 0.5s ease-in-out;
-    }
-
-    .carousel-images img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
-
-    .card-content {
-        padding: clamp(1rem, 2vw, 1.5rem);
-    }
-
-    .card-title {
-        font-size: clamp(1rem, 2.5vw, 1.2rem);
-        color: #333;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-    }
-
-    .card-description {
-        color: #666;
-        font-size: clamp(0.85rem, 2vw, 0.9rem);
-        line-height: 1.5;
-    }
-
-    /* Section Styles */
-    .section {
-        max-width: 1400px;
-        margin: 0 auto clamp(2rem, 4vw, 3rem) auto;
-        padding: clamp(1rem, 3vw, 2rem);
-    }
-
-    .section-title {
-        text-align: center;
-        font-size: clamp(1.5rem, 5vw, 3.1rem);
-        color: black;
-        margin-bottom: clamp(1rem, 2vw, 1.5rem);
-    }
-
-    .section-subtitle {
-        text-align: center;
-        font-size: clamp(0.85rem, 2vw, 1rem);
-        color: #666;
-        margin-bottom: clamp(1rem, 2vw, 2rem);
-    }
-
-    .floor-title {
-        font-size: clamp(1.2rem, 3.5vw, 1.8rem);
-        color: #333;
-        margin-bottom: clamp(1rem, 2vw, 2rem);
-        text-align: center;
-        padding: clamp(0.75rem, 1.5vw, 1rem);
-        background: #f8f9fa;
-        border-radius: 10px;
-    }
-
-    /* Features Section */
-    .features {
-        background: #f8f9fa;
-    }
-
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: clamp(1.5rem, 3vw, 2rem);
-    }
-
-    .feature-card {
-        text-align: center;
-        padding: clamp(1.5rem, 3vw, 2rem);
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    }
-
-    /* Testimonials */
-    .testimonials-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: clamp(1.5rem, 3vw, 2rem);
-    }
-
-    .testimonial-card {
-        background: white;
-        padding: clamp(1.5rem, 3vw, 2rem);
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        text-align: center;
-    }
-
-    /* Footer */
-    .footer {
-        background: #333;
-        color: white;
-        text-align: center;
-        padding: clamp(2rem, 4vw, 3rem) 1rem;
-    }
-
-    .footer-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 clamp(0.5rem, 2vw, 2rem);
-    }
-
-    /* Smooth scrolling */
-    html {
-        scroll-behavior: smooth;
-    }
-
-    /* Touch device optimization */
-    @@media (hover: none) and (pointer: coarse) {
-        .category-card:hover {
-            transform: none;
-        }
-        .category-card:active {
-            transform: scale(0.98);
-        }
-    }
-
-    /* Ultra small screens */
-    @@media (max-width: 320px) {
-        .section {
-            padding: 0.75rem;
-        }
-        .nav-links {
-            max-width: 280px;
-        }
-    }
-</style>
-
-<!-- REST OF YOUR CSHTML MARKUP REMAINS EXACTLY THE SAME - ONLY CSS WAS MODIFIED ABOVE -->
-<!-- Header and all other HTML markup continues as in your original file -->
-
-    <!-- Header -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vernekar's Radha Heritage Home Stay</title>
+    
+    <!-- CDN Links -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+   <link href="~/css/website-responsive.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ============================================
+     HEADER & NAVIGATION
+     ============================================ -->
 <header class="header">
-    <nav class="nav">
-        <a href="#" class="logo">
-            🏠 Vernekar's Radha Heritage Home Stay
+    <div class="nav-container">
+        <!-- Logo with Font Awesome Icon -->
+        <a href="#home" class="logo">
+            <i class="fas fa-home logo-icon"></i>
+            <span>Vernekar's Radha Heritage Home Stay</span>
         </a>
-        <!-- Hamburger Menu Icon -->
-        <button class="hamburger" id="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
 
-        <!-- Navigation Links -->
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#rooms">Rooms</a></li>
-            <li><a href="#awards">Awards</a></li>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#testimonials">Reviews</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li>
-                <a asp-action="Login" asp-controller="Login" title="Admin Login">👤</a>
+        <!-- Desktop & Mobile Navigation -->
+        <ul class="nav-menu" id="navMenu">
+            <li class="nav-item">
+                <a href="#rooms" class="nav-link">Rooms</a>
+            </li>
+            <li class="nav-item">
+                <a href="#awards" class="nav-link">Awards</a>
+            </li>
+            <li class="nav-item">
+                <a href="#features" class="nav-link">Features</a>
+            </li>
+            <li class="nav-item">
+                <a href="#calendar" class="nav-link">Calendar</a>
+            </li>
+            <li class="nav-item">
+                <a href="#contact" class="nav-link">Contact</a>
+            </li>
+            <li class="nav-item">
+                <a asp-action="Login" asp-controller="Login" class="nav-link admin-link" title="Admin Login">
+                    <i class="fas fa-user"></i>
+                </a>
             </li>
         </ul>
-    </nav>
 
-    <!-- Overlay for mobile menu -->
-    <div class="nav-overlay" id="navOverlay"></div>
+        <!-- Hamburger Button -->
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileOverlay"></div>
 </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-        <h1>A Heritage Stay That Feels Like Home.</h1>
-        <p>
-            Enjoy comfort and a warm welcome in every stay.
-        </p>
-        </div>
-    </section>
-
-
-<!-- Calendar Container -->
-<div class="calendar-container">
-    <div class="calendar-header">
-        <h3 class="calendar-title">
-            <i class="fas fa-calendar-week me-2"></i>Booking Calendar
-        </h3>
-        <p class="text-muted mb-0">Reserve Your Stay</p>
+<!-- ============================================
+     HERO SECTION - PROFESSIONAL WITHOUT IMAGE
+     ============================================ -->
+<section class="hero" id="home">
+    <div class="hero-content">
+        <h1>A Heritage Stay That Feels Like Home</h1>
+        <p>Enjoy comfort and a warm welcome in every stay</p>
     </div>
-    <div id="websiteCalendar"></div>
-    
-    <!-- Simplified Legend -->
-    <div class="calendar-legend">
-        <div class="legend-item">
-            <div class="legend-color available"></div>
-            <span>Available</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color booked"></div>
-            <span>Booked</span>
-        </div>
-    </div>
-</div>
+</section>
 
-    <!-- Booking Form -->
-    <div class="booking-form">
-        <div class="form-row">
-            <div class="form-group">
-                <label for="property">Select Property</label>
-                <select id="property" name="property">
-                    <option value="">Select a Property</option>
-                    @foreach (var home in Model.Homes)
-                    {
-                        <option value="@home.Id">@home.Name</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="checkin">Check-in Date</label>
-                <input type="date" id="checkin" name="checkin">
-            </div>
-            <div class="form-group">
-                <label for="checkout">Check-out Date</label>
-                <input type="date" id="checkout" name="checkout">
-            </div>
-            <div class="form-group">
-                <button class="search-btn " onclick="searchAvailability()">Search Availability</button>
-            </div>
+<!-- ============================================
+     CALENDAR SECTION
+     ============================================ -->
+<section id="calendar">
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <h3 class="calendar-title">
+                <i class="fas fa-calendar-week me-2"></i>Booking Calendar
+            </h3>
+            <p class="text-muted mb-0">Reserve Your Stay</p>
         </div>
-    </div>
+        <div id="websiteCalendar"></div>
 
-    <!-- Rooms Section -->
-<section class="section" style="padding:10px;">
-    <h2 class="section-title" style="font-size:3.1rem;">Our Beutiful Rooms</h2>
-    <p class="section-subtitle">Experience Comfort & Luxury</p>
-
-    <div class="common-area-grid">
-        <div class="category-card common-area-card" data-carousel="common-sitting">
-            <div class="carousel-container">
-                <div class="carousel-images">
-                   <img src="~/images/radha_classic/siitingarea1.jpg" />
-                    <img src="~/images/radha_classic/siitingarea2.jpg" />
-                    <img src="~/images/radha_classic/siitingarea3.jpg" />
-                </div>
+        <!-- Legend -->
+        <div class="calendar-legend">
+            <div class="legend-item">
+                <div class="legend-color available"></div>
+                <span>Available</span>
             </div>
-            <div class="card-content">
-                <h3 class="card-title">Common Sitting Area</h3>
-                <p class="card-description">Relax and unwind in our beautifully designed outdoor sitting areas. Perfect for morning coffee or evening gatherings.</p>
+            <div class="legend-item">
+                <div class="legend-color booked"></div>
+                <span>Booked</span>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Radha Classic Section -->
-<section class="section">
-    <h2 class="floor-title">🏛️ Radha Classic - Ground Floor</h2>
+<!-- ============================================
+     BOOKING FORM
+     ============================================ -->
+<div class="booking-form">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="property">Select Property</label>
+            <select id="property" name="property">
+                <option value="">Select a Property</option>
+                @foreach (var home in Model.Homes)
+                {
+                    <option value="@home.Id">@home.Name</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="checkin">Check-in Date</label>
+            <input type="date" id="checkin" name="checkin">
+        </div>
+        <div class="form-group">
+            <label for="checkout">Check-out Date</label>
+            <input type="date" id="checkout" name="checkout">
+        </div>
+        <div class="form-group">
+            <button class="search-btn" onclick="searchAvailability()">
+                <i class="fas fa-search me-2"></i>Search Availability
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================
+     ROOMS SECTION
+     ============================================ -->
+<section class="section" id="rooms" style="padding:10px;">
+    <h2 class="section-title">Our Beautiful Rooms</h2>
+    <p class="section-subtitle">Experience Comfort & Luxury</p>
+
+    <!-- Common Sitting Area -->
+    <div class="common-area-grid">
+        <div class="category-card common-area-card" data-carousel="common-sitting">
+            <div class="carousel-container">
+                <div class="carousel-images">
+                    <img src="~/images/radha_classic/siitingarea1.jpg" alt="Sitting Area 1" loading="eager" />
+                    <img src="~/images/radha_classic/siitingarea2.jpg" alt="Sitting Area 2" loading="lazy" />
+                    <img src="~/images/radha_classic/siitingarea3.jpg" alt="Sitting Area 3" loading="lazy" />
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Common Sitting Area</h3>
+                <p class="card-description">Relax and unwind in our beautifully designed outdoor sitting areas.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Radha Classic -->
+    <h2 class="floor-title">
+        <i class="fas fa-building floor-icon"></i>
+        Radha Classic - Ground Floor
+    </h2>
     <div class="category-grid">
         <!-- Bedrooms Card -->
         <div class="category-card" data-carousel="classic-bedrooms">
             <div class="carousel-container">
                 <div class="carousel-images">
-                    <img src="Images/Radha_Classic/BedRoom1.jpg" alt="Bedroom 1">
-                    <img src="Images/Radha_Classic/BedRoom2.jpg" alt="Bedroom 2">
-                    <img src="Images/Radha_Classic/BedRoom3.jpg" alt="Bedroom 3">
-                    <img src="Images/Radha_Classic/BedRoom4.jpg" alt="Bedroom 4">
-                    <img src="Images/Radha_Classic/BedRoom5.jpg" alt="Bedroom 5">
-                    <img src="Images/Radha_Classic/BedRoom6.jpg" alt="Bedroom 6">
-                    <img src="Images/Radha_Classic/BedRoom7.jpg" alt="Bedroom 7">
-                    <img src="Images/Radha_Classic/BedRoom8.jpg" alt="Bedroom 8">
+                    <img src="Images/Radha_Classic/BedRoom1.jpg" alt="Bedroom 1" loading="lazy">
+                    <img src="Images/Radha_Classic/BedRoom2.jpg" alt="Bedroom 2" loading="lazy">
+                    <img src="Images/Radha_Classic/BedRoom3.jpg" alt="Bedroom 3" loading="lazy">
+                    <img src="Images/Radha_Classic/BedRoom4.jpg" alt="Bedroom 4" loading="lazy">
+                    <img src="Images/Radha_Classic/BedRoom5.jpg" alt="Bedroom 5" loading="lazy">
+                    <img src="Images/Radha_Classic/BedRoom6.jpg" alt="Bedroom 6" loading="lazy">
+                    <img src="Images/Radha_Classic/BedRoom7.jpg" alt="Bedroom 7" loading="lazy">
+                    <img src="Images/Radha_Classic/BedRoom8.jpg" alt="Bedroom 8" loading="lazy">
                 </div>
             </div>
             <div class="card-content">
                 <h3 class="card-title">Bedrooms</h3>
-                <p class="card-description">Spacious and well-appointed bedrooms with modern amenities for a restful stay.</p>
+                <p class="card-description">Spacious bedrooms with modern amenities for a restful stay.</p>
             </div>
         </div>
 
@@ -1010,14 +187,14 @@
         <div class="category-card" data-carousel="classic-halls">
             <div class="carousel-container">
                 <div class="carousel-images">
-                    <img src="Images/Radha_Classic/Hall1.jpg" alt="Hall 1">
-                    <img src="Images/Radha_Classic/Hall2.jpg" alt="Hall 2">
-                    <img src="Images/Radha_Classic/Hall3.jpg" alt="Hall 3">
+                    <img src="Images/Radha_Classic/Hall1.jpg" alt="Hall 1" loading="lazy">
+                    <img src="Images/Radha_Classic/Hall2.jpg" alt="Hall 2" loading="lazy">
+                    <img src="Images/Radha_Classic/Hall3.jpg" alt="Hall 3" loading="lazy">
                 </div>
             </div>
             <div class="card-content">
                 <h3 class="card-title">Living Halls</h3>
-                <p class="card-description">Comfortable living spaces perfect for family gatherings and relaxation.</p>
+                <p class="card-description">Comfortable living spaces perfect for family gatherings.</p>
             </div>
         </div>
 
@@ -1025,14 +202,14 @@
         <div class="category-card" data-carousel="classic-kitchen">
             <div class="carousel-container">
                 <div class="carousel-images">
-                    <img src="Images/Radha_Classic/KitchenArea1.jpg" alt="Kitchen 1">
-                    <img src="Images/Radha_Classic/KitchenArea2.jpg" alt="Kitchen 2">
-                    <img src="Images/Radha_Classic/KitchenArea3.jpg" alt="Kitchen 3">
+                    <img src="Images/Radha_Classic/KitchenArea1.jpg" alt="Kitchen 1" loading="lazy">
+                    <img src="Images/Radha_Classic/KitchenArea2.jpg" alt="Kitchen 2" loading="lazy">
+                    <img src="Images/Radha_Classic/KitchenArea3.jpg" alt="Kitchen 3" loading="lazy">
                 </div>
             </div>
             <div class="card-content">
                 <h3 class="card-title">Kitchen Areas</h3>
-                <p class="card-description">Fully equipped modern kitchens for your culinary needs and convenience.</p>
+                <p class="card-description">Fully equipped modern kitchens for your convenience.</p>
             </div>
         </div>
 
@@ -1040,44 +217,45 @@
         <div class="category-card" data-carousel="classic-toilets">
             <div class="carousel-container">
                 <div class="carousel-images">
-                    <img src="Images/Radha_Classic/Toilet1.jpg" alt="Toilet 1">
-                    <img src="Images/Radha_Classic/Toilet2.jpg" alt="Toilet 2">
-                    <img src="Images/Radha_Classic/Toilet3.jpg" alt="Toilet 3">
-                    <img src="Images/Radha_Classic/Toilet4.jpg" alt="Toilet 4">
+                    <img src="Images/Radha_Classic/Toilet1.jpg" alt="Toilet 1" loading="lazy">
+                    <img src="Images/Radha_Classic/Toilet2.jpg" alt="Toilet 2" loading="lazy">
+                    <img src="Images/Radha_Classic/Toilet3.jpg" alt="Toilet 3" loading="lazy">
+                    <img src="Images/Radha_Classic/Toilet4.jpg" alt="Toilet 4" loading="lazy">
                 </div>
             </div>
             <div class="card-content">
                 <h3 class="card-title">Bathrooms</h3>
-                <p class="card-description">Clean and modern bathroom facilities with premium fixtures.</p>
+                <p class="card-description">Clean modern bathroom facilities with premium fixtures.</p>
             </div>
         </div>
     </div>
-</section>
 
-<!-- Radha Heritage Section -->
-<section class="section">
-    <h2 class="floor-title">🏰 Radha Heritage - First Floor</h2>
+    <!-- Radha Heritage -->
+    <h2 class="floor-title">
+        <i class="fas fa-city floor-icon"></i>
+        Radha Heritage - First Floor
+    </h2>
     <div class="category-grid">
         <!-- Bedrooms Card -->
         <div class="category-card" data-carousel="heritage-bedrooms">
             <div class="carousel-container">
                 <div class="carousel-images">
-                    <img src="Images/Radha_Heritage/BedRoom1.jpg" alt="Bedroom 1">
-                    <img src="Images/Radha_Heritage/BedRoom10.jpg" alt="Bedroom 10">
-                    <img src="Images/Radha_Heritage/BedRoom11.jpg" alt="Bedroom 11">
-                    <img src="Images/Radha_Heritage/BedRoom2.jpg" alt="Bedroom 2">
-                    <img src="Images/Radha_Heritage/BedRoom3.jpg" alt="Bedroom 3">
-                    <img src="Images/Radha_Heritage/BedRoom4.jpg" alt="Bedroom 4">
-                    <img src="Images/Radha_Heritage/BedRoom5.jpg" alt="Bedroom 5">
-                    <img src="Images/Radha_Heritage/BedRoom6.jpg" alt="Bedroom 6">
-                    <img src="Images/Radha_Heritage/BedRoom7.jpg" alt="Bedroom 7">
-                    <img src="Images/Radha_Heritage/BedRoom8.jpg" alt="Bedroom 8">
-                    <img src="Images/Radha_Heritage/BedRoom9.jpg" alt="Bedroom 9">
+                    <img src="Images/Radha_Heritage/BedRoom1.jpg" alt="Bedroom 1" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom2.jpg" alt="Bedroom 2" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom3.jpg" alt="Bedroom 3" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom4.jpg" alt="Bedroom 4" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom5.jpg" alt="Bedroom 5" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom6.jpg" alt="Bedroom 6" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom7.jpg" alt="Bedroom 7" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom8.jpg" alt="Bedroom 8" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom9.jpg" alt="Bedroom 9" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom10.jpg" alt="Bedroom 10" loading="lazy">
+                    <img src="Images/Radha_Heritage/BedRoom11.jpg" alt="Bedroom 11" loading="lazy">
                 </div>
             </div>
             <div class="card-content">
                 <h3 class="card-title">Bedrooms</h3>
-                <p class="card-description">Heritage-style bedrooms combining traditional charm with modern comfort.</p>
+                <p class="card-description">Heritage-style bedrooms with traditional charm and modern comfort.</p>
             </div>
         </div>
 
@@ -1085,16 +263,16 @@
         <div class="category-card" data-carousel="heritage-halls">
             <div class="carousel-container">
                 <div class="carousel-images">
-                    <img src="Images/Radha_Heritage/Hall1.jpg" alt="Hall 1">
-                    <img src="Images/Radha_Heritage/Hall2.jpg" alt="Hall 2">
-                    <img src="Images/Radha_Heritage/Hall3.jpg" alt="Hall 3">
-                    <img src="Images/Radha_Heritage/Hall4.jpg" alt="Hall 4">
-                    <img src="Images/Radha_Heritage/Hall5.jpg" alt="Hall 5">
+                    <img src="Images/Radha_Heritage/Hall1.jpg" alt="Hall 1" loading="lazy">
+                    <img src="Images/Radha_Heritage/Hall2.jpg" alt="Hall 2" loading="lazy">
+                    <img src="Images/Radha_Heritage/Hall3.jpg" alt="Hall 3" loading="lazy">
+                    <img src="Images/Radha_Heritage/Hall4.jpg" alt="Hall 4" loading="lazy">
+                    <img src="Images/Radha_Heritage/Hall5.jpg" alt="Hall 5" loading="lazy">
                 </div>
             </div>
             <div class="card-content">
                 <h3 class="card-title">Living Halls</h3>
-                <p class="card-description">Elegant living spaces with heritage architecture and comfortable seating.</p>
+                <p class="card-description">Elegant living spaces with heritage architecture.</p>
             </div>
         </div>
 
@@ -1102,13 +280,13 @@
         <div class="category-card" data-carousel="heritage-dining">
             <div class="carousel-container">
                 <div class="carousel-images">
-                    <img src="Images/Radha_Heritage/Dinning1.jpg" alt="Dining 1">
-                    <img src="Images/Radha_Heritage/Dinning2.jpg" alt="Dining 2">
+                    <img src="Images/Radha_Heritage/Dinning1.jpg" alt="Dining 1" loading="lazy">
+                    <img src="Images/Radha_Heritage/Dinning2.jpg" alt="Dining 2" loading="lazy">
                 </div>
             </div>
             <div class="card-content">
                 <h3 class="card-title">Dining Areas</h3>
-                <p class="card-description">Spacious dining areas perfect for family meals and special occasions.</p>
+                <p class="card-description">Spacious dining areas perfect for family meals.</p>
             </div>
         </div>
 
@@ -1116,114 +294,117 @@
         <div class="category-card" data-carousel="heritage-toilets">
             <div class="carousel-container">
                 <div class="carousel-images">
-                    <img src="Images/Radha_Heritage/Toilet1.jpg" alt="Toilet 1">
-                    <img src="Images/Radha_Heritage/Toilet2.jpg" alt="Toilet 2">
-                    <img src="Images/Radha_Heritage/Toilet3.jpg" alt="Toilet 3">
-                    <img src="Images/Radha_Heritage/Toilet4.jpg" alt="Toilet 4">
+                    <img src="Images/Radha_Heritage/Toilet1.jpg" alt="Toilet 1" loading="lazy">
+                    <img src="Images/Radha_Heritage/Toilet2.jpg" alt="Toilet 2" loading="lazy">
+                    <img src="Images/Radha_Heritage/Toilet3.jpg" alt="Toilet 3" loading="lazy">
+                    <img src="Images/Radha_Heritage/Toilet4.jpg" alt="Toilet 4" loading="lazy">
                 </div>
             </div>
             <div class="card-content">
                 <h3 class="card-title">Bathrooms</h3>
-                <p class="card-description">Well-maintained bathrooms with modern amenities and elegant design.</p>
+                <p class="card-description">Well-maintained bathrooms with modern amenities.</p>
             </div>
         </div>
     </div>
 </section>
 
-    <!-- Awards Section -->
-    <section id="awards" class="section awards-section">
-        <div class="awards-header">
-            <div class="award-badge">
-                <span class="trophy-icon">🏆</span>
-                <h2 class="awards-title">BRAND OF INDIA 2025</h2>
-                <span class="trophy-icon">🏆</span>
-            </div>
-            <div class="award-subtitle">
-                <span class="star-icon">✨</span>
-                <span>Excellence in Indian Hospitality</span>
-                <span class="star-icon">✨</span>
-            </div>
+<!-- ============================================
+     AWARDS SECTION
+     ============================================ -->
+<section id="awards" class="section awards-section">
+    <div class="awards-header">
+        <div class="award-badge">
+            <i class="fas fa-trophy trophy-icon"></i>
+            <h2 class="awards-title">BRAND OF INDIA 2025</h2>
+            <i class="fas fa-trophy trophy-icon"></i>
         </div>
+        <div class="award-subtitle">
+            <i class="fas fa-star star-icon"></i>
+            <span>Excellence in Indian Hospitality</span>
+            <i class="fas fa-star star-icon"></i>
+        </div>
+    </div>
 
-        <div class="awards-content">
-            <div class="row align-items-center">
-                <!-- Award Images Carousel -->
-                <div class="col-lg-6 mb-4 mb-lg-0">
-                    <div class="awards-carousel-container">
-                        <div class="awards-carousel-images">
-                            <img src="~/Images/Awards/award1.jpg" alt="Brand of India Award 2025" class="award-image">
-                            <img src="~/Images/Awards/award2.jpg" alt="Excellence Award" class="award-image">
-                            <img src="~/Images/Awards/award3.jpg" alt="Hospitality Recognition" class="award-image">
-                            <img src="~/Images/Awards/award4.jpg" alt="Heritage Homestay Award" class="award-image">
-                        </div>
-                        <div class="carousel-controls">
-                            <button class="carousel-btn prev-btn" onclick="moveAwardSlide(-1)">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="carousel-btn next-btn" onclick="moveAwardSlide(1)">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                        <div class="carousel-indicators" id="awardIndicators"></div>
+    <div class="awards-content">
+        <div class="row align-items-center">
+            <!-- Award Images Carousel -->
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="awards-carousel-container">
+                    <div class="awards-carousel-images">
+                        <img src="~/Images/Awards/award1.jpg" alt="Brand of India Award 2025" class="award-image" loading="lazy">
+                        <img src="~/Images/Awards/award2.jpg" alt="Excellence Award" class="award-image" loading="lazy">
+                        <img src="~/Images/Awards/award3.jpg" alt="Hospitality Recognition" class="award-image" loading="lazy">
+                        <img src="~/Images/Awards/award4.jpg" alt="Heritage Homestay Award" class="award-image" loading="lazy">
                     </div>
-                </div>
-
-                <!-- Award Description -->
-                <div class="col-lg-6">
-                    <div class="award-description">
-                        <h3 class="award-property-name">Vernekar's<br>RADHA CLASSIC HERITAGE HOMESTAY<br>Belagavi, Karnataka</h3>
-                        
-                        <div class="award-message">
-                            <p class="lead">We are proud to share that <strong>Radha Classic Heritage</strong> has been honoured as the <strong>Best Homestay – 2025</strong> under the prestigious Brand of India Awards!</p>
-                            
-                            <div class="recognition-list">
-                                <p class="mb-3">This recognition celebrates our unwavering commitment to:</p>
-                                <ul class="award-features">
-                                    <li>
-                                        <span class="feature-icon">🌟</span>
-                                        <span>Exceptional Hospitality</span>
-                                    </li>
-                                    <li>
-                                        <span class="feature-icon">🌟</span>
-                                        <span>Impeccable Customer Service</span>
-                                    </li>
-                                    <li>
-                                        <span class="feature-icon">🌟</span>
-                                        <span>Luxurious Ambience with a Heritage Touch</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                    <div class="carousel-controls">
+                        <button class="carousel-btn prev-btn" onclick="moveAwardSlide(-1)" aria-label="Previous award">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-btn next-btn" onclick="moveAwardSlide(1)" aria-label="Next award">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
+                    <div class="carousel-indicators" id="awardIndicators"></div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Features Section -->
-    <section id="features" class="section features">
+            <!-- Award Description -->
+            <div class="col-lg-6">
+                <div class="award-description">
+                    <h3 class="award-property-name">Vernekar's<br>RADHA CLASSIC HERITAGE HOMESTAY<br>Belagavi, Karnataka</h3>
+
+                    <div class="award-message">
+                        <p class="lead">We are proud to share that <strong>Radha Classic Heritage</strong> has been honoured as the <strong>Best Homestay – 2025</strong>!</p>
+
+                        <div class="recognition-list">
+                            <p class="mb-3">This recognition celebrates our commitment to:</p>
+                            <ul class="award-features">
+                                <li>
+                                    <i class="fas fa-star feature-icon"></i>
+                                    <span>Exceptional Hospitality</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-star feature-icon"></i>
+                                    <span>Impeccable Customer Service</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-star feature-icon"></i>
+                                    <span>Luxurious Ambience with Heritage Touch</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     FEATURES SECTION
+     ============================================ -->
+<section id="features" class="section features">
     <h2>Vernekar's Radha Heritage Home Stay</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🏡</div>
-                <h3>Authentic Experience</h3>
-                <p>Live like a local with our carefully selected homestay properties</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🗺️</div>
-                <h3>Local Guidance</h3>
-                <p>Get insider tips and recommendations from knowledgeable hosts</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">💰</div>
-                <h3>Great Value</h3>
-                <p>Affordable rates with excellent amenities and personal service</p>
-            </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <i class="fas fa-home feature-icon"></i>
+            <h3>Authentic Experience</h3>
+            <p>Live like a local with our carefully selected homestay properties</p>
         </div>
-    </section>
+        <div class="feature-card">
+            <i class="fas fa-map-marked-alt feature-icon"></i>
+            <h3>Local Guidance</h3>
+            <p>Get insider tips and recommendations from knowledgeable hosts</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-dollar-sign feature-icon"></i>
+            <h3>Great Value</h3>
+            <p>Affordable rates with excellent amenities and personal service</p>
+        </div>
+    </div>
+</section>
 
-
-    <!-- Booking Modal -->
+ <!-- Booking Modal -->
     <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -1410,18 +591,32 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer" id="contact">
-        <div class="footer-content">
-        <p>&copy; 2025 Vernekar's Radha Heritage Home Stay. All rights reserved.</p>
-        <p>📧 Vaibsv1@yahoo.com | 📞 +919845352106</p>
-        </div>
-    </footer>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Add these CDN links for FullCalendar -->
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+
+<!-- ============================================
+     FOOTER
+     ============================================ -->
+<footer class="footer" id="contact">
+    <div class="footer-content">
+        <p>&copy; 2025 Vernekar's Radha Heritage Home Stay. All rights reserved.</p>
+        <p>
+            <i class="fas fa-envelope footer-icon"></i>
+            Vaibsv1@yahoo.com | 
+            <i class="fas fa-phone footer-icon"></i>
+            +919845352106
+        </p>
+    </div>
+</footer>
+
+<!-- CDN Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+
+<!-- Custom JavaScript -->
+@* <script src="~/js/website-script.js"></script> *@
+
+<!-- Inline Razor Data -->
  <script>
     $(document).ready(function () {
         if (localStorage.getItem('IsLoggedIn') == "true") {
@@ -1430,11 +625,102 @@
         
         // Initialize validation
         initializeWebsiteValidation();
-        
+        initializeNavigation();
         // Initialize awards carousel
         initializeAwardsCarousel();
     });
+    function initializeNavigation() {
+    const hamburger = document.querySelector('.hamburger-btn');
+    const navMenu = document.querySelector('.nav-menu');
+    const overlay = document.querySelector('.mobile-menu-overlay');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const body = document.body;
 
+    // Toggle mobile menu
+    function toggleMenu() {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+        overlay.classList.toggle('active');
+        body.classList.toggle('menu-open');
+    }
+
+    // Close mobile menu
+    function closeMenu() {
+        hamburger.classList.remove('active');
+        navMenu.classList.remove('active');
+        overlay.classList.remove('active');
+        body.classList.remove('menu-open');
+    }
+
+    // Hamburger click event
+    if (hamburger) {
+        hamburger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggleMenu();
+        });
+    }
+
+    // Overlay click event
+    if (overlay) {
+        overlay.addEventListener('click', closeMenu);
+    }
+
+    // Nav links click event with smooth scroll
+    navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+
+            // Check if it's an anchor link (starts with #)
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+
+                // Close menu on mobile
+                if (window.innerWidth <= 768) {
+                    closeMenu();
+                }
+
+                // Get target section
+                const targetId = href;
+                const targetSection = document.querySelector(targetId);
+
+                if (targetSection) {
+                    // Calculate offset for sticky header
+                    const headerHeight = document.querySelector('.header').offsetHeight;
+                    const targetPosition = targetSection.offsetTop - headerHeight;
+
+                    // Smooth scroll to target with delay for menu close animation
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }, window.innerWidth <= 768 ? 300 : 0);
+                }
+            }
+        });
+    });
+
+    // Close menu on window resize to desktop size
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 768 && navMenu.classList.contains('active')) {
+            closeMenu();
+        }
+    });
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+            closeMenu();
+        }
+    });
+
+    // Prevent menu closing when clicking inside menu
+    if (navMenu) {
+        navMenu.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+    }
+}
 
     // Awards Carousel Functionality
     let currentAwardSlide = 0;
@@ -1964,7 +1250,7 @@
         bookingActions.innerHTML = `
             <button class="book-now-btn" onclick="openBookingModal('${propertyId}', '${checkin}', '${checkout}', '${homeName}')">
                     <i class="fas fa-calendar-plus"></i> Book Your Stay
-            </button>
+        </button>
         `;
 
         // Insert after the booking form
@@ -2020,12 +1306,12 @@
         const bookingDetails = document.getElementById('bookingDetails');
         const totalPriceDisplay = document.getElementById('totalPriceDisplay');
         const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
-        
+
         // Calculate pricing based on room selection
         let finalPrice = totalPrice;
         let rateDescription = `${formatPrice(pricePerDay)}/night (Entire Property)`;
         let isIndividualRoomBooking = false;
-        
+
         if (selectedRooms.length > 0) {
             // Calculate price for selected rooms
             const roomTotal = selectedRooms.reduce((sum, room) => sum + (room.Price || 0), 0);
@@ -2034,7 +1320,7 @@
                 rateDescription = `${formatPrice(roomTotal)}/night (Selected Rooms)`;
                 isIndividualRoomBooking = true;
             }
-        }
+                }
 
         let roomBreakdown = '';
         if (isIndividualRoomBooking && selectedRooms.length > 0) {
@@ -2046,27 +1332,27 @@
                             `<li>${room.Label} - ${formatPrice(room.Price)}/night</li>`
                         ).join('')}
                     </ul>
-                </div>
+        </div>
             `;
         }
 
         bookingDetails.innerHTML = `
             <div class="booking-detail-item">
                 <strong>Property:</strong> ${propertyName}
-            </div>
+        </div>
             <div class="booking-detail-item">
                 <strong>Check-in:</strong> ${new Date(checkin).toLocaleDateString()}
-            </div>
+        </div>
             <div class="booking-detail-item">
                 <strong>Check-out:</strong> ${new Date(checkout).toLocaleDateString()}
-            </div>
+        </div>
             <div class="booking-detail-item">
                 <strong>Duration:</strong> ${days} night${days > 1 ? 's' : ''}
-            </div>
+    </div>
             ${roomBreakdown}
             <div class="booking-detail-item">
                 <strong>Rate:</strong> ${rateDescription}
-            </div>
+</div>
         `;
 
         totalPriceDisplay.innerHTML = `Total: ${formatPrice(finalPrice)}`;
@@ -2475,10 +1761,10 @@
             showNotification('Please select a property first', 'error');
             return;
         }
-        
+
         // Load rooms for the selected property
         loadRoomsForProperty(homeId);
-        
+
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('roomSelectionModal'));
         modal.show();
@@ -2490,9 +1776,9 @@
             <div class="text-center p-4">
                 <div class="spinner-border" role="status">
                     <span class="visually-hidden">Loading...</span>
-                </div>
-                <div class="mt-2">Loading rooms...</div>
             </div>
+                <div class="mt-2">Loading rooms...</div>
+        </div>
         `;
         
         // Get rooms from the model data
@@ -2531,11 +1817,11 @@
                             Choose specific bedrooms only - Must book within 3 days of stay
                             <div class="alert alert-warning mt-2 p-2">
                                 <small><i class="fas fa-info-circle"></i> Individual room booking is only available 3 days before your check-in date</small>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
+            </div>
+        </div>
+    </div>
 
             <div id="roomCheckboxes" class="mt-3" style="display: none;">
                 <div class="row">
@@ -2579,10 +1865,10 @@
                             '<div class="text-muted small">Only bedrooms can be selected individually</div>' :
                             ''
                         }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
                 `;
             });
 
@@ -2597,7 +1883,7 @@
                 <i class="fas fa-info-circle"></i>
                 <strong>Room details not configured.</strong><br>
                 You can book the entire property which includes all available accommodations.
-            </div>
+        </div>
             `;
         }
 
@@ -2686,7 +1972,7 @@
             
             // Get property base price
             const propertyPricePerDay = getPriceForProperty(propertyId);
-            
+
             let finalPrice;
             if (selectedRooms.length > 0) {
                 // Individual room pricing
@@ -2973,3 +2259,6 @@
     });
 
 </script>
+
+</body>
+</html>
