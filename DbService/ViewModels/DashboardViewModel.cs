@@ -10,6 +10,8 @@ namespace DbService.ViewModels
     {
         public int TotalBookings { get; set; }
         public decimal TotalRevenue { get; set; }
+        public decimal TotalAdvance { get; set; }
+        public decimal TotalPending { get; set; }
         public int TotalProperties { get; set; }
         public int TotalRooms { get; set; }
         public int PendingBookings { get; set; }
@@ -51,6 +53,8 @@ namespace DbService.ViewModels
         public string PropertyName { get; set; }
         public DateTime BookingDate { get; set; }
         public decimal Amount { get; set; }
+        public decimal Advance { get; set; }
+        public decimal Pending { get; set; }
         public string Status { get; set; }
     }
 }

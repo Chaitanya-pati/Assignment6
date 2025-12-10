@@ -7,7 +7,7 @@ function getHomeName(homeId,idSelector) {
     for (let option of homeSelector.options) {
         if (parseInt(option.value) === homeId) {
             return option.text;
-        }
+        }           
     }
     return `Property ${homeId}`;
 }

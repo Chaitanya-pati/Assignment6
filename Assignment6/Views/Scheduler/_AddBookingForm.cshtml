@@ -933,6 +933,7 @@
             PaymentStatus: "pending",
             CreatedAt: new Date(),
             Price: pricing.totalPrice,
+            AdvancePrice: parseFloat($('#AdvancePrice').val()) || 0,
             GuestNumbers: parseInt($('#GuestNumbers').val()),
             Document: $('#Document')[0].files[0] ? $('#Document')[0].files[0].name : null,
             IsBooked: true,

@@ -1389,6 +1389,29 @@
                   if (picker) {
                       picker.setDate(dateStr);
                   }
+
+                  // Ensure AdvancePrice input is present in the booking form modal
+                  try {
+                      if ($('#modalBody').find('#AdvancePrice').length === 0) {
+                          const advHtml = `
+                            <div class="mb-3 px-3" id="advancePriceContainer">
+                                <label for="AdvancePrice" class="form-label">
+                                    <i class="fas fa-money-bill-wave"></i> Advance Price (₹)
+                                </label>
+                                <input type="number" step="0.01" min="0" id="AdvancePrice" name="AdvancePrice" class="form-control" value="0" />
+                            </div>`;
+
+                          // Try to insert near the total price display if present, otherwise append to modal body
+                          const target = $('#modalBody').find('#totalPriceDisplay').closest('.mb-3, .booking-summary').first();
+                          if (target && target.length) {
+                              target.after(advHtml);
+                          } else {
+                              $('#modalBody').append(advHtml);
+                          }
+                      }
+                  } catch (e) {
+                      console.warn('Could not inject AdvancePrice input:', e);
+                  }
               })
               .fail(function (xhr, status, error) {
                   console.error('Error loading booking form:', error);

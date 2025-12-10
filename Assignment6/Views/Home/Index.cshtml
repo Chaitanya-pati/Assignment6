@@ -248,7 +248,12 @@
                                     <td class="fw-medium">@booking.CustomerName</td>
                                     <td>@booking.PropertyName</td>
                                     <td>@booking.BookingDate.ToString("MMM dd, yyyy")</td>
-                                    <td class="fw-bold">₹@booking.Amount.ToString("N0")</td>
+                            <td class="fw-bold">
+                                ₹@booking.Amount.ToString("N0")
+                                <div class="small text-muted">
+                                    Adv: ₹@booking.Advance.ToString("N0") &nbsp;|&nbsp; Pending: ₹@booking.Pending.ToString("N0")
+                                </div>
+                            </td>
                                     <td>
                                         <span class="status-badge status-@booking.Status.ToLower()">
                                             @booking.Status

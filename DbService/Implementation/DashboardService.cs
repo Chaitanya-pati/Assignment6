@@ -25,6 +25,10 @@ namespace Assignment6.Services
                     .Where(b => b.PaymentStatus.ToLower() == "paid" || b.IsBooked == true)
                     .Sum(b => b.Price);
 
+                // Sum of advances and pending amounts
+                var totalAdvance = db.Bookings.Where(b => b.IsBooked == true).Sum(b => (long?)b.AdvancePrice) ?? 0;
+                var totalPending = db.Bookings.Where(b => b.IsBooked == true).Sum(b => (long?)b.Price - (long?)b.AdvancePrice) ?? 0;
+
                 var totalProperties = db.Homes.Count();
                 var totalRooms = db.Rooms.Count();
 
@@ -43,6 +47,8 @@ namespace Assignment6.Services
                 {
                     TotalBookings = totalBookings,
                     TotalRevenue = totalRevenue,
+                    TotalAdvance = totalAdvance,
+                    TotalPending = totalPending,
                     TotalProperties = totalProperties,
                     TotalRooms = totalRooms,
                     PendingBookings = pendingBookings,
@@ -172,6 +178,8 @@ namespace Assignment6.Services
                         PropertyName = b.Home.Name,
                         BookingDate = b.BookingDateFrom,
                         Amount = b.Price,
+                        Advance = (decimal?)(b.AdvancePrice ?? 0) ?? 0,
+                        Pending = (decimal?)(b.Price - (b.AdvancePrice ?? 0)) ?? 0,
                         Status = b.PaymentStatus
                     })
                     .ToList();

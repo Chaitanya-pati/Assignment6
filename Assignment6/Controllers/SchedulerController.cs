@@ -473,6 +473,8 @@ namespace Assignment6.Controllers
                     homeId = b.HomeId,
                     paymentStatus = b.PaymentStatus,
                     price = b.Price,
+                    advance = b.AdvancePrice ?? 0,
+                    pending = b.Price - (b.AdvancePrice ?? 0),
                     guestNumbers = b.GuestNumbers,
                     document = b.Document,
                     bookingRooms = b.BookingRooms?.Select(br => new
@@ -1153,6 +1155,8 @@ namespace Assignment6.Controllers
                         bookingDateTo = b.BookingDateTo.ToString("yyyy-MM-dd"),
                         homeId = b.HomeId,
                         price = b.Price,
+                        advance = b.AdvancePrice ?? 0,
+                        pending = b.Price - (b.AdvancePrice ?? 0),
                         guestNumbers = b.GuestNumbers,
                         createdAt = b.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ss"),
                         paymentStatus = b.PaymentStatus
