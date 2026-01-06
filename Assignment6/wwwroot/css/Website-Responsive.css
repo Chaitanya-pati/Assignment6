@@ -147,7 +147,7 @@ img {
     border: none;
     cursor: pointer;
     padding: 0;
-    z-index: 1001;
+    z-index: 99999;
     flex-shrink: 0;
 }
 
@@ -209,14 +209,14 @@ body.menu-open {
         height: 100vh;
         width: 85%;
         max-width: 320px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #202022 0%, #90829f 100%);
         flex-direction: column;
         justify-content: flex-start;
         align-items: stretch;
         padding: 70px 0 20px 0;
         gap: 0;
         transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 999;
+        z-index: 9999;
         overflow-y: auto;
         box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
     }
@@ -325,7 +325,7 @@ body.menu-open {
     padding: 3rem 1rem;
     overflow: hidden;
     /* Clean background image (replace with your real one later) */
-    background: url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1600') center/cover no-repeat;
+    background: url('/Images/Awards/CoverPage.webp') center / cover no-repeat;
 }
 
 .hero-content {
