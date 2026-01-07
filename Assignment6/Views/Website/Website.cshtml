@@ -1696,7 +1696,7 @@
                 'BookingData.IsBooked': false,
                 'BookingData.CheckOut': false,
                 'BookingData.TotalDays': document.getElementById('TotalDays').value,
-                'Rooms': JSON.stringify(selectedRooms)
+                'Rooms': selectedRooms
             },
             success: function (response) {
                 if (response.success) {

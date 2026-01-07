@@ -69,6 +69,7 @@ namespace Assignment6.Controllers
         [HttpGet]
         public IActionResult PaymentSuccess(int bookingId)
         {
+            _bookingService.ApproveBookingRequest(bookingId);
             var booking = _bookingService.GetBookingById(bookingId);
             var payment = _paymentService.GetPaymentByBookingId(bookingId);
 
