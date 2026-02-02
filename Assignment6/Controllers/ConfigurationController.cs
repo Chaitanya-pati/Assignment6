@@ -28,6 +28,7 @@ namespace Assignment6.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult SaveHome(Home homeData)
         {
             try
@@ -47,11 +48,16 @@ namespace Assignment6.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult UpdateHome(Home homeData)
         {
             try
             {
-                Home savedHome = _configurationService.SaveHome(homeData);
+                if (homeData.Id == 0)
+                {
+                    homeData.CreatedAt = DateTime.Now;
+                }
+                Home savedHome = _configurationService.UpdateHome(homeData);
                 return Json(savedHome.Id);
             }
             catch (Exception ex)
@@ -61,6 +67,7 @@ namespace Assignment6.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult SaveRooms(List<Room> roomSaveRequests)
         {
             try

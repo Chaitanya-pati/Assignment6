@@ -1377,50 +1377,56 @@
       window.showNotification = showNotification;
 
       // Handle Date Click
-      function handleDateClick(dateStr) {
-          showLoading('Loading booking form...');
-          $.get('/Scheduler/AddBookingForm', { date: dateStr })
-              .done(function (html) {
-                  $('#modalBody').html(html);
-                  $('#bookingModal').modal('show');
+            function handleDateClick(dateStr) {
+              showLoading('Loading booking form...');
+              $.get('/Scheduler/AddBookingForm', { date: dateStr })
+                  .done(function (html) {
+                      $('#modalBody').html(html);
+                      $('#bookingModal').modal('show');
 
-                  // Set the selected date in the form
-                  const picker = window.currentDatePicker;
-                  if (picker) {
-                      picker.setDate(dateStr);
-                  }
+                      // Set the selected date in the form
+                      const picker = window.currentDatePicker;
+                      if (picker) {
+                          picker.setDate(dateStr);
+                      }
 
-                  // Ensure AdvancePrice input is present in the booking form modal
-                  try {
-                      if ($('#modalBody').find('#AdvancePrice').length === 0) {
-                          const advHtml = `
+                      // Set default check-in and check-out dates
+                      const checkIn = new Date(dateStr);
+                      const checkOut = new Date(checkIn);
+                      checkOut.setDate(checkIn.getDate() + 1);
+                      $('#BookingDateFrom').val(checkIn.toISOString().split('T')[0]);
+                      $('#BookingDateTo').val(checkOut.toISOString().split('T')[0]);
+
+                      // Ensure AdvancePrice input is present in the booking form modal
+                      try {
+                          if ($('#modalBody').find('#AdvancePrice').length === 0) {
+                              const advHtml = `
                             <div class="mb-3 px-3" id="advancePriceContainer">
-                                <label for="AdvancePrice" class="form-label">
-                                    <i class="fas fa-money-bill-wave"></i> Advance Price (₹)
-                                </label>
-                                <input type="number" step="0.01" min="0" id="AdvancePrice" name="AdvancePrice" class="form-control" value="0" />
+                            <label for="AdvancePrice" class="form-label">
+                            <i class="fas fa-money-bill-wave"></i> Advance Price (₹)
+                            </label>
+                            <input type="number" step="0.01" min="0" id="AdvancePrice" name="AdvancePrice" class="form-control" value="0" />
                             </div>`;
 
-                          // Try to insert near the total price display if present, otherwise append to modal body
-                          const target = $('#modalBody').find('#totalPriceDisplay').closest('.mb-3, .booking-summary').first();
-                          if (target && target.length) {
-                              target.after(advHtml);
-                          } else {
-                              $('#modalBody').append(advHtml);
+                              const target = $('#modalBody').find('#totalPriceDisplay').closest('.mb-3, .booking-summary').first();
+                              if (target && target.length) {
+                                  target.after(advHtml);
+                              } else {
+                                  $('#modalBody').append(advHtml);
+                              }
                           }
+                      } catch (e) {
+                          console.warn('Could not inject AdvancePrice input:', e);
                       }
-                  } catch (e) {
-                      console.warn('Could not inject AdvancePrice input:', e);
-                  }
-              })
-              .fail(function (xhr, status, error) {
-                  console.error('Error loading booking form:', error);
-                  showNotification('Error loading booking form. Please try again.', 'error');
-              })
-              .always(function () {
-                  hideLoading();
-              });
-      }
+                  })
+                  .fail(function (xhr, status, error) {
+                      console.error('Error loading booking form:', error);
+                      showNotification('Error loading booking form. Please try again.', 'error');
+                  })
+                  .always(function () {
+                      hideLoading();
+                  });
+          }
 
 
       // Helper function for status badge classes
@@ -1696,124 +1702,137 @@
       });
 
 
-      function showEventDetails(event) {
-          console.log(event,"Event from kartik dev")
-          const props = event.extendedProps;
-          const startDate = event.start.toLocaleDateString();
-          const endDate = event.end ? event.end.toLocaleDateString() : 'N/A';
+        function showEventDetails(event) {
+            console.log(event,"Event from kartik dev")
 
-          // Build room details if available
-          let roomDetails = '';
-          if (props.bookingRooms && props.bookingRooms.length > 0) {
-              roomDetails = '<div class="mt-2"><strong>Booked Rooms:</strong><ul class="mb-0 mt-1">';
-              props.bookingRooms.forEach(room => {
-                 // const roomName =  GetRoomDetailsById(room.roomId);
-                  debugger
+            const props = event.extendedProps;
+            const startDate = event.start.toLocaleDateString();
+            const endDate = event.end ? event.end.toLocaleDateString() : 'N/A';
 
-                      $.ajax({
-                          url: '/Scheduler/GetRoomDetailsById',
+                var remainingAmount = "";
+                // Calculate advance and remaining amount from backend fields
+                const advancePaid = props.advancePaid || 0;
+                // Prefer backend-provided amountToBePaid, fallback to calculation
+                if(props.paymentStatus == 'Paid')
+                {
+                    remainingAmount = 0;
+
+                }
+                else{
+                    remainingAmount = (typeof props.amountToBePaid !== 'undefined') ? props.amountToBePaid : ((props.price || 0) - advancePaid);
+
+                }
+
+            // Build room details if available
+            let roomDetails = '';
+            if (props.bookingRooms && props.bookingRooms.length > 0) {
+                roomDetails = '<div class="mt-2"><strong>Booked Rooms:</strong><ul class="mb-0 mt-1">';
+                props.bookingRooms.forEach(room => {
+                    $.ajax({
+                        url: '/Scheduler/GetRoomDetailsById',
                         type: 'POST',
                         async: false,
                         data: {
-                                roomId: room.roomId
+                            roomId: room.roomId
                         },
                         success: function (response) {
                             if (response) {
-                               roomDetails += `<li>${response}</li>`;
-                            }
-                            else{
-                               roomDetails += `<li>${""}</li>`;
+                                roomDetails += `<li>${response}</li>`;
+                            } else {
+                                roomDetails += `<li></li>`;
                             }
                         },
-                            error: function (xhr, status, error) {
-                           // console.error('Error completing booking:', error);
-                           // showNotification('Error completing booking. Please try again.', 'error');
+                        error: function (xhr, status, error) {
+                            // error handling
                         },
-                     });
+                    });
+                });
+                roomDetails += '</ul></div>';
+            }
 
-              });
-              roomDetails += '</ul></div>';
-          }
+            // Add payment update section for pending bookings
+            let paymentSection = '';
+            if (props.paymentStatus && props.paymentStatus.toLowerCase() === 'pending') {
+                paymentSection = `
+                    <div class="mt-3 p-2 border-top">
+                    <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="paymentPaidCheck_${event.id}">
+                    <label class="form-check-label" for="paymentPaidCheck_${event.id}">
+                    <strong>Mark as Paid & Complete</strong>
+                    </label>
+                    </div>
+                    <button class="btn btn-success btn-sm w-100 mb-2" onclick="completeBookingWithInvoice(${event.id}, '${props.customerName || 'Unknown'}')">
+                    <i class="fas fa-check me-1"></i>Complete & Generate Invoice
+                    </button>
+                    </div>
+                                `;
+                            }
 
-          // Add payment update section for pending bookings
-          let paymentSection = '';
-          if (props.paymentStatus && props.paymentStatus.toLowerCase() === 'pending') {
-              paymentSection = `
-                  <div class="mt-3 p-2 border-top">
-                      <div class="form-check mb-2">
-                          <input class="form-check-input" type="checkbox" id="paymentPaidCheck_${event.id}">
-                          <label class="form-check-label" for="paymentPaidCheck_${event.id}">
-                              <strong>Mark as Paid & Complete</strong>
-                          </label>
-                      </div>
-                      <button class="btn btn-success btn-sm w-100 mb-2" onclick="completeBookingWithInvoice(${event.id}, '${props.customerName || 'Unknown'}')">
-                          <i class="fas fa-check me-1"></i>Complete & Generate Invoice
-                      </button>
-                  </div>
-              `;
-          }
+                            // ADD delete button section (always show)
+                            const deleteSection = `
+                    <div class="mt-3 p-2 border-top">
+                    <button class="btn btn-danger btn-sm w-100" onclick="deleteBooking(${event.id}, '${props.customerName || 'Unknown'}')">
+                    <i class="fas fa-trash me-1"></i>Delete Booking
+                    </button>
+                    </div>
+                            `;
 
-          // ADD delete button section (always show)
-          const deleteSection = `
-              <div class="mt-3 p-2 border-top">
-                  <button class="btn btn-danger btn-sm w-100" onclick="deleteBooking(${event.id}, '${props.customerName || 'Unknown'}')">
-                      <i class="fas fa-trash me-1"></i>Delete Booking
-                  </button>
-              </div>
-          `;
+                            const eventInfo = `
+                    <div class="event-details">
+                    <h6 class="mb-2 text-center">
+                    <i class="fas fa-calendar-check me-2"></i>${event.title}
+                    </h6>
+                    <div class="text-center mb-3">
+                    <span class="status-badge ${getStatusBadgeClass(props.paymentStatus)}">
+                                            ${props.paymentStatus || 'Unknown'}
+                    </span>
+                    </div>
 
-          const eventInfo = `
-              <div class="event-details">
-                  <h6 class="mb-2 text-center">
-                      <i class="fas fa-calendar-check me-2"></i>${event.title}
-                  </h6>
-                  <div class="text-center mb-3">
-                      <span class="status-badge ${getStatusBadgeClass(props.paymentStatus)}">
-                          ${props.paymentStatus || 'Unknown'}
-                      </span>
-                  </div>
+                                    <div class="row g-1 small">
+                    <div class="col-5"><strong>Customer:</strong></div>
+                    <div class="col-7">${props.customerName || 'N/A'}</div>
 
-                  <div class="row g-1 small">
-                      <div class="col-5"><strong>Customer:</strong></div>
-                      <div class="col-7">${props.customerName || 'N/A'}</div>
+                                        <div class="col-5"><strong>Email:</strong></div>
+                    <div class="col-7">${props.customerEmail || 'N/A'}</div>
 
-                      <div class="col-5"><strong>Email:</strong></div>
-                      <div class="col-7">${props.customerEmail || 'N/A'}</div>
+                                        <div class="col-5"><strong>Phone:</strong></div>
+                    <div class="col-7">${props.customerPhone || 'N/A'}</div>
 
-                      <div class="col-5"><strong>Phone:</strong></div>
-                      <div class="col-7">${props.customerPhone || 'N/A'}</div>
+                                        <div class="col-5"><strong>Check-in:</strong></div>
+                    <div class="col-7">${startDate}</div>
 
-                      <div class="col-5"><strong>Check-in:</strong></div>
-                      <div class="col-7">${startDate}</div>
+                                        <div class="col-5"><strong>Check-out:</strong></div>
+                    <div class="col-7">${endDate}</div>
 
-                      <div class="col-5"><strong>Check-out:</strong></div>
-                      <div class="col-7">${endDate}</div>
+                                        <div class="col-5"><strong>Property:</strong></div>
+                    <div class="col-7">${props.homeName || 'N/A'}</div>
 
-                      <div class="col-5"><strong>Property:</strong></div>
-                      <div class="col-7">${props.homeName || 'N/A'}</div>
+                                        <div class="col-5"><strong>Rooms:</strong></div>
+                    <div class="col-7">${props.roomCount || 0}</div>
 
-                      <div class="col-5"><strong>Rooms:</strong></div>
-                      <div class="col-7">${props.roomCount || 0}</div>
+                                        <div class="col-5"><strong>Total:</strong></div>
+                    <div class="col-7"><strong>₹${props.price || 0}</strong></div>
+                    <div class="col-5"><strong>Advance Paid:</strong></div>
+                    <div class="col-7">₹${advancePaid}</div>
+                    <div class="col-5"><strong>Remaining:</strong></div>
+                    <div class="col-7"><strong>₹${remainingAmount}</strong></div>
+                    </div>
 
-                      <div class="col-5"><strong>Total:</strong></div>
-                      <div class="col-7"><strong>₹${props.price || 0}</strong></div>
-                  </div>
+                                    ${props.message ? `
+                    <div class="mt-2 p-2 bg-light rounded">
+                    <strong class="d-block mb-1">Notes:</strong>
+                    <small>${props.message}</small>
+                    </div>
+                                    ` : ''}
 
-                  ${props.message ? `
-                      <div class="mt-2 p-2 bg-light rounded">
-                          <strong class="d-block mb-1">Notes:</strong>
-                          <small>${props.message}</small>
-                      </div>
-                  ` : ''}
+                                    ${roomDetails}
+                                    ${paymentSection}
+                                    ${deleteSection}
+                    </div>
+                            `;
 
-                  ${roomDetails}
-                  ${paymentSection}
-                  ${deleteSection}
-              </div>
-          `;
-
-          showNotification(eventInfo, 'info', 0);
-      }
+                    showNotification(eventInfo, 'info', 0);
+        }
 
        //-GetDetails OF Room
         function GetRoomDetailsById(roomId)

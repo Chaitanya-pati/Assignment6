@@ -46,6 +46,16 @@ namespace DbService.Implementation
             }
         }
 
+        public Home UpdateHome(Home home)
+        {
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                db.Homes.Update(home);
+                db.SaveChanges();
+                return db.Homes.Where(x => x.Id == home.Id).FirstOrDefault();
+            }
+        }
+
         public List<Room> SaveRooms(List<Room> rooms)
         {
             List<Room> savedRooms = new List<Room>();

@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vernekar's Radha Heritage Home Stay</title>
-    
+     <link rel="icon" type="image/png" href="~/images/HomeIc.png">
     <!-- CDN Links -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -71,7 +71,7 @@
 <section class="hero" id="home">
     <div class="hero-content">
         <h1>A Heritage Stay That Feels Like Home</h1>
-        <p>Enjoy comfort and a warm welcome in every stay</p>
+        <p>Enjoy comfort and a warm welcome in every stay !!</p>
     </div>
 </section>
 
@@ -137,7 +137,7 @@
      ROOMS SECTION
      ============================================ -->
 <section class="section" id="rooms" style="padding:10px;">
-    <h2 class="section-title">Our Beautiful Rooms</h2>
+    <h2 class="text-center" style="font-size: 2rem;margin-bottom: 2.5rem;color: #333;font-weight: 700;">Our Beautiful Rooms</h2>
     <p class="section-subtitle">Experience Comfort & Luxury</p>
 
     <!-- Common Sitting Area -->
@@ -351,7 +351,7 @@
             <!-- Award Description -->
             <div class="col-lg-6">
                 <div class="award-description">
-                    <h3 class="award-property-name">Vernekar's<br>RADHA CLASSIC HERITAGE HOMESTAY<br>Belagavi, Karnataka</h3>
+                    <h3 class="award-property-name">Vernekar's<br>Radha Classic Heritage Homestay<br>Belagavi, Karnataka</h3>
 
                     <div class="award-message">
                         <p class="lead">We are proud to share that <strong>Radha Classic Heritage</strong> has been honoured as the <strong>Best Homestay – 2025</strong>!</p>
@@ -384,7 +384,7 @@
      FEATURES SECTION
      ============================================ -->
 <section id="features" class="section features">
-    <h2>Vernekar's Radha Heritage Home Stay</h2>
+    <h2>Why Choose Vernekar's Radha Heritage Home Stay?</h2>
     <div class="features-grid">
         <div class="feature-card">
             <i class="fas fa-home feature-icon"></i>
@@ -543,6 +543,7 @@
                         <input type="hidden" id="TotalDays" name="TotalDays">
                         <input type="hidden" id="SelectedRoomIds" name="SelectedRoomIds">
                         <input type="hidden" id="SelectedRoomData" name="SelectedRoomData">
+                        <p>By submitting this form, you agree to our  <a href="/Home/Privacy" target="_blank" class="reviews_terms_link">Privacy Policy.</a></p>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -591,22 +592,227 @@
         </div>
     </div>
 
+    <div class="reviews_section">
+        <div class="reviews_header">
+            <h2>What Our Guests Say!</h2>
+        </div>
 
+        <div class="reviews_carousel_container">
+            <button class="reviews_carousel_nav reviews_prev" onclick="reviewsPrevSlide()" aria-label="Previous review">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+
+            <div class="reviews_carousel_wrapper">
+                <div class="reviews_carousel_track" id="reviewsCarouselTrack">
+                    <!-- Review 1 -->
+                    <div class="reviews_card">
+                        <div class="reviews_card_header">
+                            <h3 class="reviews_reviewer_name">Mangesh Gholkar</h3>
+                            <div class="reviews_card_stars">
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                            </div>
+                        </div>
+                        <p class="reviews_text">
+                            A perfect home away from home! Radha Homestay truly lives up to its name, it felt like staying at my own home. The host, Mr. Vernekar, was absolutely fantastic and made sure everything was taken care of. The rooms are clean and spacious, with a lovely heritage look and beautiful lighting. Overall, great hospitality, perfect comfort, and excellent value for money. Highly recommended!
+                        </p>
+                        <div class="reviews_highlights">
+                            <span class="reviews_highlight_tag">Luxury</span>
+                            <span class="reviews_highlight_tag">Quiet</span>
+                            <span class="reviews_highlight_tag">Child-friendly</span>
+                            <span class="reviews_highlight_tag">Great value</span>
+                        </div>
+                    </div>
+
+                    <!-- Review 2 -->
+                    <div class="reviews_card">
+                        <div class="reviews_card_header">
+                            <h3 class="reviews_reviewer_name">Rishikant Havala</h3>
+                            <div class="reviews_card_stars">
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                            </div>
+                        </div>
+                        <p class="reviews_text">
+                            We had booked the entire Homestay for our guests, and it turned out to be a wonderful experience. The property is beautifully maintained, clean, and offers a peaceful atmosphere — perfect for a comfortable stay. The hospitality extended by the host, Mr. Vaibhav, was truly outstanding. He was attentive, accommodating, and ensured that every guest felt at home. Highly recommended!
+                        </p>
+                    </div>
+
+                    <!-- Review 3 -->
+                    <div class="reviews_card">
+                        <div class="reviews_card_header">
+                            <h3 class="reviews_reviewer_name">Sphurti Ghatawalimath</h3>
+                            <div class="reviews_card_stars">
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                            </div>
+                        </div>
+                        <p class="reviews_text">
+                            Thank u Vaibhav Vernekar for this Homestay. Very beautiful interiors, spacious rooms and hygienic. Accessible to first gate in minutes. Must try and most recommend 👍.
+                        </p>
+                        <div class="reviews_highlights">
+                            <span class="reviews_highlight_tag">Great view</span>
+                            <span class="reviews_highlight_tag">Quiet</span>
+                            <span class="reviews_highlight_tag">Child-friendly</span>
+                            <span class="reviews_highlight_tag">Great value</span>
+                        </div>
+                    </div>
+
+                    <!-- Review 4 -->
+                    <div class="reviews_card">
+                        <div class="reviews_card_header">
+                            <h3 class="reviews_reviewer_name">Syed Kashif Hussain</h3>
+                            <div class="reviews_card_stars">
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                            </div>
+                        </div>
+                        <p class="reviews_text">
+                            Amazing stay! 😊 The place was super comfy and the vibes were on point! 👌 Our host provided a warm welcome and incredible hospitality, making our trip truly unforgettable. 🙏 Thanks for the wonderful experience! Highly recommend! 🌟🌟🌟🌟🌟
+                        </p>
+                        <div class="reviews_highlights">
+                            <span class="reviews_highlight_tag">Luxury</span>
+                            <span class="reviews_highlight_tag">Great value</span>
+                        </div>
+                    </div>
+
+                    <!-- Review 5 -->
+                    <div class="reviews_card">
+                        <div class="reviews_card_header">
+                            <h3 class="reviews_reviewer_name">Aakash Ranade</h3>
+                            <div class="reviews_card_stars">
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                            </div>
+                        </div>
+                        <p class="reviews_text">
+                            Superb stay, very unique and luxurious villa with modern kitchen and rooms. Highly recommend. Also staff quite friendly.
+                        </p>
+                        <div class="reviews_highlights">
+                            <span class="reviews_highlight_tag">Luxury</span>
+                            <span class="reviews_highlight_tag">Quiet</span>
+                            <span class="reviews_highlight_tag">Great value</span>
+                        </div>
+                    </div>
+
+                    <!-- Review 6 -->
+                    <div class="reviews_card">
+                        <div class="reviews_card_header">
+                            <h3 class="reviews_reviewer_name">Sunil DS</h3>
+                            <div class="reviews_card_stars">
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                                <span class="reviews_star">★</span>
+                            </div>
+                        </div>
+                        <p class="reviews_text">
+                            One of the best home 🏠 stay in Belgaum. Cleanly maintained and supportive staff. Interior and show piece are exceptionally good.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="reviews_carousel_nav reviews_next" onclick="reviewsNextSlide()" aria-label="Next review">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+
+            <div class="reviews_carousel_indicators" id="reviewsIndicators"></div>
+        </div>
+    </div>
 
 <!-- ============================================
      FOOTER
      ============================================ -->
-<footer class="footer" id="contact">
-    <div class="footer-content">
-        <p>&copy; 2025 Vernekar's Radha Heritage Home Stay. All rights reserved.</p>
-        <p>
-            <i class="fas fa-envelope footer-icon"></i>
-            Vaibsv1@yahoo.com | 
-            <i class="fas fa-phone footer-icon"></i>
-            +919845352106
-        </p>
-    </div>
-</footer>
+        <!-- Footer -->
+ <footer class="footer w-100" id="contact">
+        <div class="container">
+            <div class="row">
+                <!-- Contact Information -->
+                <div class="col-lg-5 col-md-6 mb-4">
+                    <div class="section-title">Get In Touch</div>
+                    
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-text">
+                                319/c, Roy Rd, Shivaji Colony,<br>
+                                Tilakwadi, Belagavi, Karnataka 590006
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <a href="mailto:radhaheritagehomestay@gmail.com" class="contact-text">
+                                radhaheritagehomestay@gmail.com
+                            </a>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <a href="tel:+919845352106" class="contact-text">
+                                +91 9845352106
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="social-links">
+                        <a href="https://wa.me/919845352106" target="_blank" class="social-icon" title="WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="tel:+919845352106" class="social-icon" title="Call Now">
+                            <i class="fas fa-phone-alt"></i>
+                        </a>
+                        <a href="https://www.instagram.com/vernekars_radha_heritage_stay?igsh=MXE4dXh3YTVjczJhdg==" target="_blank" class="social-icon" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    
+                </div>
+                
+                <!-- Map Section -->
+                <div class="col-lg-7 col-md-6 mb-4">
+                    <div class="section-title">Find Us Here</div>
+                    <div class="map-section">
+                        <div class="map-container">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d8616.924160151795!2d74.50188381455378!3d15.835378907483332!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e0!4m0!4m5!1s0x3bbf673d10e5360d%3A0x3004770ec9f346d4!2sVernekar&#39;s%20Radha%20Heritage%20Home%20Stay%2C%20319%2Fc%2C%20Roy%20Rd%2C%20Shivaji%20Colony%2C%20Tilakwadi%2C%20Belagavi%2C%20Karnataka%20590006!3m2!1d15.8357282!2d74.50016049999999!5e0!3m2!1sen!2sin!4v1767856912357!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright-text">
+                © @DateTime.Now.Year Vernekar's Radha Heritage Home Stay. All rights reserved.<a href="/Home/Privacy" class="reviews_terms_link" target="_blank">Privacy Policy</a>
+                
+            </div>
+        </div>
+    </footer>
 
 <!-- CDN Scripts -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -2107,6 +2313,90 @@
             });
         }
     });
+    // Reviews Section 
+
+   let reviewsCurrentSlide = 0;
+        const reviewsTotalSlides = 6;
+        const reviewsTrack = document.getElementById('reviewsCarouselTrack');
+        const reviewsIndicatorsContainer = document.getElementById('reviewsIndicators');
+
+        // Create indicators
+        for (let i = 0; i < reviewsTotalSlides; i++) {
+            const indicator = document.createElement('button');
+            indicator.className = 'reviews_indicator';
+            indicator.onclick = () => reviewsGoToSlide(i);
+            indicator.setAttribute('aria-label', `Go to review ${i + 1}`);
+            reviewsIndicatorsContainer.appendChild(indicator);
+        }
+
+        function reviewsUpdateCarousel() {
+            reviewsTrack.style.transform = `translateX(-${reviewsCurrentSlide * 100}%)`;
+            
+            // Update indicators
+            const indicators = document.querySelectorAll('.reviews_indicator');
+            indicators.forEach((indicator, index) => {
+                if (index === reviewsCurrentSlide) {
+                    indicator.classList.add('reviews_active');
+                } else {
+                    indicator.classList.remove('reviews_active');
+                }
+            });
+        }
+
+        function reviewsNextSlide() {
+            reviewsCurrentSlide = (reviewsCurrentSlide + 1) % reviewsTotalSlides;
+            reviewsUpdateCarousel();
+        }
+
+        function reviewsPrevSlide() {
+            reviewsCurrentSlide = (reviewsCurrentSlide - 1 + reviewsTotalSlides) % reviewsTotalSlides;
+            reviewsUpdateCarousel();
+        }
+
+        function reviewsGoToSlide(index) {
+            reviewsCurrentSlide = index;
+            reviewsUpdateCarousel();
+        }
+
+        // Auto-play
+        let reviewsAutoPlayInterval = setInterval(reviewsNextSlide, 5000);
+
+        // Pause auto-play on hover
+        const reviewsCarouselContainer = document.querySelector('.reviews_carousel_container');
+        reviewsCarouselContainer.addEventListener('mouseenter', () => {
+            clearInterval(reviewsAutoPlayInterval);
+        });
+
+        reviewsCarouselContainer.addEventListener('mouseleave', () => {
+            reviewsAutoPlayInterval = setInterval(reviewsNextSlide, 5000);
+        });
+
+        // Initialize
+        reviewsUpdateCarousel();
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') reviewsPrevSlide();
+            if (e.key === 'ArrowRight') reviewsNextSlide();
+        });
+
+        // Touch swipe support
+        let reviewsTouchStartX = 0;
+        let reviewsTouchEndX = 0;
+
+        reviewsCarouselContainer.addEventListener('touchstart', (e) => {
+            reviewsTouchStartX = e.changedTouches[0].screenX;
+        });
+
+        reviewsCarouselContainer.addEventListener('touchend', (e) => {
+            reviewsTouchEndX = e.changedTouches[0].screenX;
+            reviewsHandleSwipe();
+        });
+
+        function reviewsHandleSwipe() {
+            if (reviewsTouchEndX < reviewsTouchStartX - 50) reviewsNextSlide();
+            if (reviewsTouchEndX > reviewsTouchStartX + 50) reviewsPrevSlide();
+        }
 
     function validateIndividualRoomBookingDates() {
         const checkinInput = document.getElementById('BookingDateFrom');
@@ -2143,7 +2433,7 @@
             const maxBookingDate = new Date(checkinDate);
             maxBookingDate.setDate(maxBookingDate.getDate() - 3);
             showNotification(
-                `Individual room booking for ${checkinDate.toDateString()} is only available from ${maxBookingDate.toDateString()} onwards. For earlier booking, please select "Book Entire Property".`,
+                `Individual room booking for ${checkinDate.toDateString()} is not available & only available for ${maxBookingDate.toDateString()}. For earlier booking, please select "Book Entire Property".`,
                 'error',
                 8000
             );

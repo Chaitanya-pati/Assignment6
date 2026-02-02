@@ -467,14 +467,13 @@ namespace Assignment6.Controllers
                     customerEmail = b.CustomerEmail,
                     customerPhone = b.CustomerPhone,
                     message = b.Message,
-                    // FIXED: Don't add extra day to checkout date
                     bookingDateFrom = b.BookingDateFrom.ToString("yyyy-MM-dd"),
-                    bookingDateTo = b.BookingDateTo.ToString("yyyy-MM-dd"), // Use actual checkout date
+                    bookingDateTo = b.BookingDateTo.ToString("yyyy-MM-dd"),
                     homeId = b.HomeId,
                     paymentStatus = b.PaymentStatus,
                     price = b.Price,
-                    advance = b.AdvancePrice ?? 0,
-                    pending = b.Price - (b.AdvancePrice ?? 0),
+                    advancePaid = b.AdvancePrice ?? 0,
+                    amountToBePaid = b.Price - (b.AdvancePrice ?? 0),
                     guestNumbers = b.GuestNumbers,
                     document = b.Document,
                     bookingRooms = b.BookingRooms?.Select(br => new
@@ -493,7 +492,6 @@ namespace Assignment6.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-        // REPLACE the existing GenerateInvoice method with this updated version
 
 
         private string GenerateInvoice(int bookingId)

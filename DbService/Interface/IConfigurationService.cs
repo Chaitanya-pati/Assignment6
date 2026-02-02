@@ -12,6 +12,7 @@ namespace DbService.Interface
     {
         public List<Home> GetHomeMaster();
         public Home SaveHome(Home home);
+        public Home UpdateHome(Home home);
         public List<Room> SaveRooms(List<Room> rooms);
         public bool SaveLayoutElement(List<LayoutElement> layoutElements);
 
