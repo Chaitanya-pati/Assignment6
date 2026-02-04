@@ -1539,10 +1539,6 @@
 
                   // Show notification about the filter
                   showNotification(`Showing bookings for: ${getHomeName(selectedHomeId)}`, 'info', 3000);
-              } else {
-                  currentPropertyFilter = null;
-                  $('.calendar-title').html('<i class="fas fa-calendar-week me-2"></i>Booking Calendar - All Properties');
-                  showNotification('Showing all property bookings', 'info', 3000);
               }
 
               // Refresh calendar with new filter
