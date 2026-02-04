@@ -2103,8 +2103,12 @@
           return console.error(err.toString());
       });
           function BindSchedulerData(data) {
-            // Clear all existing events first
-            calendar.removeAllEvents();
+            console.log('BindSchedulerData called with', data?.length, 'bookings');
+            
+            // Clear all existing events first - get all events and remove them
+            const allEvents = calendar.getEvents();
+            console.log('Removing', allEvents.length, 'existing events');
+            allEvents.forEach(event => event.remove());
             
             // Transform booking data to events
             data?.forEach(booking => {
@@ -2114,6 +2118,8 @@
 
                 const startDate = booking.bookingDateFrom;
                 const endDate = booking.bookingDateTo;
+
+                console.log('Adding booking:', booking.id, booking.customerName, 'for homeId:', booking.homeId);
 
                 // Add new event with blue color (#3498db)
                 calendar.addEvent({
@@ -2142,6 +2148,7 @@
                 });
             });
 
+            console.log('After binding, calendar has', calendar.getEvents().length, 'events');
             calendar.render(); // re-render view if needed
         }
 </script>
