@@ -952,7 +952,9 @@
                     <select id="homeSelector" class="form-select">
                         @foreach (var home in Model.Homes)
                         {
-                            <option value="@home.Id" @(home.Id == 1 ? "selected" : "")>@home.Name</option>
+                            <option value="@home.Id" selected="@(home.Id == 1)">
+                                @home.Name
+                            </option>
                         }
                     </select>
                 </div>
@@ -1029,6 +1031,7 @@
 <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
 
 <script>
+
       // Add this right after your existing script tag opens
       var currentPropertyFilter = 1; // Default to Ground Floor (homeId = 1)
       var calendarEl = document.getElementById('calendar');
@@ -1166,57 +1169,63 @@
           //         }
           //     }
           // },
-          eventDidMount: function (info) {
-              if (info.event.display === 'background') {
-                  const dayEl = info.el.closest('.fc-daygrid-day');
-                  if (dayEl) {
-                      const eventDate = new Date(info.event.startStr);
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
+             eventDidMount: function (info) {
+                if (info.event.display === 'background') {
+                    const dayEl = info.el.closest('.fc-daygrid-day');
+                    if (dayEl) {
+                        const eventDate = new Date(info.event.startStr);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
 
-                      // Style the entire day cell
-                      dayEl.style.backgroundColor = info.event.backgroundColor;
-                      dayEl.style.color = 'white';
-                      dayEl.style.cursor = 'pointer';
-                      dayEl.style.position = 'relative';
+                        // **CRITICAL FIX: Remove any existing overlays first**
+                        const existingOverlay = dayEl.querySelector('.booking-overlay');
+                        if (existingOverlay) {
+                            existingOverlay.remove();
+                        }
 
-                      // Add booking details overlay with Airbnb indicator
-                      const overlay = document.createElement('div');
-                      overlay.className = 'booking-overlay';
+                        // Style the entire day cell
+                        dayEl.style.backgroundColor = info.event.backgroundColor;
+                        dayEl.style.color = 'white';
+                        dayEl.style.cursor = 'pointer';
+                        dayEl.style.position = 'relative';
 
-                      const isAirbnb = info.event.extendedProps.isAirbnbBooking;
-                      const airbnbIndicator = isAirbnb ? '<div class="airbnb-indicator">🏠 Airbnb</div>' : '';
+                        // Add booking details overlay with Airbnb indicator
+                        const overlay = document.createElement('div');
+                        overlay.className = 'booking-overlay';
+                        overlay.dataset.bookingId = info.event.id; // Add identifier for easier cleanup
 
-                      overlay.innerHTML = `
-                      ${airbnbIndicator}
-                      <div class="booking-customer">${info.event.title}</div>
-                      <div class="booking-property">${info.event.extendedProps.homeName}</div>
-                      <div class="booking-price">₹${info.event.extendedProps.price}</div>
-                  `;
+                        const isAirbnb = info.event.extendedProps.isAirbnbBooking;
+                        const airbnbIndicator = isAirbnb ? '<div class="airbnb-indicator">🏠 Airbnb</div>' : '';
 
-                      dayEl.appendChild(overlay);
+                        overlay.innerHTML = `
+                            ${airbnbIndicator}
+                            <div class="booking-customer">${info.event.title}</div>
+                            <div class="booking-property">${info.event.extendedProps.homeName}</div>
+                            <div class="booking-price">₹${info.event.extendedProps.price}</div>
+                        `;
 
-                      // Add click handler for booking details
-                      dayEl.addEventListener('click', function (e) {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          showEventDetails(info.event);
-                      });
+                        dayEl.appendChild(overlay);
 
-                      // Add tooltip only for future bookings or today's bookings
-                      if (eventDate >= today) {
-                          const bookingType = isAirbnb ? 'Airbnb' : 'Manual';
-                          $(info.el).tooltip({
-                              title: `${bookingType} Booking: ${info.event.title} - ${info.event.extendedProps.homeName} (₹${info.event.extendedProps.price})`,
-                              placement: 'top',
-                              trigger: 'hover',
-                              container: 'body'
-                          });
-                      }
-                      // No tooltip for past bookings
-                  }
-              }
-          },
+                        // Add click handler for booking details
+                        dayEl.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            showEventDetails(info.event);
+                        });
+
+                        // Add tooltip only for future bookings or today's bookings
+                        if (eventDate >= today) {
+                            const bookingType = isAirbnb ? 'Airbnb' : 'Manual';
+                            $(info.el).tooltip({
+                                title: `${bookingType} Booking: ${info.event.title} - ${info.event.extendedProps.homeName} (₹${info.event.extendedProps.price})`,
+                                placement: 'top',
+                                trigger: 'hover',
+                                container: 'body'
+                            });
+                        }
+                    }
+                }
+            },
           eventClick: function (info) {
               showEventDetails(info.event);
           },
@@ -1447,43 +1456,59 @@
           }
       }
 
-      function fetchAndDisplayBookings() {
-          // Prevent duplicate simultaneous calls
-          if (isLoadingBookings) {
-              console.log('Already loading bookings, skipping duplicate call');
-              return;
-          }
-          
-          isLoadingBookings = true;
-          showLoading('Loading bookings...');
+          function fetchAndDisplayBookings() {
+        // Prevent duplicate simultaneous calls
+        if (isLoadingBookings) {
+            console.log('Already loading bookings, skipping duplicate call');
+            return;
+        }
 
-          // Build URL with optional property filter
-          let url = '/Scheduler/GetBookings';
-          if (currentPropertyFilter) {
-              url += `?homeId=${currentPropertyFilter}`;
-          }
+        isLoadingBookings = true;
+        showLoading('Loading bookings...');
 
-          console.log('Fetching bookings from:', url);
-          console.log('Current filter:', currentPropertyFilter);
+        // Build URL with optional property filter
+        let url = '/Scheduler/GetBookings';
+        if (currentPropertyFilter) {
+            url += `?homeId=${currentPropertyFilter}`;
+        }
 
-          $.ajax({
-              url: url,
-              type: 'GET',
-              success: function (data) {
-                  console.log('Received', data.length, 'bookings from server');
-                  BindSchedulerData(data);
-              },
-              error: function (xhr, status, error) {
-                  console.error("Get Bookings Error:", error);
-                  console.error("Response:", xhr.responseText);
-                  showNotification("Error retrieving bookings. Please try again.", 'error');
-              },
-              complete: function () {
-                  hideLoading();
-                  isLoadingBookings = false;
-              }
-          });
-      }
+        console.log('=== FETCHING BOOKINGS ===');
+        console.log('URL:', url);
+        console.log('Current filter:', currentPropertyFilter);
+        console.log('Filter name:', getHomeName(currentPropertyFilter));
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            cache: false, // Prevent caching
+            success: function (data) {
+                console.log('=== AJAX SUCCESS ===');
+                console.log('Received', data.length, 'bookings from server');
+
+                // Log first few bookings for verification
+                if (data.length > 0) {
+                    console.log('Sample bookings received:');
+                    data.slice(0, 3).forEach(b => {
+                        console.log(`  - ID:${b.id}, HomeId:${b.homeId}, Customer:${b.customerName}`);
+                    });
+                }
+
+                BindSchedulerData(data);
+            },
+            error: function (xhr, status, error) {
+                console.error("=== AJAX ERROR ===");
+                console.error("Status:", status);
+                console.error("Error:", error);
+                console.error("Response:", xhr.responseText);
+                showNotification("Error retrieving bookings. Please try again.", 'error');
+            },
+            complete: function () {
+                hideLoading();
+                isLoadingBookings = false;
+                console.log('=== FETCH COMPLETE ===');
+            }
+        });
+    }
 
 
       // ADD this debugging function to check your backend data
@@ -1541,6 +1566,12 @@
 
       // jQuery Ready Function
       $(document).ready(function () {
+
+            console.log('=== AVAILABLE HOMES ===');
+    $('#homeSelector option').each(function() {
+        console.log(`Home: "${$(this).text()}" = ID: ${$(this).val()}`);
+    });
+    console.log('======================');
           // Initialize calendar title with default property (Ground Floor)
           const defaultHomeId = parseInt($('#homeSelector').val());
           if (defaultHomeId) {
@@ -1549,23 +1580,25 @@
           
           // Handle Home dropdown change
           // Add this inside your existing $(document).ready function
-          $('#homeSelector').on('change', function () {
-              const selectedHomeId = parseInt($(this).val());
+             $('#homeSelector').on('change', function () {
+        const selectedHomeId = parseInt($(this).val());
 
-              if (selectedHomeId) {
-                  currentPropertyFilter = selectedHomeId;
-                  console.log(`Filtering calendar for property: ${selectedHomeId} (${getHomeName(selectedHomeId)})`);
+        if (selectedHomeId) {
+            currentPropertyFilter = selectedHomeId;
+            console.log('=== PROPERTY FILTER CHANGED ===');
+            console.log(`New filter: ${selectedHomeId} (${getHomeName(selectedHomeId)})`);
 
-                  // Update calendar title to show selected property
-                  $('.calendar-title').html(`<i class="fas fa-calendar-week me-2"></i>Booking Calendar - ${getHomeName(selectedHomeId)}`);
+            // Update calendar title to show selected property
+            $('.calendar-title').html(`<i class="fas fa-calendar-week me-2"></i>Booking Calendar - ${getHomeName(selectedHomeId)}`);
 
-                  // Show notification about the filter
-                  showNotification(`Showing bookings for: ${getHomeName(selectedHomeId)}`, 'info', 3000);
-              }
+            // Show notification about the filter
+            showNotification(`Showing bookings for: ${getHomeName(selectedHomeId)}`, 'info', 3000);
+        }
 
-              // Refresh calendar with new filter
-              fetchAndDisplayBookings();
-          });
+        // Refresh calendar with new filter
+        fetchAndDisplayBookings();
+    });
+
           $(document).on('change', '#HomeId', function () {
               const homeId = $(this).val();
               if (!homeId) return;
@@ -2118,16 +2151,49 @@
       connection.start().catch(function (err) {
           return console.error(err.toString());
       });
-          function BindSchedulerData(data) {
-            console.log('BindSchedulerData called with', data?.length, 'bookings');
-            
-            // Clear all existing events first - get all events and remove them
-            const allEvents = calendar.getEvents();
-            console.log('Removing', allEvents.length, 'existing events');
-            allEvents.forEach(event => event.remove());
-            
-            // Transform booking data to events
-            data?.forEach(booking => {
+
+              function BindSchedulerData(data) {
+        console.log('=== BindSchedulerData START ===');
+        console.log('Total bookings received:', data?.length);
+        console.log('Current property filter:', currentPropertyFilter);
+        console.log('Filter property name:', getHomeName(currentPropertyFilter));
+
+        // **CRITICAL FIX: Clean up ALL manually added overlays and styles**
+        document.querySelectorAll('.fc-daygrid-day').forEach(dayCell => {
+            // Remove overlays
+            const overlay = dayCell.querySelector('.booking-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+
+            // Reset day cell styles
+            dayCell.style.backgroundColor = '';
+            dayCell.style.color = '';
+
+            // Remove tooltips
+            $(dayCell).tooltip('dispose');
+        });
+
+        // Remove all calendar events
+        calendar.removeAllEvents();
+
+        let addedCount = 0;
+        let skippedCount = 0;
+
+        // Transform booking data to events
+        if (data && data.length > 0) {
+            data.forEach(booking => {
+                console.log(`Processing booking ${booking.id}: homeId=${booking.homeId}, customer=${booking.customerName}`);
+
+                // **CRITICAL FIX: Filter bookings by selected property**
+                if (currentPropertyFilter && booking.homeId !== currentPropertyFilter) {
+                    console.log(`❌ SKIPPED - Booking ${booking.id} homeId:${booking.homeId} doesn't match filter:${currentPropertyFilter}`);
+                    skippedCount++;
+                    return; // Skip this booking
+                }
+
+                console.log(`✅ ADDING - Booking ${booking.id} matches filter`);
+
                 const homeName = getHomeName(booking.homeId);
                 const roomCount = booking.bookingRooms ? booking.bookingRooms.length : 0;
                 const isAirbnb = booking.isAirbnbBooking || booking.customerName === "Airbnb Guest";
@@ -2135,15 +2201,15 @@
                 const startDate = booking.bookingDateFrom;
                 const endDate = booking.bookingDateTo;
 
-                console.log('Adding booking:', booking.id, booking.customerName, 'for homeId:', booking.homeId);
+                // Add new event with appropriate color
+                const eventColor = isAirbnb ? '#FF6B35' : '#3498db';
 
-                // Add new event with blue color (#3498db)
                 calendar.addEvent({
                     id: booking.id,
                     title: booking.customerName,
                     start: startDate,
                     end: endDate,
-                    color: '#3498db', // Blue color for all bookings
+                    color: eventColor,
                     allDay: true,
                     display: 'background',
                     extendedProps: {
@@ -2162,9 +2228,17 @@
                         isAirbnbBooking: isAirbnb
                     }
                 });
-            });
 
-            console.log('After binding, calendar has', calendar.getEvents().length, 'events');
-            calendar.render(); // re-render view if needed
+                addedCount++;
+            });
         }
+
+        console.log(`=== BindSchedulerData COMPLETE ===`);
+        console.log(`Added: ${addedCount} bookings`);
+        console.log(`Skipped: ${skippedCount} bookings`);
+        console.log(`Calendar now has: ${calendar.getEvents().length} total events`);
+
+        // Re-render the calendar to display updated events
+        calendar.render();
+    }
 </script>

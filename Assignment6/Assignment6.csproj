@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\UserManagement\UserManagement.Lib\UserManagement.Lib.csproj" />
+    <ProjectReference Include="..\..\Chaitanya-pati\UserManagement\UserManagement.Lib\UserManagement.Lib.csproj" />
     <ProjectReference Include="..\DbService\DbService.csproj" />
   </ItemGroup>
 
