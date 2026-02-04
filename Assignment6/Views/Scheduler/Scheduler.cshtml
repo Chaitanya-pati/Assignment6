@@ -1033,6 +1033,7 @@
       var currentPropertyFilter = 1; // Default to Ground Floor (homeId = 1)
       var calendarEl = document.getElementById('calendar');
       var calendar;
+      var isLoadingBookings = false; // Prevent duplicate loads
 
       calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: 'dayGridMonth',
