@@ -1452,11 +1452,15 @@
               url += `?homeId=${currentPropertyFilter}`;
           }
 
+          console.log('Fetching bookings from:', url);
+          console.log('Current filter:', currentPropertyFilter);
+
           $.ajax({
               url: url,
               type: 'GET',
               success: function (data) {
-                   BindSchedulerData(data);
+                  console.log('Received', data.length, 'bookings from server');
+                  BindSchedulerData(data);
               },
               error: function (xhr, status, error) {
                   console.error("Get Bookings Error:", error);
