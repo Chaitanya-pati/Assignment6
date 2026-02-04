@@ -1236,8 +1236,11 @@
           },
 
           datesSet: function (info) {
-              console.log('Calendar view changed:', info.startStr, 'to', info.endStr);
-              fetchAndDisplayBookings();
+              console.log('Calendar datesSet fired:', info.startStr, 'to', info.endStr);
+              // Don't fetch if already loading
+              if (!isLoadingBookings) {
+                  fetchAndDisplayBookings();
+              }
           }
       });
 
