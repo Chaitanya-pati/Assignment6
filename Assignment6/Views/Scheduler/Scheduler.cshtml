@@ -2101,6 +2101,9 @@
           return console.error(err.toString());
       });
           function BindSchedulerData(data) {
+            // Clear all existing events first
+            calendar.removeAllEvents();
+            
             // Transform booking data to events
             data?.forEach(booking => {
                 const homeName = getHomeName(booking.homeId);
@@ -2110,49 +2113,31 @@
                 const startDate = booking.bookingDateFrom;
                 const endDate = booking.bookingDateTo;
 
-                const existingEvent = calendar.getEventById(booking.id);
-
-                if (existingEvent) {
-                    // Update existing event
-                    existingEvent.setProp('title', booking.customerName);
-                    existingEvent.setDates(startDate, endDate); // update start & end
-                    existingEvent.setProp('color', isAirbnb ? '#FF6B35' : getBookingColor(booking.paymentStatus));
-                    existingEvent.setExtendedProp('customerName', booking.customerName);
-                    existingEvent.setExtendedProp('customerEmail', booking.customerEmail);
-                    existingEvent.setExtendedProp('customerPhone', booking.customerPhone);
-                    existingEvent.setExtendedProp('message', booking.message);
-                    existingEvent.setExtendedProp('price', booking.price);
-                    existingEvent.setExtendedProp('paymentStatus', booking.paymentStatus);
-                    existingEvent.setExtendedProp('homeId', booking.homeId);
-                    existingEvent.setExtendedProp('homeName', homeName);
-                    existingEvent.setExtendedProp('roomCount', roomCount);
-                    existingEvent.setExtendedProp('bookingRooms', booking.bookingRooms);
-                    existingEvent.setExtendedProp('isAirbnbBooking', isAirbnb);
-                } else {
-                    // Add new event
-                    calendar.addEvent({
-                        id: booking.id,
-                        title: booking.customerName,
-                        start: startDate,
-                        end: endDate,
-                        color: isAirbnb ? '#FF6B35' : getBookingColor(booking.paymentStatus),
-                        allDay: true,
-                        display: 'background',
-                        extendedProps: {
-                            customerName: booking.customerName,
-                            customerEmail: booking.customerEmail,
-                            customerPhone: booking.customerPhone,
-                            message: booking.message,
-                            price: booking.price,
-                            paymentStatus: booking.paymentStatus,
-                            homeId: booking.homeId,
-                            homeName: homeName,
-                            roomCount: roomCount,
-                            bookingRooms: booking.bookingRooms,
-                            isAirbnbBooking: isAirbnb
-                        }
-                    });
-                }
+                // Add new event with blue color (#3498db)
+                calendar.addEvent({
+                    id: booking.id,
+                    title: booking.customerName,
+                    start: startDate,
+                    end: endDate,
+                    color: '#3498db', // Blue color for all bookings
+                    allDay: true,
+                    display: 'background',
+                    extendedProps: {
+                        customerName: booking.customerName,
+                        customerEmail: booking.customerEmail,
+                        customerPhone: booking.customerPhone,
+                        message: booking.message,
+                        price: booking.price,
+                        advancePaid: booking.advancePaid,
+                        amountToBePaid: booking.amountToBePaid,
+                        paymentStatus: booking.paymentStatus,
+                        homeId: booking.homeId,
+                        homeName: homeName,
+                        roomCount: roomCount,
+                        bookingRooms: booking.bookingRooms,
+                        isAirbnbBooking: isAirbnb
+                    }
+                });
             });
 
             calendar.render(); // re-render view if needed
