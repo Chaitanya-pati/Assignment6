@@ -1525,6 +1525,12 @@
 
       // jQuery Ready Function
       $(document).ready(function () {
+          // Initialize calendar title with default property (Ground Floor)
+          const defaultHomeId = parseInt($('#homeSelector').val());
+          if (defaultHomeId) {
+              $('.calendar-title').html(`<i class="fas fa-calendar-week me-2"></i>Booking Calendar - ${getHomeName(defaultHomeId)}`);
+          }
+          
           // Handle Home dropdown change
           // Add this inside your existing $(document).ready function
           $('#homeSelector').on('change', function () {
