@@ -950,10 +950,9 @@
                         <i class="fas fa-home"></i>Select Property
                     </label>
                     <select id="homeSelector" class="form-select">
-                        <option value="">Select a Property</option>
                         @foreach (var home in Model.Homes)
                         {
-                            <option value="@home.Id">@home.Name</option>
+                            <option value="@home.Id" @(home.Id == 1 ? "selected" : "")>@home.Name</option>
                         }
                     </select>
                 </div>
