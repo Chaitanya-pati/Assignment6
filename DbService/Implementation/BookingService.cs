@@ -498,7 +498,6 @@ namespace DbService.Implementation
         //        throw new Exception("Error fetching bookings: " + ex.Message, ex);
         //    }
         //}
-
         public List<Booking> GetAllBookings(DateTime? startDate = null, DateTime? endDate = null, int? homeId = null)
         {
             try
@@ -511,30 +510,54 @@ namespace DbService.Implementation
                         .Include(b => b.Home)
                         .AsQueryable();
 
-                    // REMOVED: Default date filtering - now gets ALL bookings unless specifically filtered
-                    // Only apply date filters if both startDate and endDate are provided
+                    // Apply date range filter if both dates are provided (for 6-month chunks)
                     if (startDate.HasValue && endDate.HasValue)
                     {
+                        // Filter bookings that overlap with the requested date range
+                        // A booking overlaps if: booking_end > range_start AND booking_start < range_end
                         query = query.Where(b =>
-                            b.BookingDateTo >= startDate.Value &&
-                            b.BookingDateFrom <= endDate.Value);
+                            b.BookingDateTo > startDate.Value &&
+                            b.BookingDateFrom < endDate.Value);
+
+                        Console.WriteLine($"Filtering bookings between {startDate.Value:yyyy-MM-dd} and {endDate.Value:yyyy-MM-dd}");
+                    }
+                    else
+                    {
+                        // If no date filter provided, optionally limit to reasonable range
+                        // to prevent loading years of data at once
+                        var defaultStartDate = DateTime.Now.AddMonths(-12);
+                        var defaultEndDate = DateTime.Now.AddMonths(12);
+
+                        query = query.Where(b =>
+                            b.BookingDateTo > defaultStartDate &&
+                            b.BookingDateFrom < defaultEndDate);
+
+                        Console.WriteLine($"No date filter provided. Using default range: {defaultStartDate:yyyy-MM-dd} to {defaultEndDate:yyyy-MM-dd}");
                     }
 
-                    if (homeId.HasValue)
+                    // Apply homeId filter if specified
+                    if (homeId.HasValue && homeId.Value > 0)
                     {
                         query = query.Where(b => b.HomeId == homeId.Value);
+                        Console.WriteLine($"Filtering for HomeId: {homeId.Value}");
                     }
 
-                    return query.OrderBy(b => b.BookingDateFrom).ToList();
+                    var result = query
+                        .OrderBy(b => b.BookingDateFrom)
+                        .ToList();
+
+                    Console.WriteLine($"Retrieved {result.Count} bookings from database");
+
+                    return result;
                 }
             }
             catch (Exception ex)
             {
-                // You could log the error here
+                Console.WriteLine($"Error in GetAllBookings service: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 throw new Exception("Error fetching bookings: " + ex.Message, ex);
             }
         }
-
         // ADD these methods to your BookingService class
 
         public bool UpdatePaymentStatus(int bookingId, string paymentStatus)

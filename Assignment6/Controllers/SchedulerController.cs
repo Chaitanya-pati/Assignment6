@@ -454,12 +454,6 @@ namespace Assignment6.Controllers
                     .Where(b => b.IsBooked) // Only show approved bookings on calendar
                     .ToList();
 
-                // Apply additional homeId filtering if specified
-                if (homeId.HasValue)
-                {
-                    bookings = bookings.Where(b => b.HomeId == homeId.Value).ToList();
-                }
-
                 var result = bookings.Select(b => new
                 {
                     id = b.Id,
@@ -476,6 +470,7 @@ namespace Assignment6.Controllers
                     amountToBePaid = b.Price - (b.AdvancePrice ?? 0),
                     guestNumbers = b.GuestNumbers,
                     document = b.Document,
+                   // isAirbnbBooking = b.IsAirbnbBooking ?? false, // Include Airbnb flag
                     bookingRooms = b.BookingRooms?.Select(br => new
                     {
                         roomId = br.RoomId,
@@ -483,7 +478,10 @@ namespace Assignment6.Controllers
                     }).ToList()
                 });
 
-                Console.WriteLine($"Returning {result.Count()} approved bookings");
+                Console.WriteLine($"Returning {result.Count()} approved bookings" +
+                    (startDate.HasValue && endDate.HasValue ? $" between {startDate.Value:yyyy-MM-dd} and {endDate.Value:yyyy-MM-dd}" : "") +
+                    (homeId.HasValue ? $" for HomeId: {homeId.Value}" : ""));
+
                 return Json(result);
             }
             catch (Exception ex)
@@ -492,7 +490,6 @@ namespace Assignment6.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
 
         private string GenerateInvoice(int bookingId)
         {
