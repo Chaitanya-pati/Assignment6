@@ -44,9 +44,18 @@ let allImageData = [];
 
 async function loadImageData() {
     if (allImageData.length > 0) return allImageData;
-    const res = await fetch('/data/property-images.json');
-    allImageData = await res.json();
-    return allImageData;
+    try {
+        const res = await fetch('/data/property-images.json');
+        if (!res.ok) {
+            console.error('Failed to load image data:', res.status);
+            return [];
+        }
+        allImageData = await res.json();
+        return allImageData;
+    } catch (error) {
+        console.error('Error loading image data:', error);
+        return [];
+    }
 }
 
 function openImageViewerWithImages(images) {

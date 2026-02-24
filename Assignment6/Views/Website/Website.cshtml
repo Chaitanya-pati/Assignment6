@@ -818,7 +818,8 @@
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-
+@await Html.PartialAsync("_ImageViewer")
+ 
 <!-- Custom JavaScript -->
 @* <script src="~/js/website-script.js"></script> *@
 
@@ -1996,6 +1997,7 @@
 
     function displayRooms(rooms) {
         const container = document.getElementById('roomListContainer');
+        const propertyId = document.getElementById('property').value;
 
         let html = `
             <div class="row">
@@ -2032,7 +2034,7 @@
             <div id="roomCheckboxes" class="mt-3" style="display: none;">
                 <div class="row">
             `;
-
+            debugger
             rooms.forEach(room => {
                 const isChargeable = room.price > 0;
                 const roomPrice = room.price || 0;
@@ -2046,36 +2048,74 @@
                     !roomType.includes('balcony') &&
                     !roomType.includes('living') &&
                     !roomType.includes('kitchen');
+                 const hideBtn = isBedroom ? "" : "hidden";
+                // html += `
+                //     <div class="col-md-6 mb-3">
+                //         <div class="card room-card ${isChargeable ? 'border-primary' : 'border-secondary'} ${!isSelectableRoom ? 'opacity-50' : ''}">
+                //             <div class="card-body">
+                //              <button onclick="showRoomImages('P1','R1')">
+                //                     Show Room Images
+                //             </button>
+                //                 <div class="form-check">
+                //                     <input class="form-check-input room-checkbox" type="checkbox"
+                //                            id="room_${room.id}" value="${room.id}"
+                //                            data-name="${room.label}" data-price="${roomPrice}"
+                //                            ${!isSelectableRoom ? 'disabled' : ''}>
+                //                     <label class="form-check-label" for="room_${room.id}">
+                //                         <strong>${room.label}</strong>
+                //                         ${isChargeable ?
+                //                         `<span class="badge bg-primary ms-2">${formatPrice(roomPrice)}/night</span>` :
+                //                         '<span class="badge bg-secondary ms-2">Free</span>'
+                //                        }
+                //                                 ${!isSelectableRoom ?
+                //                     '<span class="badge bg-warning ms-2">Not Selectable</span>' :
+                //                     ''
+                //                     }
+                //                             </label>
+                //                             ${!isSelectableRoom ?
+                //                     '<div class="text-muted small">Only bedrooms can be selected individually</div>' :
+                //                     ''
+                //                   }
+                //             </div>
+                //          </div>
+                //       </div>
+                //   </div>
+                // `;
 
                 html += `
-                    <div class="col-md-6 mb-3">
-                        <div class="card room-card ${isChargeable ? 'border-primary' : 'border-secondary'} ${!isSelectableRoom ? 'opacity-50' : ''}">
-                            <div class="card-body">
-                                <div class="form-check">
-                                    <input class="form-check-input room-checkbox" type="checkbox"
-                                           id="room_${room.id}" value="${room.id}"
-                                           data-name="${room.label}" data-price="${roomPrice}"
-                                           ${!isSelectableRoom ? 'disabled' : ''}>
-                                    <label class="form-check-label" for="room_${room.id}">
+                              <div class="col-md-6 mb-3">
+                                <div class="card room-card ${isChargeable ? 'border-primary' : 'border-secondary'} ${!isSelectableRoom ? 'opacity-50' : ''}">
+                                  <div class="card-body">
+                                    <div class="form-check">
+                                      <input class="form-check-input room-checkbox" type="checkbox"
+                                             id="room_${room.id}" value="${room.id}"
+                                             data-name="${room.label}" data-price="${roomPrice}"
+                                             ${!isSelectableRoom ? 'disabled' : ''}>
+                                      <label class="form-check-label" for="room_${room.id}">
                                         <strong>${room.label}</strong>
-                                        ${isChargeable ?
-                            `<span class="badge bg-primary ms-2">${formatPrice(roomPrice)}/night</span>` :
-                            '<span class="badge bg-secondary ms-2">Free</span>'
-                        }
-                                        ${!isSelectableRoom ?
-                            '<span class="badge bg-warning ms-2">Not Selectable</span>' :
-                            ''
-                        }
-                                    </label>
-                                    ${!isSelectableRoom ?
-                            '<div class="text-muted small">Only bedrooms can be selected individually</div>' :
-                            ''
-                        }
-                </div>
-            </div>
-            </div>
-        </div>
-                `;
+                                        ${isChargeable
+                                          ? `<span class="badge bg-primary ms-2">${formatPrice(roomPrice)}/night</span>`
+                                          : '<span class="badge bg-secondary ms-2">Free</span>'
+                                        }
+                                        ${!isSelectableRoom
+                                          ? '<span class="badge bg-warning ms-2">Not Selectable</span>'
+                                          : ''
+                                        }
+                                      </label>
+                                      ${!isSelectableRoom
+                                        ? '<div class="text-muted small">Only bedrooms can be selected individually</div>'
+                                        : ''
+                                      }
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-info mt-2"
+                                            onclick="showRoomImages('P${propertyId}','${room.label}')" ${hideBtn}>
+                                      <i class="bi bi-images"></i> View Room Images
+                                    </button>
+                                   
+                                  </div>
+                                </div>
+                              </div>
+                            `;
             });
 
             html += `
