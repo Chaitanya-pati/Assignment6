@@ -1,0 +1,24 @@
+[
+  //Property 1 - Radha Classic
+  {
+    "propertyNumber": "P1",
+    "roomNumber": "R1",
+    "images": [ "/images/RadhaClassicBedrooms/firstBedroom3.webp", "/images/RadhaClassicBedrooms/firstBedroom5.webp" ]
+  },
+  {
+    "propertyNumber": "P1",
+    "roomNumber": "R2",
+    "images": [ "/images/RadhaClassicBedrooms/secondBedroom2.webp" ]
+  },
+  {
+    "propertyNumber": "P1",
+    "roomNumber": "R3",
+    "images": [ "/images/RadhaClassicBedrooms/thirdBedroom1.webp","/images/RadhaClassicBedrooms/thirdBedroom3.webp" ]
+  },
+  {
+    "propertyNumber": "P1",
+    "roomNumber": "R4",
+    "images": [ "/images/RadhaClassicBedrooms/fourthBedroom2.webp", "/images/RadhaClassicBedrooms/fourthBedroom4.webp" ]
+  }
+  
+]

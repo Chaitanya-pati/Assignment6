@@ -1,0 +1,87 @@
+<!-- Image Viewer Modal -->
+<div id="imageViewerModal" class="image-viewer-modal" style="display:none;">
+    <div class="image-viewer-content">
+        <span class="image-viewer-close" onclick="closeImageViewer()">&times;</span>
+        <img id="imageViewerImg" src="" alt="Room Image" class="image-viewer-img" />
+        <div id="imageViewerThumbnails" class="image-viewer-thumbnails"></div>
+    </div>
+</div>
+
+<style>
+.image-viewer-modal {
+    position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
+}
+.image-viewer-content {
+    background: #fff; border-radius: 8px; padding: 1rem; max-width: 90vw; max-height: 90vh; box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column; align-items: center;
+}
+.image-viewer-close {
+    align-self: flex-end; font-size: 2rem; cursor: pointer; margin-bottom: 0.5rem;
+}
+.image-viewer-img {
+    max-width: 80vw; max-height: 60vh; border-radius: 4px; margin-bottom: 1rem;
+}
+.image-viewer-thumbnails {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+}
+.image-viewer-thumb {
+    width: 60px; height: 40px; object-fit: cover; border-radius: 3px; cursor: pointer; border: 2px solid transparent;
+    transition: border 0.2s;
+}
+.image-viewer-thumb:hover {
+    border: 2px solid #007bff;
+}
+@@media (max-width: 600px) {
+    .image-viewer-content { max-width: 98vw; max-height: 98vh; padding: 0.5rem; }
+    .image-viewer-img { max-width: 95vw; max-height: 40vh; }
+    .image-viewer-thumb { width: 40px; height: 28px; }
+}
+</style>
+
+<script>
+let allImageData = [];
+
+async function loadImageData() {
+    if (allImageData.length > 0) return allImageData;
+    const res = await fetch('/data/property-images.json');
+    allImageData = await res.json();
+    return allImageData;
+}
+
+function openImageViewerWithImages(images) {
+    if (!images || images.length === 0) return;
+    const modal = document.getElementById('imageViewerModal');
+    const imgElem = document.getElementById('imageViewerImg');
+    const thumbsDiv = document.getElementById('imageViewerThumbnails');
+    imgElem.src = images[0];
+    thumbsDiv.innerHTML = '';
+    images.forEach(img => {
+        const thumb = document.createElement('img');
+        thumb.src = img;
+        thumb.className = 'image-viewer-thumb';
+        thumb.onclick = () => imgElem.src = img;
+        thumbsDiv.appendChild(thumb);
+    });
+    modal.style.display = 'flex';
+}
+
+function closeImageViewer() {
+    document.getElementById('imageViewerModal').style.display = 'none';
+}
+
+// Call this to show images for a specific property and room
+async function showRoomImages(propertyNumber, roomNumber) {
+    const data = await loadImageData();
+    const entry = data.find(x => x.propertyNumber === propertyNumber && x.roomNumber === roomNumber);
+    if (entry) openImageViewerWithImages(entry.images);
+}
+
+// Call this to show all images for a property
+async function showPropertyImages(propertyNumber) {
+    const data = await loadImageData();
+    const images = data.filter(x => x.propertyNumber === propertyNumber)
+                       .flatMap(x => x.images);
+    if (images.length > 0) openImageViewerWithImages(images);
+}
+</script>
