@@ -1,5 +1,7 @@
 ﻿@{
     Layout = "";
+    var editPrice = ViewBag.EditPrice as bool? ?? false;
+    var homeId = ViewBag.HomeId as int?;
 }
 <style>
     :root {
@@ -16,7 +18,36 @@
         --white: #ffffff;
         --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
+    /* Notifications */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        max-width: 400px;
+        border-radius: 4px;
+        box-shadow: var(--box-shadow);
+        border: 1px solid;
+    }
 
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
     * {
         margin: 0;
         padding: 0;
@@ -40,16 +71,16 @@
         box-shadow: var(--box-shadow);
     }
 
-    .header h1 {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-    }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
 
-    .header p {
-        opacity: 0.9;
-        font-size: 1rem;
-    }
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
 
     .container {
         display: flex;
@@ -73,15 +104,15 @@
         max-height: calc(100vh - 200px);
     }
 
-    .sidebar h3 {
-        margin-bottom: 1rem;
-        color: var(--text-dark);
-        font-size: 1.2rem;
-        text-align: center;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid var(--primary-color);
-        font-weight: 600;
-    }
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            text-align: center;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--primary-color);
+            font-weight: 600;
+        }
 
     .element-item {
         display: flex;
@@ -98,16 +129,16 @@
         font-weight: 500;
     }
 
-    .element-item:hover {
-        background-color: var(--secondary-color);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+        .element-item:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
 
-    .element-item:active {
-        cursor: grabbing;
-        transform: scale(0.98);
-    }
+        .element-item:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
 
     .element-icon {
         font-size: 1.3rem;
@@ -140,9 +171,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: 
-            linear-gradient(to right, #e0e0e0 1px, transparent 1px), 
-            linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+        background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px), linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
         background-size: 20px 20px;
         opacity: 0.3;
         z-index: 1;
@@ -169,17 +198,17 @@
         padding: 5px;
     }
 
-    .room-element:hover {
-        transform: scale(1.02);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        border-color: var(--success-color);
-    }
+        .room-element:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-color: var(--success-color);
+        }
 
-    .room-element.selected {
-        border-color: var(--warning-color);
-        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
-        background-color: #fef9e7;
-    }
+        .room-element.selected {
+            border-color: var(--warning-color);
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
+            background-color: #fef9e7;
+        }
 
     .resize-handle {
         position: absolute;
@@ -195,10 +224,10 @@
         touch-action: none;
     }
 
-    .resize-handle:hover {
-        background: var(--warning-color);
-        transform: scale(1.1);
-    }
+        .resize-handle:hover {
+            background: var(--warning-color);
+            transform: scale(1.1);
+        }
 
     .delete-btn {
         position: absolute;
@@ -252,22 +281,22 @@
         font-size: 0.875rem;
     }
 
-    .control-btn:hover {
-        background-color: var(--primary-color);
-        color: var(--white);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+        .control-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
 
-    .control-btn.save {
-        background-color: var(--success-color);
-        color: var(--white);
-        border-color: var(--success-color);
-    }
+        .control-btn.save {
+            background-color: var(--success-color);
+            color: var(--white);
+            border-color: var(--success-color);
+        }
 
-    .control-btn.save:hover {
-        background-color: #229954;
-    }
+            .control-btn.save:hover {
+                background-color: #229954;
+            }
 
     .properties-panel {
         position: fixed;
@@ -286,48 +315,48 @@
         overflow-y: auto;
     }
 
-    .properties-panel.show {
-        display: block;
-    }
+        .properties-panel.show {
+            display: block;
+        }
 
-    .properties-panel h4 {
-        margin-bottom: 1rem;
-        color: var(--text-dark);
-        text-align: center;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid var(--primary-color);
-        font-size: 1.1rem;
-        font-weight: 600;
-    }
+        .properties-panel h4 {
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            text-align: center;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--primary-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
 
     .property-group {
         margin-bottom: 1rem;
     }
 
-    .property-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: var(--text-dark);
-        font-size: 0.9rem;
-    }
+        .property-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
 
-    .property-group input {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        font-size: 0.9rem;
-        color: var(--text-dark);
-        background: var(--white);
-        transition: border-color 0.2s ease;
-    }
+        .property-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            background: var(--white);
+            transition: border-color 0.2s ease;
+        }
 
-    .property-group input:focus {
-        border-color: var(--primary-color);
-        outline: none;
-        box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.1);
-    }
+            .property-group input:focus {
+                border-color: var(--primary-color);
+                outline: none;
+                box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.1);
+            }
 
     .room-price {
         position: absolute;
@@ -344,6 +373,31 @@
     .room-element:hover .room-price {
         background: rgba(39, 174, 96, 1) !important;
     }
+
+    /* FIX: Edit price input styling */
+    .edit-room-price {
+        position: absolute;
+        bottom: 20px;
+        left: 2px;
+        width: 75px;
+        height: 26px;
+        z-index: 100;
+        font-size: 0.72rem;
+        border-radius: 3px;
+        border: 1.5px solid #27ae60;
+        padding: 2px 4px;
+        background: #fff;
+        color: #222;
+        cursor: text;
+        pointer-events: all;
+        touch-action: auto;
+    }
+
+        .edit-room-price:focus {
+            outline: none;
+            border-color: #1a8a4a;
+            box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.25);
+        }
 
     /* Responsive Design */
     @@media (max-width: 992px) {
@@ -381,7 +435,7 @@
             transform: scale(calc(var(--mobile-scale, 1))) !important;
             height: calc(600px * var(--mobile-scale, 1)) !important;
         }
-        
+
         .grid-overlay {
             background-size: calc(20px * var(--mobile-scale, 1)) calc(20px * var(--mobile-scale, 1));
         }
@@ -430,9 +484,9 @@
             padding: 1rem 0;
         }
 
-        .header h1 {
-            font-size: 1.3rem;
-        }
+            .header h1 {
+                font-size: 1.3rem;
+            }
 
         .sidebar {
             padding: 1rem;
@@ -669,6 +723,11 @@
     }
 
     function handleTouchStart(e) {
+        // FIX: Do not intercept touch events on the price input
+        if (e.target.classList.contains('edit-room-price')) {
+            return;
+        }
+
         if (e.touches.length === 1) {
             const touch = e.touches[0];
             const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -703,6 +762,11 @@
     }
 
     function handleTouchMove(e) {
+        // FIX: Do not intercept touch events on the price input
+        if (e.target.classList.contains('edit-room-price')) {
+            return;
+        }
+
         if (e.touches.length === 1) {
             const touch = e.touches[0];
 
@@ -831,6 +895,11 @@
     }
 
     function handleMouseDown(e) {
+        // FIX: Do not intercept clicks/mousedown on the price input
+        if (e.target.classList.contains('edit-room-price')) {
+            return;
+        }
+
         if (e.target.classList.contains('resize-handle') || e.target.classList.contains('delete-btn')) {
             return;
         }
@@ -900,6 +969,11 @@
     }
 
     function selectElement(e) {
+        // FIX: Do not deselect when clicking the price input
+        if (e.target && e.target.classList.contains('edit-room-price')) {
+            return;
+        }
+
         document.querySelectorAll('.room-element').forEach(el => {
             el.classList.remove('selected');
         });
@@ -1005,7 +1079,6 @@
 
     // Clean saveLayout function
     function saveLayout() {
-        debugger
         const designArea = document.getElementById('designArea');
         const rooms = [];
 
@@ -1013,7 +1086,7 @@
             const roomId = parseInt(el.id);
             const type = el.getAttribute('data-type');
             const price = parseInt(el.getAttribute('data-price')) || 0;
-            rooms.push(roomId); // ✅ push only roomId here
+            rooms.push(roomId);
 
             return {
                 x: parseInt(el.style.left),
@@ -1021,7 +1094,7 @@
                 width: parseInt(el.style.width),
                 height: parseInt(el.style.height),
                 label: el.querySelector('span').textContent,
-                type: type, // ✅ correctly captured
+                type: type,
                 roomId: roomId,
                 homeId: localStorage.getItem('maxHomeId'),
                 pricePerDay: price
@@ -1037,10 +1110,8 @@
         };
 
         localStorage.setItem('homestayLayout', JSON.stringify(layout));
-        // msgPopup('success', 'Layout exported successfully');
         window.close();
     }
-
 
     // Clean function to save rooms with prices
     function saveRoomsWithPrices(elements) {
@@ -1163,6 +1234,10 @@
 
     // Click outside to deselect
     document.addEventListener('click', (e) => {
+        // FIX: Do not deselect when clicking the price input
+        if (e.target.classList.contains('edit-room-price')) {
+            return;
+        }
         if (!e.target.closest('.room-element') && !e.target.closest('.properties-panel')) {
             document.querySelectorAll('.room-element').forEach(el => {
                 el.classList.remove('selected');
@@ -1174,6 +1249,10 @@
 
     // Touch outside to deselect
     document.addEventListener('touchend', (e) => {
+        // FIX: Do not deselect when touching the price input
+        if (e.target.classList.contains('edit-room-price')) {
+            return;
+        }
         if (!e.target.closest('.room-element') && !e.target.closest('.properties-panel')) {
             document.querySelectorAll('.room-element').forEach(el => {
                 el.classList.remove('selected');
@@ -1185,4 +1264,108 @@
 
     // Initialize the designer when DOM is loaded
     document.addEventListener('DOMContentLoaded', initDesigner);
+
+    // If editPrice mode, show price editing UI for rooms
+    $(document).ready(function () {
+        if (@(editPrice.ToString().ToLower())) {
+            // Wait for layout to load
+            setTimeout(function () {
+                $(".room-element").each(function () {
+                    var el = $(this);
+                    el.find('.edit-room-price').remove(); // Remove any existing input
+                    var price = el.data("price");
+                    var roomId = el.attr("id");
+
+                    // FIX: Appended input via DOM to avoid inline style typos; z-index 100 ensures it is above room element layers
+                    var input = $('<input>', {
+                        type: 'number',
+                        class: 'edit-room-price',
+                        value: price,
+                        'data-roomid': roomId
+                    });
+
+                    el.append(input);
+                });
+
+                // FIX: Correct spacing in length check
+                if ($('#saveRoomPricesBtn').length === 0) {
+                    $('.controls').append('<button id="saveRoomPricesBtn" class="control-btn save"><i class="fas fa-save me-1"></i>Save Prices</button>');
+                }
+            }, 800);
+
+            // FIX: Stop mousedown and touchstart from bubbling out of the price input
+            // This prevents the room element's drag handler from swallowing the click
+            $(document).on('mousedown touchstart', '.edit-room-price', function (e) {
+                e.stopPropagation();
+            });
+
+            // FIX: Update data-price attribute and the green badge live as user types
+            $(document).on('input change', '.edit-room-price', function (e) {
+                var input = $(this);
+                var newPrice = parseInt(input.val()) || 0;
+                var parentRoom = input.closest('.room-element');
+                parentRoom.attr('data-price', newPrice);
+                parentRoom.find('.room-price').text('₹' + newPrice);
+            });
+        }
+
+        // Save all prices in bulk
+        $(document).on('click', '#saveRoomPricesBtn', function (e) {
+            e.stopPropagation(); // FIX: Prevent click from bubbling and deselecting elements
+            var updates = [];
+
+            $('.edit-room-price').each(function () {
+                var input = $(this);
+                var layoutElementId = input.data('roomid');
+                var newPrice = parseInt(input.val()) || 0;
+                updates.push({ layoutElementId: layoutElementId, newPricePerDay: newPrice });
+            });
+
+            if (updates.length === 0) {
+                alert('No rooms found to update.');
+                return;
+            }
+
+            $.ajax({
+                url: '/Configuration/UpdateLayoutRoomPrices',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(updates),
+                success: function (res) {
+                    if (res.success) {
+                        showNotification('Room prices updated!', 'success');
+                    } else {
+                        showNotification('Failed to update prices.', 'error');
+                    }
+                },
+                error: function () {
+                    showNotification('Error updating prices.', 'error');
+                }
+            });
+        });
+    });
+
+      function showNotification(message, type = 'info', duration = 5000) {
+        const alertClass = type === 'success' ? 'alert-success' :
+            type === 'error' ? 'alert-danger' : 'alert-info';
+        const iconClass = type === 'success' ? 'fa-check-circle' :
+            type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+
+        const notification = $(`
+            <div class="alert ${alertClass} alert-dismissible fade show notification" role="alert">
+                <i class="fas ${iconClass} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `);
+
+        $('.notification').remove();
+        $('body').append(notification);
+
+        if (duration > 0) {
+            setTimeout(() => notification.fadeOut(300, function() { $(this).remove(); }), duration);
+        }
+    }
+
+    window.showNotification = showNotification;
 </script>

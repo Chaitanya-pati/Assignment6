@@ -1,5 +1,4 @@
-﻿
-using DbService.Interface;
+﻿using DbService.Interface;
 using DbService.Models;
 using DbService.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -112,6 +111,36 @@ namespace DbService.Implementation
                 layoutElements = db.LayoutElements.Where(x => x.HomeId == homeId).ToList();
             }
             return layoutElements;
+        }
+
+        public bool UpdateLayoutRoomPrice(int layoutElementId, long newPricePerDay)
+        {
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                var layoutElement = db.LayoutElements.FirstOrDefault(x => x.Id == layoutElementId);
+                if (layoutElement == null)
+                    return false;
+                layoutElement.PricePerDay = newPricePerDay;
+                db.SaveChanges();
+                return true;
+            }
+        }
+
+        public bool UpdateLayoutRoomPrices(List<LayoutRoomPriceUpdateModel> updates)
+        {
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                foreach (var update in updates)
+                {
+                    var layoutElement = db.LayoutElements.FirstOrDefault(x => x.Id == update.LayoutElementId);
+                    if (layoutElement != null)
+                    {
+                        layoutElement.PricePerDay = update.NewPricePerDay;
+                    }
+                }
+                db.SaveChanges();
+                return true;
+            }
         }
     }
 }

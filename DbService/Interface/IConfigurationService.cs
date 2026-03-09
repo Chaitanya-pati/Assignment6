@@ -15,7 +15,8 @@ namespace DbService.Interface
         public Home UpdateHome(Home home);
         public List<Room> SaveRooms(List<Room> rooms);
         public bool SaveLayoutElement(List<LayoutElement> layoutElements);
-
         public List<LayoutElement> GetLayout(int homeId);
+        public bool UpdateLayoutRoomPrice(int layoutElementId, long newPricePerDay);
+        public bool UpdateLayoutRoomPrices(List<LayoutRoomPriceUpdateModel> updates);
     }
 }

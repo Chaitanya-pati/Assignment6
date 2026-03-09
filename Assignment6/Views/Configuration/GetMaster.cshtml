@@ -859,63 +859,61 @@
         let lastLayoutTimestamp = null;
 
         function checkForLayoutUpdate(homeId) {
-            const layoutData = localStorage.getItem('homestayLayout');
+            // Always clear localStorage for layout before fetching new
+            localStorage.removeItem('homestayLayout');
 
-            // Step 1: If layout exists in localStorage, render it immediately
-            if (layoutData) {
-                const parsed = JSON.parse(layoutData);
-                lastLayoutTimestamp = parsed.timestamp;
-                renderLayoutPreview(parsed);
-            }
-
-            // Step 2: If homeId is provided, fetch layout from DB
             if (homeId) {
                 $.ajax({
                     url: '/Configuration/GetLayoutByhomeId',
                     type: 'GET',
                     data: { homeId: homeId },
                     success: function (response) {
-                        if (response && Array.isArray(response) && response.length > 0) {
-                            // Construct layout object with fallback defaults
+                        if (response && Array.isArray(response) && response.length >0) {
+                            // Only keep unique room elements by RoomId or Label
+                            const uniqueElements = [];
+                            const seen = new Set();
+                            response.forEach(el => {
+                                const key = el.roomId || el.label;
+                                if (!seen.has(key)) {
+                                    uniqueElements.push(el);
+                                    seen.add(key);
+                                }
+                            });
+
                             const newLayout = {
                                 timestamp: new Date().toISOString(),
-                                designWidth: 800,
-                                designHeight: 600,
-                                elements: response,
-                                roomsData: response.map(e => e.roomId).filter((v, i, a) => v != null && a.indexOf(v) === i)
+                                designWidth:800,
+                                designHeight:600,
+                                elements: uniqueElements,
+                                roomsData: uniqueElements.map(e => e.roomId).filter((v, i, a) => v != null && a.indexOf(v) === i)
                             };
 
-                            // Save to localStorage
                             localStorage.setItem('homestayLayout', JSON.stringify(newLayout));
-
-                            // Only render if it's a new layout
-                            if (newLayout.timestamp !== lastLayoutTimestamp) {
-                                lastLayoutTimestamp = newLayout.timestamp;
-                                renderLayoutPreview(newLayout);
-                            }
+                            renderLayoutPreview(newLayout);
                         } else {
                             resetLayoutPreview();
                             showAlert("No layout found for this property.", "info");
                         }
                     },
                     error: function () {
-                       resetLayoutPreview();
+                        resetLayoutPreview();
                         showAlert('Error fetching layout from server.', 'danger');
                     }
                 });
-            } else if (!layoutData) {
-               // resetLayoutPreview();
+            } else {
+                resetLayoutPreview();
                 showAlert("Please create layout first.", "warning");
             }
         }
 
         function renderLayoutPreview(layout) {
             const container = document.getElementById('layoutPreview');
-
-            // Clear and add header
+            // Only count unique rooms
+            const uniqueRooms = new Set(layout.elements.map(el => el.roomId || el.label));
             container.innerHTML = `
                 <div class="layout-preview-header">
-                    <i class="fas fa-map me-2"></i>Room Layout Preview (${layout.elements.length} rooms)
+                   <i class="fas fa-map me-2"></i>Room Layout Preview (${uniqueRooms.size} rooms)
+                   &nbsp;&nbsp;<i class="fas fa-edit me-2" title="Edit Price" style="cursor:pointer;" onclick="redirectToEditPrice()"></i>
                 </div>
             `;
 
@@ -948,6 +946,17 @@
 
                 container.appendChild(roomDiv);
             });
+        }
+
+        // Add this function to handle the redirect
+        function redirectToEditPrice() {
+            // Get the current homeId from the form (edit or add mode)
+            const homeId = $('#homeId').val() || '';
+            if (homeId) {
+                window.location.href = `/Configuration/Configuration?homeId=${homeId}&editPrice=true`;
+            } else {
+                showAlert('Please select or create a property first.', 'warning');
+            }
         }
 
         // Alert system

@@ -48,9 +48,14 @@ namespace Assignment6.Controllers
         {
             return View();
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public IActionResult Scheduler()
         {
+            if (!User.Identity.IsAuthenticated || !User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
             var model = _bookingService.GetSchedularData();
             return View(model);
         }

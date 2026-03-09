@@ -16,8 +16,10 @@ namespace Assignment6.Controllers
             _configurationService = configurationService;
         }
         [Authorize(Roles = "Admin")]
-        public IActionResult Configuration()
+        public IActionResult Configuration(int? homeId, bool? editPrice)
         {
+            ViewBag.EditPrice = editPrice ?? false;
+            ViewBag.HomeId = homeId;
             return View();
         }
         [Authorize(Roles = "Admin")]
@@ -111,6 +113,36 @@ namespace Assignment6.Controllers
             catch (Exception ex)
             {
                 return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public IActionResult UpdateLayoutRoomPrice(int layoutElementId, long newPricePerDay)
+        {
+            try
+            {
+                var result = _configurationService.UpdateLayoutRoomPrice(layoutElementId, newPricePerDay);
+                return Json(new { success = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public IActionResult UpdateLayoutRoomPrices([FromBody] List<LayoutRoomPriceUpdateModel> updates)
+        {
+            try
+            {
+                var result = _configurationService.UpdateLayoutRoomPrices(updates);
+                return Json(new { success = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
             }
         }
     }
