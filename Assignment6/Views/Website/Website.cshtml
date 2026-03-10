@@ -2456,30 +2456,37 @@
         const timeDiff = checkinDate.getTime() - today.getTime();
         const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-        // Check if booking is for today (same day)
-        if (daysDiff === 0) {
-            showNotification("You can't book individual rooms for today. Please select 'Book Entire Property' or choose a future date.", 'error', 6000);
-            return false;
-        }
-
         // Check if booking is for past dates
         if (daysDiff < 0) {
             showNotification('Cannot book for past dates.', 'error');
             return false;
         }
 
-        // Check if booking is more than 3 days in advance
-        if (daysDiff > 3) {
-            const maxBookingDate = new Date(checkinDate);
-            maxBookingDate.setDate(maxBookingDate.getDate() - 3);
+        // Check if booking is for today or less than 3 days in advance
+        if (daysDiff < 3) {
+            const validBookingDate = new Date(today);
+            validBookingDate.setDate(validBookingDate.getDate() + 3);
             showNotification(
-                `Individual room booking for ${checkinDate.toDateString()} is not available & only available for ${maxBookingDate.toDateString()}. For earlier booking, please select "Book Entire Property".`,
+                `Individual room booking is only available exactly 3 days before check-in. For ${checkinDate.toDateString()}, you can book on ${validBookingDate.toDateString()}. Please select 'Book Entire Property' for immediate bookings.`,
                 'error',
                 8000
             );
             return false;
         }
 
+        // Check if booking is more than 3 days in advance (exactly 3 days only)
+        if (daysDiff > 3) {
+            const validBookingDate = new Date(checkinDate);
+            validBookingDate.setDate(validBookingDate.getDate() - 3);
+            showNotification(
+                `Individual room booking for ${checkinDate.toDateString()} is only available on ${validBookingDate.toDateString()}. For earlier booking, please select 'Book Entire Property'.`,
+                'error',
+                8000
+            );
+            return false;
+        }
+
+        // daysDiff === 3 (exactly 3 days) - booking is allowed
         return true;
     }
 
