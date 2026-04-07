@@ -1703,3 +1703,85 @@ reviews_terms_container {
         color: #1e40af;
         text-decoration: underline;
     }
+
+/* ============================================
+   FLOOR-BASED BOOKING COLOR DIFFERENTIATION
+   Add these styles to: wwwroot/css/website-responsive.css
+   (append at the end of the file)
+   ============================================ */
+
+/* --- Ground Floor: Radha Classic — Grey --- */
+.fc-daygrid-day.booked-classic {
+    background-color: #b0b8c1 !important;
+    border-color: #8a9199 !important;
+}
+
+    .fc-daygrid-day.booked-classic .fc-daygrid-day-number {
+        color: #2d3748 !important;
+        font-weight: 700;
+    }
+
+/* --- First Floor: Radha Heritage — Orange --- */
+.fc-daygrid-day.booked-heritage {
+    background-color: #f4a233 !important;
+    border-color: #c97d10 !important;
+}
+
+    .fc-daygrid-day.booked-heritage .fc-daygrid-day-number {
+        color: #fff !important;
+        font-weight: 700;
+    }
+
+/* --- Both floors booked on same day — split diagonal gradient --- */
+.fc-daygrid-day.booked-both {
+    background: linear-gradient(135deg, #b0b8c1 50%, #f4a233 50%) !important;
+    border-color: #8a9199 !important;
+}
+
+    .fc-daygrid-day.booked-both .fc-daygrid-day-number {
+        color: #2d3748 !important;
+        font-weight: 700;
+    }
+
+/* --- Override the old generic .booked class so it doesn't interfere --- */
+.fc-daygrid-day.booked:not(.booked-classic):not(.booked-heritage):not(.booked-both) {
+    background-color: #b0b8c1 !important;
+}
+
+/* --- Available day (keep existing green, just ensure specificity) --- */
+.fc-daygrid-day.available {
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+}
+
+/* ============================================
+   UPDATED LEGEND COLORS
+   These classes are used in the legend HTML below
+   ============================================ */
+
+.legend-color.classic-ground {
+    background-color: #b0b8c1;
+    border: 1px solid #8a9199;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.legend-color.heritage-first {
+    background-color: #f4a233;
+    border: 1px solid #c97d10;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.legend-color.both-floors {
+    background: linear-gradient(135deg, #b0b8c1 50%, #f4a233 50%);
+    border: 1px solid #8a9199;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    display: inline-block;
+}

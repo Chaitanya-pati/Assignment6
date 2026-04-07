@@ -88,15 +88,23 @@
         </div>
         <div id="websiteCalendar"></div>
 
-        <!-- Legend -->
+        <!-- REPLACEMENT (use this): -->
         <div class="calendar-legend">
             <div class="legend-item">
                 <div class="legend-color available"></div>
                 <span>Available</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color booked"></div>
-                <span>Booked</span>
+                <div class="legend-color classic-ground"></div>
+                <span>Radha Classic (Ground Floor)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color heritage-first"></div>
+                <span>Radha Heritage (First Floor)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color both-floors"></div>
+                <span>Both Properties Booked</span>
             </div>
         </div>
     </div>
@@ -1142,106 +1150,245 @@
     }
 
     // Add booking status to calendar day cell with property names
-    function addBookingStatus(dayElement, date) {
+    // function addBookingStatus(dayElement, date) {
+    //     const today = new Date();
+    //     today.setHours(0, 0, 0, 0); // Reset time to start of day
+    //     date.setHours(0, 0, 0, 0);
+
+    //     // Check if this date is before today
+    //     const isPastDate = date < today;
+
+    //     if (!window.bookingCalendarData) {
+    //         // If no data loaded yet, show as available (for future dates only)
+    //         dayElement.classList.remove('booked', 'available', 'past-date');
+    //         if (isPastDate) {
+    //             dayElement.classList.add('past-date');
+    //             dayElement.title = 'Past date';
+    //         } else {
+    //             dayElement.classList.add('available');
+    //             dayElement.title = 'Available for booking';
+    //         }
+    //         return;
+    //     }
+
+    //     const dateKey = date.toISOString().split('T')[0];
+    //     const dayBookings = window.bookingCalendarData[dateKey];
+
+    //     // Remove existing status classes
+    //     dayElement.classList.remove('booked', 'available', 'past-date');
+
+    //     // Remove any existing booking info
+    //     const existingInfo = dayElement.querySelector('.booking-info');
+    //     if (existingInfo) {
+    //         existingInfo.remove();
+    //     }
+
+    //     // Handle past dates - don't show booking information
+    //     if (isPastDate) {
+    //         dayElement.classList.add('past-date');
+    //         dayElement.title = 'Past date';
+    //         return;
+    //     }
+
+    //     // Handle future dates (today and onwards)
+    //     if (dayBookings && dayBookings.length > 0) {
+    //         // This date has confirmed bookings
+    //         dayElement.classList.add('booked');
+
+    //         // Create tooltip with property names
+    //         const propertyNames = [...new Set(dayBookings.map(b => b.homeName))];
+    //         const tooltipText = `Booked Properties:\n${propertyNames.join('\n')}`;
+    //         dayElement.title = tooltipText;
+
+    //         // Add visual indicator with property count if multiple
+    //         if (propertyNames.length > 1) {
+    //             const bookingInfo = document.createElement('div');
+    //             bookingInfo.className = 'booking-info';
+    //             bookingInfo.style.cssText = `
+    //                 position: absolute;
+    //                 top: 2px;
+    //                 left: 2px;
+    //                 background: rgba(255, 255, 255, 0.9);
+    //                 color: #495057;
+    //                 font-size: 10px;
+    //                 padding: 1px 4px;
+    //                 border-radius: 3px;
+    //                 font-weight: bold;
+    //                 z-index: 5;
+    //             `;
+    //             bookingInfo.textContent = `${propertyNames.length} properties`;
+    //             dayElement.style.position = 'relative';
+    //             dayElement.appendChild(bookingInfo);
+    //         } else {
+    //             // Single property - show property name
+    //             const bookingInfo = document.createElement('div');
+    //             bookingInfo.className = 'booking-info';
+    //             bookingInfo.style.cssText = `
+    //                 position: absolute;
+    //                 bottom: 2px;
+    //                 left: 2px;
+    //                 right: 2px;
+    //                 background: rgba(108, 117, 125, 0.9);
+    //                 color: white;
+    //                 font-size: 9px;
+    //                 padding: 1px 2px;
+    //                 border-radius: 2px;
+    //                 font-weight: 500;
+    //                 text-align: center;
+    //                 z-index: 5;
+    //                 white-space: nowrap;
+    //                 overflow: hidden;
+    //                 text-overflow: ellipsis;
+    //             `;
+    //             bookingInfo.textContent = propertyNames[0];
+    //             dayElement.style.position = 'relative';
+    //             dayElement.appendChild(bookingInfo);
+    //         }
+    //     } else {
+    //         // This date is available
+    //         dayElement.classList.add('available');
+    //         dayElement.title = 'Available for booking';
+    //     }
+    // }
+
+
+
+     function addBookingStatus(dayElement, date) {
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Reset time to start of day
+        today.setHours(0, 0, 0, 0);
         date.setHours(0, 0, 0, 0);
-
-        // Check if this date is before today
+ 
         const isPastDate = date < today;
-
-        if (!window.bookingCalendarData) {
-            // If no data loaded yet, show as available (for future dates only)
-            dayElement.classList.remove('booked', 'available', 'past-date');
-            if (isPastDate) {
-                dayElement.classList.add('past-date');
-                dayElement.title = 'Past date';
-            } else {
-                dayElement.classList.add('available');
-                dayElement.title = 'Available for booking';
-            }
-            return;
-        }
-
-        const dateKey = date.toISOString().split('T')[0];
-        const dayBookings = window.bookingCalendarData[dateKey];
-
-        // Remove existing status classes
-        dayElement.classList.remove('booked', 'available', 'past-date');
-
-        // Remove any existing booking info
+ 
+        // Remove all existing status classes
+        dayElement.classList.remove(
+            'booked', 'available', 'past-date',
+            'booked-classic', 'booked-heritage', 'booked-both'
+        );
+ 
+        // Remove any existing booking-info badge
         const existingInfo = dayElement.querySelector('.booking-info');
-        if (existingInfo) {
-            existingInfo.remove();
-        }
-
-        // Handle past dates - don't show booking information
+        if (existingInfo) existingInfo.remove();
+ 
+        // ── Past dates ──────────────────────────────────────────
         if (isPastDate) {
             dayElement.classList.add('past-date');
             dayElement.title = 'Past date';
             return;
         }
-
-        // Handle future dates (today and onwards)
-        if (dayBookings && dayBookings.length > 0) {
-            // This date has confirmed bookings
-            dayElement.classList.add('booked');
-
-            // Create tooltip with property names
-            const propertyNames = [...new Set(dayBookings.map(b => b.homeName))];
-            const tooltipText = `Booked Properties:\n${propertyNames.join('\n')}`;
-            dayElement.title = tooltipText;
-
-            // Add visual indicator with property count if multiple
-            if (propertyNames.length > 1) {
-                const bookingInfo = document.createElement('div');
-                bookingInfo.className = 'booking-info';
-                bookingInfo.style.cssText = `
-                    position: absolute;
-                    top: 2px;
-                    left: 2px;
-                    background: rgba(255, 255, 255, 0.9);
-                    color: #495057;
-                    font-size: 10px;
-                    padding: 1px 4px;
-                    border-radius: 3px;
-                    font-weight: bold;
-                    z-index: 5;
-                `;
-                bookingInfo.textContent = `${propertyNames.length} properties`;
-                dayElement.style.position = 'relative';
-                dayElement.appendChild(bookingInfo);
-            } else {
-                // Single property - show property name
-                const bookingInfo = document.createElement('div');
-                bookingInfo.className = 'booking-info';
-                bookingInfo.style.cssText = `
-                    position: absolute;
-                    bottom: 2px;
-                    left: 2px;
-                    right: 2px;
-                    background: rgba(108, 117, 125, 0.9);
-                    color: white;
-                    font-size: 9px;
-                    padding: 1px 2px;
-                    border-radius: 2px;
-                    font-weight: 500;
-                    text-align: center;
-                    z-index: 5;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                `;
-                bookingInfo.textContent = propertyNames[0];
-                dayElement.style.position = 'relative';
-                dayElement.appendChild(bookingInfo);
-            }
-        } else {
-            // This date is available
+ 
+        // ── No data loaded yet ──────────────────────────────────
+        if (!window.bookingCalendarData) {
             dayElement.classList.add('available');
             dayElement.title = 'Available for booking';
+            return;
+        }
+ 
+        const dateKey = date.toISOString().split('T')[0];
+        const dayBookings = window.bookingCalendarData[dateKey];
+ 
+        // ── No bookings on this day ─────────────────────────────
+        if (!dayBookings || dayBookings.length === 0) {
+            dayElement.classList.add('available');
+            dayElement.title = 'Available for booking';
+            return;
+        }
+ 
+        // ── Determine which floor(s) are booked ─────────────────
+        // "Classic"  → ground floor (grey)
+        // "Heritage" → first floor  (orange)
+        debugger
+        const hasClassic  = dayBookings.some(b => b.homeName && b.homeName.includes('Ground Floor'));
+        const hasHeritage = dayBookings.some(b => b.homeName && b.homeName.includes('1st Floor'));
+ 
+        // Build tooltip
+        const propertyNames = [...new Set(dayBookings.map(b => b.homeName))];
+        dayElement.title = `Booked:\n${propertyNames.join('\n')}`;
+ 
+        if (hasClassic && hasHeritage) {
+            // Both floors booked → split diagonal
+            dayElement.classList.add('booked-both');
+ 
+            const badge = document.createElement('div');
+            badge.className = 'booking-info';
+            badge.style.cssText = `
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                background: rgba(255,255,255,0.88);
+                color: #333;
+                font-size: 9px;
+                padding: 1px 4px;
+                border-radius: 3px;
+                font-weight: 700;
+                z-index: 5;
+                white-space: nowrap;
+            `;
+            badge.textContent = 'Both';
+            dayElement.style.position = 'relative';
+            dayElement.appendChild(badge);
+ 
+        } else if (hasClassic) {
+            // Ground floor only → grey
+            dayElement.classList.add('booked-classic');
+ 
+            const badge = document.createElement('div');
+            badge.className = 'booking-info';
+            badge.style.cssText = `
+                position: absolute;
+                bottom: 2px;
+                left: 2px;
+                right: 2px;
+                background: rgba(45,55,72,0.82);
+                color: #fff;
+                font-size: 9px;
+                padding: 1px 3px;
+                border-radius: 2px;
+                font-weight: 600;
+                text-align: center;
+                z-index: 5;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            `;
+            badge.textContent = 'Classic';
+            dayElement.style.position = 'relative';
+            dayElement.appendChild(badge);
+ 
+        } else if (hasHeritage) {
+            // First floor only → orange
+            dayElement.classList.add('booked-heritage');
+ 
+            const badge = document.createElement('div');
+            badge.className = 'booking-info';
+            badge.style.cssText = `
+                position: absolute;
+                bottom: 2px;
+                left: 2px;
+                right: 2px;
+                background: rgba(120,60,0,0.75);
+                color: #fff;
+                font-size: 9px;
+                padding: 1px 3px;
+                border-radius: 2px;
+                font-weight: 600;
+                text-align: center;
+                z-index: 5;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            `;
+            badge.textContent = 'Heritage';
+            dayElement.style.position = 'relative';
+            dayElement.appendChild(badge);
+ 
+        } else {
+            // Fallback for any other property names — use grey
+            dayElement.classList.add('booked-classic');
+            dayElement.title = `Booked: ${propertyNames.join(', ')}`;
         }
     }
+
 
     // Update calendar display
     function updateCalendarDisplay() {

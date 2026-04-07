@@ -406,14 +406,16 @@ namespace DbService.Implementation
                     db.Bookings.Add(bookingData);
                     db.SaveChanges();
 
-                    foreach (var room in rooms)
+                    if (rooms != null)
                     {
-                        var roomSaveData = new BookingRoom();
-                        roomSaveData.BookingId = bookingData.Id;
-                        roomSaveData.RoomId = room.Id;
-                        db.BookingRooms.Add(roomSaveData);
+                        foreach (var room in rooms)
+                        {
+                            var roomSaveData = new BookingRoom();
+                            roomSaveData.BookingId = bookingData.Id;
+                            roomSaveData.RoomId = room.Id;
+                            db.BookingRooms.Add(roomSaveData);
+                        }
                     }
-
                     db.SaveChanges();
                     isSaved = true;
                 }

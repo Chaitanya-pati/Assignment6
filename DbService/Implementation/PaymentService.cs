@@ -13,9 +13,13 @@ namespace DbService.Implementation
     public class PaymentService : IPaymentService
     {
         private readonly DbContextOptions<Assignment6Context> _dbconnection;
+        private readonly IConfiguration _configuration;
         private readonly RazorpayClient _razorpayClient;
+        private readonly RazorpayClient _razorpayClientNew;
         private readonly string _razorpayKeyId;
         private readonly string _razorpayKeySecret;
+        private readonly string _razorpayNewKeyId;
+        private readonly string _razorpayNewKeySecret;
 
         // This constructor should match what Program.cs is calling
         public PaymentService(string connectionString, IConfiguration configuration)
@@ -24,11 +28,17 @@ namespace DbService.Implementation
                 .UseSqlServer(connectionString)
                 .Options;
 
+            _configuration = configuration;
+
+            // Initialize Razorpay account 1 (1st Floor - Heritage)
             _razorpayKeyId = configuration["Razorpay:KeyId"];
             _razorpayKeySecret = configuration["Razorpay:KeySecret"];
-
-            // Create RazorpayClient internally
             _razorpayClient = new RazorpayClient(_razorpayKeyId, _razorpayKeySecret);
+
+            // Initialize Razorpay account 2 (Ground Floor - Classic)
+            _razorpayNewKeyId = configuration["Razorpaynew:KeyId"];
+            _razorpayNewKeySecret = configuration["Razorpaynew:KeySecret"];
+            _razorpayClientNew = new RazorpayClient(_razorpayNewKeyId, _razorpayNewKeySecret);
         }
 
         public PaymentViewModel CreatePaymentOrder(int bookingId)
@@ -44,6 +54,9 @@ namespace DbService.Implementation
                     throw new Exception("Booking not found");
                 }
 
+                // Get the appropriate Razorpay credentials based on HomeId
+                var (razorpayClient, keyId, keySecret) = GetRazorpayCredentials(booking.HomeId);
+
                 // Create Razorpay Order
                 Dictionary<string, object> options = new Dictionary<string, object>();
                 options.Add("amount", booking.Price * 100); // Amount in paise
@@ -51,7 +64,7 @@ namespace DbService.Implementation
                 options.Add("receipt", $"booking_{bookingId}_{DateTime.Now:yyyyMMddHHmmss}");
                 options.Add("payment_capture", 1);
 
-                Order order = _razorpayClient.Order.Create(options);
+                Order order = razorpayClient.Order.Create(options);
                 string orderId = order["id"].ToString();
 
                 // Save payment record
@@ -77,7 +90,7 @@ namespace DbService.Implementation
                     Amount = booking.Price,
                     Currency = "INR",
                     RazorpayOrderId = orderId,
-                    RazorpayKeyId = _razorpayKeyId,
+                    RazorpayKeyId = keyId,
                     BookingDetails = booking
                 };
             }
@@ -87,10 +100,15 @@ namespace DbService.Implementation
         {
             try
             {
+                // Get HomeId for the booking to determine which Razorpay account to use
+                int homeId = GetHomeIdByBookingId(paymentResponse.BookingId);
+                var (_, _, keySecret) = GetRazorpayCredentials(homeId);
+
                 // Verify signature
                 string signature = GenerateSignature(
                     paymentResponse.RazorpayOrderId,
-                    paymentResponse.RazorpayPaymentId
+                    paymentResponse.RazorpayPaymentId,
+                    keySecret
                 );
 
                 bool isValid = signature == paymentResponse.RazorpaySignature;
@@ -154,14 +172,46 @@ namespace DbService.Implementation
             }
         }
 
-        private string GenerateSignature(string orderId, string paymentId)
+        private string GenerateSignature(string orderId, string paymentId, string keySecret)
         {
             string payload = $"{orderId}|{paymentId}";
 
-            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_razorpayKeySecret)))
+            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(keySecret)))
             {
                 var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();
+            }
+        }
+
+        private int GetHomeIdByBookingId(int bookingId)
+        {
+            using (var db = new Assignment6Context(_dbconnection))
+            {
+                var booking = db.Bookings.FirstOrDefault(b => b.Id == bookingId);
+                if (booking == null)
+                {
+                    throw new Exception($"Booking with ID {bookingId} not found");
+                }
+                return booking.HomeId;
+            }
+        }
+
+        private (RazorpayClient client, string keyId, string keySecret) GetRazorpayCredentials(int homeId)
+        {
+            // HomeId = 1 (Ground Floor - Classic) -> Razorpaynew
+            // HomeId = 2 (1st Floor - Heritage) -> Razorpay
+            if (homeId == 1)
+            {
+                return (_razorpayClientNew, _razorpayNewKeyId, _razorpayNewKeySecret);
+            }
+            else if (homeId == 2)
+            {
+                return (_razorpayClient, _razorpayKeyId, _razorpayKeySecret);
+            }
+            else
+            {
+                // Default to Razorpay for any other HomeId
+                return (_razorpayClient, _razorpayKeyId, _razorpayKeySecret);
             }
         }
     }
