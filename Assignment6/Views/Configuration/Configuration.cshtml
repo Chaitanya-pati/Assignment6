@@ -1334,6 +1334,9 @@
                 success: function (res) {
                     if (res.success) {
                         showNotification('Room prices updated!', 'success');
+                        setTimeout(()=>{
+                            window.location.href = "/Configuration/GetMaster";
+                        },2000);
                     } else {
                         showNotification('Failed to update prices.', 'error');
                     }

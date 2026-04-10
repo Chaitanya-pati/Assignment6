@@ -133,9 +133,11 @@ namespace DbService.Implementation
                 foreach (var update in updates)
                 {
                     var layoutElement = db.LayoutElements.FirstOrDefault(x => x.Id == update.LayoutElementId);
+                    var Rooms = db.Rooms.FirstOrDefault(x => x.Id == layoutElement.RoomId);
                     if (layoutElement != null)
                     {
                         layoutElement.PricePerDay = update.NewPricePerDay;
+                        Rooms.PricePerDay = update.NewPricePerDay;
                     }
                 }
                 db.SaveChanges();
