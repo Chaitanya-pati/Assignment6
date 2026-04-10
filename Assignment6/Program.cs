@@ -1,9 +1,9 @@
-using Assignment6.Services;
+﻿using Assignment6.Services;
 using DbService.SignalR;
 using DbService.Implementation;
 using DbService.Interface;
 using Hangfire;
-using Hangfire.MemoryStorage;
+using Hangfire.SqlServer; // ✅ ADDED
 using Newtonsoft.Json;
 using UserManagement.Lib;
 using Assignment6;
@@ -39,7 +39,7 @@ builder.Services.AddSingleton<IDashboardService, DashboardService>(provide =>
     return new DashboardService(connectionString);
 });
 
-// Register PaymentService - CORRECTED
+// Register PaymentService
 builder.Services.AddSingleton<IPaymentService>(provider =>
 {
     var config = provider.GetRequiredService<IConfiguration>();
@@ -47,23 +47,19 @@ builder.Services.AddSingleton<IPaymentService>(provider =>
 });
 
 builder.Services.Configure<WhatsappService>(builder.Configuration.GetSection("Twilio"));
-
-// after Configure<WhatsappService>
 builder.Services.AddSingleton<TwilioSmsService>();
-// or AddScoped<TwilioSmsService>(); depending on your needs
 
-
-// Initialize Twilio client using env vars or config
+// Twilio Init (keep as-is or uncomment if needed)
 var accountSid = builder.Configuration["Twilio:AccountSid"];
 var authToken = builder.Configuration["Twilio:AuthToken"];
 //TwilioClient.Init(accountSid, authToken);
 
-
 builder.Services.AddUserManagementServices(builder.Configuration);
 
+// ✅ UPDATED HANGFIRE CONFIG (IMPORTANT)
 builder.Services.AddHangfire(cfg =>
 {
-    cfg.UseMemoryStorage();
+    cfg.UseSqlServerStorage(connectionString); // ✅ CHANGED
 });
 
 builder.Services.AddHangfireServer();
@@ -76,13 +72,16 @@ builder.Services.AddControllersWithViews()
 
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
+
+// Airbnb Job
 builder.Services.AddScoped<AirbnbSyncJob>();
 
 var app = builder.Build();
 
+// Hangfire Dashboard
 app.UseHangfireDashboard("/hangfire");
 
-// Schedule Airbnb sync every minute
+// ✅ ENSURE JOB REGISTERS PROPERLY
 RecurringJob.AddOrUpdate<AirbnbSyncJob>(
     "sync-airbnb",
     job => job.RunAsync(),
@@ -97,8 +96,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.MapHub<SignalRService>("/signalR");
+
 app.UseRouting();
+
+// (No change here intentionally)
+app.MapHub<SignalRService>("/signalR");
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
