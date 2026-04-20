@@ -778,7 +778,6 @@ namespace Assignment6.Controllers
                 PdfDocument doc = converter.ConvertHtmlString(htmlContent);
                 doc.Save(filePath);
                 doc.Close();
-                System.IO.File.Delete(filePath);
 
                 Console.WriteLine($"PDF generated at: {filePath}");
 
