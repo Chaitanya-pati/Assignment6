@@ -537,325 +537,207 @@ namespace Assignment6.Controllers
         // ADD this method to generate HTML content
         private string GenerateInvoiceHtml(Booking booking)
         {
+            bool isAirbnbBooking = booking.CustomerName == "Airbnb Guest" || booking.CustomerName?.Contains("Airbnb") == true;
+            bool isPastBooking = booking.BookingDateTo < DateTime.Now;
+            int nights = (booking.BookingDateTo - booking.BookingDateFrom).Days;
+            long advancePaid = booking.AdvancePrice ?? 0;
+            long remaining = booking.Price - advancePaid;
+
+            string statusBadge = isAirbnbBooking
+                ? "<span style='background:#fffaeb;color:#b54708;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;'>Airbnb</span>"
+                : isPastBooking
+                    ? "<span style='background:#ecfdf3;color:#027a48;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;'>Completed</span>"
+                    : "<span style='background:#ecfdf3;color:#027a48;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;'>Active</span>";
+
+            string roomDetails = (booking.BookingRooms?.Count > 0)
+                ? string.Join(", ", booking.BookingRooms.Select(r => $"Room {r.RoomId}"))
+                : "N/A";
+
+            string roomCount = $"{booking.BookingRooms?.Count ?? 0} {(booking.BookingRooms?.Count == 1 ? "room" : "rooms")}";
+            string bookingType = isAirbnbBooking ? "Airbnb" : "Direct Booking";
+
+            string notesSection = string.IsNullOrEmpty(booking.Message) ? "" : $@"
+        <tr>
+            <td colspan='2' style='padding-top:12px;'>
+                <table width='100%' cellpadding='0' cellspacing='0' style='background:#f9fafb;border:0.5px solid #eaecf0;border-radius:8px;'>
+                    <tr>
+                        <td style='padding:14px 18px;'>
+                            <div style='font-size:10px;font-weight:600;color:#98a2b3;text-transform:uppercase;letter-spacing:0.9px;margin-bottom:8px;'>Special Requests &amp; Notes</div>
+                            <div style='font-size:12px;color:#344054;line-height:1.7;'>{booking.Message}</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>";
+
+            string amountDueRow = remaining > 0 ? $@"
+        <tr style='border-bottom:0.5px solid #f2f4f7;'>
+            <td style='padding:11px 18px;font-size:12px;color:#667085;'>Amount due</td>
+            <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:500;text-align:right;'>&#8377;{remaining:N0}</td>
+        </tr>" : "";
+
             var html = $@"
 <!DOCTYPE html>
-<html>
+<html lang='en'>
 <head>
     <meta charset='utf-8'>
-    <title>Invoice - {booking.Id:D6}</title>
+    <title>Invoice - Vernekar HomeStays</title>
     <style>
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        html, body {{
+          font-family: 'Segoe UI', Arial, sans-serif;
+            background: #ffffff;
+            color: #0a0f1e;
+            font-size: 15px;
+            line-height: 1.7;
+            width: 100%;
         }}
-
-        body {{ 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: white;
-            color: #333;
-            line-height: 1.3;
-            font-size: 12px;
-            height: 100vh;
-            overflow: hidden;
+        .wrapper {{
+            width: 100%;
+            padding: 52px 56px;
+            background: #ffffff;
         }}
-        
-        .invoice-container {{ 
-            max-width: 800px; 
-            margin: 0 auto; 
-            background: white; 
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }}
-        
-        .header {{ 
-            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }}
-        
-        .company-name {{ 
-            font-size: 24px; 
-            font-weight: bold; 
-            margin-bottom: 4px;
-            letter-spacing: 1px;
-        }}
-        
-        .company-tagline {{
-            font-size: 12px;
-            opacity: 0.9;
-        }}
-
-        .invoice-header {{
-            background: white;
-            padding: 15px 20px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }}
-
-        .invoice-title {{ 
-            font-size: 24px; 
-            font-weight: bold;
-            color: #2d3748;
-        }}
-
-        .invoice-number {{ 
-            color: #e53e3e;
-            font-size: 16px;
-            font-weight: bold;
-        }}
-
-        .invoice-date {{
-            color: #718096;
-            font-size: 12px;
-            margin-top: 3px;
-        }}
-
-        .content-section {{
-            padding: 20px;
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }}
-
-        .left-column {{
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }}
-
-        .right-column {{
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }}
-
-        .info-section {{
-            background: #4a5568;
-            color: white;
-            padding: 8px 15px;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }}
-
         .info-card {{
-            background: #f7fafc;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid #4a5568;
-            flex: 1;
+             background: #f9fafb;
+                border: 1px solid #d0d5dd;
+                border-radius: 8px;
+                padding: 24px 26px;
+                vertical-align: top;
         }}
-
-        .info-row {{
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-        }}
-
-        .info-row:last-child {{
-            margin-bottom: 0;
-        }}
-
-        .info-label {{
-            font-weight: 600;
-            color: #4a5568;
-            font-size: 11px;
-        }}
-
-        .info-value {{
-            color: #2d3748;
-            font-weight: 500;
-        }}
-
-        .payment-status {{
-            display: inline-block;
-            background: #48bb78;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: bold;
+        .card-title {{
+          font-size: 11px;
+            font-weight: 700;
+            color: #0a0c10;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d0d5dd;
         }}
-
-        .total-section {{
-            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            grid-column: span 2;
-            margin-top: 10px;
+        .row-label {{
+               font-size: 17px;
+                color: #0a0c10;
+                padding: 7px 0;
+                width: 42%;
+                font-weight: 500
         }}
-
-        .total-label {{
-            font-size: 16px;
-            margin-bottom: 8px;
-            opacity: 0.9;
-        }}
-
-        .total-amount {{
-            font-size: 32px;
-            font-weight: bold;
-        }}
-
-        .footer {{
-            background: #f7fafc;
-            padding: 12px 20px;
-            text-align: center;
-            color: #718096;
-            border-top: 1px solid #e2e8f0;
-        }}
-
-        .footer-title {{
-            font-size: 14px;
-            color: #2d3748;
-            margin-bottom: 4px;
-            font-weight: 600;
-        }}
-
-        .footer-details {{
-            font-size: 10px;
-            line-height: 1.2;
-        }}
-
-        @media print {{
-            body {{ 
-                background-color: white;
-                margin: 0;
-                padding: 0;
-                height: auto;
-                overflow: visible;
-            }}
-            .invoice-container {{ 
-                height: auto;
-                page-break-inside: avoid;
-            }}
+        .row-value {{
+                font-size: 14px;
+                color: #0a0f1e;
+                font-weight: 700;
+                padding: 7px 0;
+                text-align: right;
         }}
     </style>
 </head>
 <body>
-    <div class='invoice-container'>
-        <!-- Header -->
-        <div class='header'>
-            <div class='company-name'>VERNEKAR HOMESTAYS</div>
-            <div class='company-tagline'>Premium Hospitality & Accommodation Services</div>
-        </div>
+<div class='wrapper'>
 
-        <!-- Invoice Title Section -->
-        <div class='invoice-header'>
-            <div>
-                <div class='invoice-title'>INVOICE</div>
-                <div class='invoice-date'>Date: {DateTime.Now:MMMM dd, yyyy}</div>
-            </div>
-            <div>
-                <div class='invoice-number'>#{booking.Id:D6}</div>
-            </div>
-        </div>
+    <!-- HEADER -->
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:36px;padding-bottom:30px;border-bottom:2px solid #d0d5dd;'>
+        <tr>
+            <td style='vertical-align:top;'>
+                <div style='font-size:30px;font-weight:700;color:#101828;letter-spacing:1px;margin-bottom:6px;'>VERNEKAR</div>
+                <div style='font-size:15px;color:#16181d;margin-bottom:14px;'>Radha Heritage Homestays</div>
+                <div style='font-size:13px;color:#2c313a;line-height:2;'>radhaheritagehomestay@gmail.com</div>
+                <div style='font-size:13px;color:#2c313a;'>www.radhaheritagehomestay.com</div>
+            </td>
+            <td style='vertical-align:top;text-align:right;'>
+                <div style='font-size:11px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Invoice No</div>
+                <div style='font-size:28px;font-weight:700;color:#101828;margin:4px 0 16px;'>#{booking.Id:D6}</div>
+                <div style='font-size:11px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Invoice Date</div>
+                <div style='font-size:15px;color:#101828;font-weight:500;margin:4px 0 16px;'>{DateTime.Now:dd MMM yyyy}</div>
+                <div style='font-size:11px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Status</div>
+                <div style='margin-top:8px;'>{statusBadge}</div>
+            </td>
+        </tr>
+    </table>
 
-        <!-- Content in Two Columns -->
-        <div class='content-section'>
-            <!-- Left Column -->
-            <div class='left-column'>
-                <!-- Customer Information -->
-                <div>
-                    <div class='info-section'>Customer Information</div>
-                    <div class='info-card'>
-                        <div class='info-row'>
-                            <span class='info-label'>Full Name:</span>
-                            <span class='info-value'>{booking.CustomerName ?? "N/A"}</span>
-                        </div>
-                        <div class='info-row'>
-                            <span class='info-label'>Email:</span>
-                            <span class='info-value'>{booking.CustomerEmail ?? "N/A"}</span>
-                        </div>
-                        <div class='info-row'>
-                            <span class='info-label'>Phone:</span>
-                            <span class='info-value'>{booking.CustomerPhone ?? "N/A"}</span>
-                        </div>
-                    </div>
-                </div>
+    <!-- GUEST + PROPERTY -->
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:18px;'>
+        <tr>
+            <td width='49%' class='info-card'>
+                <div class='card-title'>Guest Information</div>
+                <table width='100%' cellpadding='0' cellspacing='0'>
+                    <tr><td class='row-label'>Name</td><td class='row-value'>{booking.CustomerName ?? "N/A"}</td></tr>
+                    <tr><td class='row-label'>Email</td><td class='row-value'>{booking.CustomerEmail ?? "N/A"}</td></tr>
+                    <tr><td class='row-label'>Phone</td><td class='row-value'>{booking.CustomerPhone ?? "N/A"}</td></tr>
+                    <tr><td class='row-label'>Guests</td><td class='row-value'>{booking.GuestNumbers}</td></tr>
+                </table>
+            </td>
+            <td width='2%'>&nbsp;</td>
+            <td width='49%' class='info-card'>
+                <div class='card-title'>Property Details</div>
+                <table width='100%' cellpadding='0' cellspacing='0'>
+                    <tr><td class='row-label'>Property</td><td class='row-value'>{booking.Home?.Name ?? "N/A"}</td></tr>
+                    <tr><td class='row-label'>Check-in</td><td class='row-value'>{booking.BookingDateFrom:dd MMM yyyy}</td></tr>
+                    <tr><td class='row-label'>Check-out</td><td class='row-value'>{booking.BookingDateTo:dd MMM yyyy}</td></tr>
+                    <tr><td class='row-label'>Duration</td><td class='row-value' style='font-weight:700;'>{nights} {(nights == 1 ? "night" : "nights")}</td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 
-                <!-- Booking Details -->
-                <div>
-                    <div class='info-section'>Booking Details</div>
-                    <div class='info-card'>
-                        <div class='info-row'>
-                            <span class='info-label'>Property:</span>
-                            <span class='info-value'>{booking.Home?.Name ?? "N/A"}</span>
-                        </div>
-                        <div class='info-row'>
-                            <span class='info-label'>Check-in:</span>
-                            <span class='info-value'>{booking.BookingDateFrom:MMM dd, yyyy}</span>
-                        </div>
-                        <div class='info-row'>
-                            <span class='info-label'>Check-out:</span>
-                            <span class='info-value'>{booking.BookingDateTo:MMM dd, yyyy}</span>
-                        </div>
-                        <div class='info-row'>
-                            <span class='info-label'>Duration:</span>
-                            <span class='info-value'>{(booking.BookingDateTo - booking.BookingDateFrom).Days} night{((booking.BookingDateTo - booking.BookingDateFrom).Days != 1 ? "s" : "")}</span>
-                        </div>
-                        <div class='info-row'>
-                            <span class='info-label'>Rooms:</span>
-                            <span class='info-value'>{booking.BookingRooms?.Count ?? 0} room{((booking.BookingRooms?.Count ?? 0) != 1 ? "s" : "")}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- BOOKING SUMMARY -->
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:18px;'>
+        <tr>
+            <td class='info-card'>
+                <div class='card-title'>Booking Summary</div>
+                <table width='100%' cellpadding='0' cellspacing='0'>
+                    <tr>
+                        <td width='50%' style='vertical-align:top;padding-right:20px;'>
+                            <table width='100%' cellpadding='0' cellspacing='0'>
+                                <tr><td class='row-label'>Rooms booked</td><td class='row-value'>{roomCount}</td></tr>
+                                <tr><td class='row-label'>Booking type</td><td class='row-value'>{bookingType}</td></tr>
+                                <tr><td class='row-label'>Booked on</td><td class='row-value'>{booking.CreatedAt:dd MMM yyyy}</td></tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 
-            <!-- Right Column -->
-            <div class='right-column'>
-                <!-- Payment Information -->
-                <div>
-                    <div class='info-section'>Payment Information</div>
-                    <div class='info-card'>
-                        <div class='info-row'>
-                            <span class='info-label'>Status:</span>
-                            <span class='payment-status'>✓ PAID</span>
-                        </div>
-                        <div class='info-row'>
-                            <span class='info-label'>Payment Date:</span>
-                            <span class='info-value'>{DateTime.Now:MMM dd, yyyy}</span>
-                        </div>
-                        <div class='info-row'>
-                            <span class='info-label'>Transaction ID:</span>
-                            <span class='info-value'>TXN-{booking.Id}-{DateTime.Now:yyyyMMdd}</span>
-                        </div>
-                    </div>
-                </div>
+    <!-- LEDGER -->
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:18px;border:1px solid #d0d5dd;border-radius:8px;overflow:hidden;background:#ffffff;'>
+        <tr style='background:#f9fafb;border-top:1px solid #d0d5dd;'>
+            <td style='padding:22px 22px;font-size:17px;font-weight:700;color:#101828;'>Total booking amount</td>
+            <td style='padding:22px 22px;font-size:22px;font-weight:700;color:#101828;text-align:right;'>&#8377;{booking.Price:N0}</td>
+        </tr>
+    </table>
 
-                {(string.IsNullOrEmpty(booking.Message) ? "" : $@"
-                <!-- Notes -->
-                <div>
-                    <div class='info-section'>Notes</div>
-                    <div class='info-card'>
-                        <div class='info-value' style='line-height: 1.4;'>{booking.Message}</div>
-                    </div>
-                </div>")}
-            </div>
+    <!-- NOTES (optional) -->
+    {(string.IsNullOrEmpty(booking.Message) ? "" : $@"
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:18px;'>
+        <tr>
+            <td style='background:#f9fafb;border:1px solid #eaecf0;border-radius:8px;padding:22px 26px;'>
+                <div style='font-size:11px;font-weight:600;color:#0a0c10;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #0a0c10;'>Special Requests &amp; Notes</div>
+                <div style='font-size:14px;color:#344054;line-height:1.8;'>{booking.Message}</div>
+            </td>
+        </tr>
+    </table>")}
 
-            <!-- Total Amount (Full Width) -->
-            <div class='total-section'>
-                <div class='total-label'>Total Amount</div>
-                <div class='total-amount'>₹{booking.Price:F2}</div>
-            </div>
-        </div>
+    <!-- SPACER - pushes footer toward bottom -->
+    <table width='100%' cellpadding='0' cellspacing='0' style='height:120px;'><tr><td></td></tr></table>
 
-        <!-- Footer -->
-        <div class='footer'>
-            <div class='footer-title'>Thank you for choosing Vernekar HomeStays!</div>
-            <div class='footer-details'>
-                Invoice generated on {DateTime.Now:MMM dd, yyyy} at {DateTime.Now:hh:mm tt} | For queries: info@vernekarhomestays.com
-            </div>
-        </div>
-    </div>
+    <!-- DIVIDER -->
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:0;'>
+        <tr>
+            <td style='border-top:1px solid #eaecf0;padding-top:24px;'>
+                <table width='100%' cellpadding='0' cellspacing='0'>
+                    <tr>
+                        <td style='font-size:13px;color:#2c313a;'>Thank you for choosing Vernekar HomeStays</td>
+                        <td style='text-align:right;font-size:12px;color:#373d49;line-height:1.9;'>
+                            radhaheritagehomestay@gmail.com &nbsp;·&nbsp; www.radhaheritagehomestay.com<br>
+                            Generated on {DateTime.Now:dd MMM yyyy, HH:mm}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</div>
 </body>
 </html>";
 
@@ -875,50 +757,35 @@ namespace Assignment6.Controllers
         {
             try
             {
-                // Create the HTML to PDF converter
                 HtmlToPdf converter = new HtmlToPdf();
 
-                // Set converter options
                 converter.Options.PdfPageSize = PdfPageSize.A4;
                 converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
 
-                // Set page margins (in points)
-                converter.Options.MarginTop = 40;
-                converter.Options.MarginBottom = 40;
-                converter.Options.MarginLeft = 40;
-                converter.Options.MarginRight = 40;
+                converter.Options.MarginTop = 0;    // We handle padding in HTML
+                converter.Options.MarginBottom = 0;
+                converter.Options.MarginLeft = 0;
+                converter.Options.MarginRight = 0;
 
-                // Set web page options
-                converter.Options.WebPageWidth = 1024;
-                converter.Options.WebPageHeight = 0; // auto height
+                converter.Options.WebPageWidth = 1200;  // wider so layout doesn't collapse
+                converter.Options.WebPageHeight = 0;
 
-                // Enable JavaScript (if needed)
                 converter.Options.JavaScriptEnabled = false;
-
-                // Set timeout (correct property name for this version)
-                //converter.Options.NavigationTimeout = 60; // 60 seconds
-
-                // Set CSS media type to print for better styling
-                converter.Options.CssMediaType = HtmlToPdfCssMediaType.Print;
-
-                // Set scaling options
+                converter.Options.CssMediaType = HtmlToPdfCssMediaType.Screen; // NOT Print
                 converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.ShrinkOnly;
                 converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.NoAdjustment;
 
-                // Convert HTML string to PDF document
                 PdfDocument doc = converter.ConvertHtmlString(htmlContent);
-
-                // Save the PDF document to the specified file path
                 doc.Save(filePath);
-
-                // Close the PDF document to free resources
                 doc.Close();
+                System.IO.File.Delete(filePath);
 
-                Console.WriteLine($"PDF invoice successfully generated at: {filePath}");
+                Console.WriteLine($"PDF generated at: {filePath}");
+
             }
-            catch (Exception apiEx)
+            catch (Exception ex)
             {
-                Console.WriteLine($"SelectPdf API Error: {apiEx.Message}");
+                Console.WriteLine($"SelectPdf Error: {ex.Message}");
                 CreateHtmlFallback(htmlContent, filePath);
             }
         }
@@ -992,6 +859,7 @@ namespace Assignment6.Controllers
 
                 var fileBytes = System.IO.File.ReadAllBytes(filePath);
                 var contentType = "application/pdf";
+               
 
                 // If you're serving HTML files for testing, use this:
                 // var contentType = "text/html";
@@ -1016,7 +884,7 @@ namespace Assignment6.Controllers
                     return Json(new { success = false, message = "Invalid booking ID" });
                 }
 
-                // Get booking details for invoice generation BEFORE deletion
+                // Get booking details for invoice generation
                 var booking = _bookingService.GetBookingById(bookingId);
 
                 if (booking == null)
@@ -1024,7 +892,7 @@ namespace Assignment6.Controllers
                     return Json(new { success = false, message = "Booking not found" });
                 }
 
-                // Generate invoice first
+                // Generate invoice (works for past bookings too)
                 string invoiceUrl = null;
                 try
                 {
@@ -1044,7 +912,7 @@ namespace Assignment6.Controllers
                     return Json(new
                     {
                         success = true,
-                        message = "Booking completed and cleared successfully",
+                        message = "Invoice generated successfully",
                         invoiceUrl = invoiceUrl
                     });
                 }
@@ -1053,7 +921,7 @@ namespace Assignment6.Controllers
                     return Json(new
                     {
                         success = false,
-                        message = "Failed to complete booking"
+                        message = "Failed to generate invoice"
                     });
                 }
             }
