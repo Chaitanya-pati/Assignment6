@@ -819,7 +819,7 @@
             $('#selectedCount').text(count);
             $('#totalRooms').text(totalRooms);
 
-            let totalPrice = 0;
+            let roomsTotal = 0;
             const roomNames = [];
 
             selectedRooms.each(function () {
@@ -829,14 +829,26 @@
 
                 // Only add price for non-common areas
                 if (!isCommon && price > 0) {
-                    totalPrice += price;
+                    roomsTotal += price;
                 }
 
                 roomNames.push(label + (isCommon ? ' (Included)' : ''));
             });
 
+            // If the user has selected every chargeable room, treat this as a
+            // whole-property booking and use the home's flat per-day rate
+            // (when configured). Otherwise charge the sum of selected rooms.
+            const totalChargeableRooms = $('.room-checkbox:not(.common-area)').length;
+            const selectedChargeableRooms = $('.room-checkbox.selected:not(.common-area)').length;
+            const allChargeableSelected = totalChargeableRooms > 0 && selectedChargeableRooms === totalChargeableRooms;
+            const homePricePerDay = parseFloat($('#HomeId option:selected').data('price')) || 0;
+
+            const displayPrice = (allChargeableSelected && homePricePerDay > 0)
+                ? homePricePerDay
+                : roomsTotal;
+
             // Display price in rupees
-            $('#estimatedPrice').text(`₹${totalPrice.toFixed(2)}`);
+            $('#estimatedPrice').text(`₹${displayPrice.toFixed(2)}`);
 
             if (count > 0) {
                 $('#selectedRoomsList').html(roomNames.join(', '));
@@ -846,6 +858,41 @@
 
             // Debug info
             console.log(`Selected: ${count}, Total Price: ₹${totalPrice}`);
+
+            // Persist current selection live so the booking form reflects it
+            // immediately (without waiting for "Confirm Selection").
+            persistRoomSelection();
+        }
+
+        // Save current room selection + meta to localStorage and notify the
+        // booking form so it can recalculate price in real time.
+        function persistRoomSelection() {
+            const currentHomeId = getCurrentHomeId();
+            const selectedRooms = [];
+            $('.room-checkbox.selected').each(function () {
+                const $el = $(this);
+                selectedRooms.push({
+                    id: $el.data('room-id'),
+                    name: $el.find('.room-label').text().trim(),
+                    price: parseFloat($el.data('price')) || 0,
+                    homeId: currentHomeId,
+                    isCommon: isCommonArea($el[0])
+                });
+            });
+
+            const totalChargeableRooms = $('.room-checkbox:not(.common-area)').length;
+            const selectedChargeableRooms = selectedRooms.filter(r => !r.isCommon).length;
+            const allChargeableSelected = totalChargeableRooms > 0 && selectedChargeableRooms === totalChargeableRooms;
+
+            localStorage.setItem('selectedRoomData', JSON.stringify(selectedRooms));
+            localStorage.setItem('roomSelectionMeta', JSON.stringify({
+                homeId: currentHomeId,
+                totalChargeableRooms: totalChargeableRooms,
+                selectedChargeableRooms: selectedChargeableRooms,
+                allChargeableSelected: allChargeableSelected
+            }));
+
+            $(window).trigger('roomsUpdated');
         }
 
         // Update "Select All" checkbox state
@@ -956,14 +1003,24 @@
                 });
             });
 
+            const totalChargeableRooms = $('.room-checkbox:not(.common-area)').length;
+            const selectedChargeableRooms = selectedRooms.filter(room => !room.isCommon).length;
+            const allChargeableSelected = totalChargeableRooms > 0 && selectedChargeableRooms === totalChargeableRooms;
+
             localStorage.setItem('selectedRoomData', JSON.stringify(selectedRooms));
+            localStorage.setItem('roomSelectionMeta', JSON.stringify({
+                homeId: currentHomeId,
+                totalChargeableRooms: totalChargeableRooms,
+                selectedChargeableRooms: selectedChargeableRooms,
+                allChargeableSelected: allChargeableSelected
+            }));
             $('#SelectedRoomIds').val(selectedRooms.map(room => room.id).join(','));
 
             $('#homeDrawingModal').modal('hide');
 
             $(window).trigger('roomsUpdated');
 
-            const chargeableCount = selectedRooms.filter(room => !room.isCommon).length;
+            const chargeableCount = selectedChargeableRooms;
             const commonCount = selectedRooms.filter(room => room.isCommon).length;
 
             showNotification(`${selectedRooms.length} room(s) selected (${chargeableCount} chargeable, ${commonCount} included)`, 'success');

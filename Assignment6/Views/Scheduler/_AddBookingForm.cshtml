@@ -769,18 +769,40 @@
             totalDays = totalDays > 0 ? totalDays : 1;
         }
 
-        // Calculate total price based on individual room prices
+        // Read room-selection meta saved when the user picked rooms in the layout modal.
+        // If the entire property (all chargeable rooms) was selected we charge the
+        // home's flat per-day price, NOT the sum of room prices.
+        const meta = JSON.parse(localStorage.getItem('roomSelectionMeta') || 'null');
+        const chargeableSelected = selectedRooms.filter(r => !r.isCommon);
+
+        // Sum chargeable room prices (common areas are always free)
         let totalRoomPrice = 0;
-        selectedRooms.forEach(room => {
-            const roomPrice = parseFloat(room.price) || 0;
-            totalRoomPrice += roomPrice;
+        chargeableSelected.forEach(room => {
+            totalRoomPrice += parseFloat(room.price) || 0;
         });
 
-        // If no rooms selected or all rooms are free, use home base price
-        const dailyRate = totalRoomPrice > 0 ? totalRoomPrice : homePricePerDay;
+        const allRoomsSelected = !!(meta
+            && meta.allChargeableSelected
+            && meta.homeId == $('#HomeId').val());
+
+        let dailyRate;
+        if (allRoomsSelected && homePricePerDay > 0) {
+            // Entire property booked → use the flat home per-day price
+            dailyRate = homePricePerDay;
+        } else if (totalRoomPrice > 0) {
+            // Partial selection → sum of selected (chargeable) room prices
+            dailyRate = totalRoomPrice;
+        } else {
+            // Fallback when no chargeable prices configured
+            dailyRate = homePricePerDay;
+        }
+
         const totalPrice = dailyRate * totalDays;
 
-        console.log(`Booking Form - Selected: ${selectedRooms.length}, Daily rate: ₹${dailyRate}, Total: ₹${totalPrice}`);
+        console.log(
+            `Booking Form - Selected: ${selectedRooms.length} (chargeable: ${chargeableSelected.length}), ` +
+            `allRoomsSelected: ${allRoomsSelected}, Daily rate: ₹${dailyRate}, Total: ₹${totalPrice}`
+        );
 
         return {
             dailyRate: dailyRate,
@@ -867,11 +889,13 @@
 
             if (filteredRooms.length !== savedRooms.length) {
                 localStorage.setItem('selectedRoomData', JSON.stringify(filteredRooms));
+                localStorage.removeItem('roomSelectionMeta');
             }
         } else {
             roomBtn.prop('disabled', true);
             roomBtn.removeAttr('data-home-id');
             localStorage.removeItem('selectedRoomData');
+            localStorage.removeItem('roomSelectionMeta');
         }
 
         updateBookingSummary();
@@ -1006,6 +1030,7 @@
     // Enhanced reset form function with validation clearing
     function resetForm() {
         localStorage.removeItem('selectedRoomData');
+        localStorage.removeItem('roomSelectionMeta');
         localStorage.removeItem('bookingData');
         updateBookingSummary();
 

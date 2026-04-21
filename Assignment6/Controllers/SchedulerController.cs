@@ -39,7 +39,7 @@ namespace Assignment6.Controllers
             //SendWhatsappMsg();
         }
 
-        public  async void SendWhatsappMsg()
+        public async void SendWhatsappMsg()
         {
             var msg = await _sms.SendSmsAsync("+918748040423", "Hiii from twillio");
         }
@@ -475,7 +475,7 @@ namespace Assignment6.Controllers
                     amountToBePaid = b.Price - (b.AdvancePrice ?? 0),
                     guestNumbers = b.GuestNumbers,
                     document = b.Document,
-                   // isAirbnbBooking = b.IsAirbnbBooking ?? false, // Include Airbnb flag
+                    // isAirbnbBooking = b.IsAirbnbBooking ?? false, // Include Airbnb flag
                     bookingRooms = b.BookingRooms?.Select(br => new
                     {
                         roomId = br.RoomId,
@@ -534,6 +534,25 @@ namespace Assignment6.Controllers
             }
         }
 
+        // Endpoint that returns the raw invoice HTML so the frontend can render it to PDF via html2pdf
+        [HttpGet]
+        public IActionResult GetInvoiceHtml(int bookingId)
+        {
+            try
+            {
+                var booking = _bookingService.GetBookingById(bookingId);
+                if (booking == null)
+                    return NotFound("Booking not found");
+
+                string html = GenerateInvoiceHtml(booking);
+                return Content(html, "text/html");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error generating invoice HTML: {ex.Message}");
+            }
+        }
+
         // ADD this method to generate HTML content
         private string GenerateInvoiceHtml(Booking booking)
         {
@@ -581,80 +600,90 @@ namespace Assignment6.Controllers
 <html lang='en'>
 <head>
     <meta charset='utf-8'>
+    <meta name='viewport' content='width=1024'>
     <title>Invoice - Vernekar HomeStays</title>
     <style>
+        @page {{ size: A4; margin: 0; }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         html, body {{
-          font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             background: #ffffff;
+            font-family: 'Segoe UI', Arial, sans-serif;
             color: #0a0f1e;
-            font-size: 15px;
-            line-height: 1.7;
-            width: 100%;
+            font-size: 12px;
+            line-height: 1.6;
         }}
-        .wrapper {{
-            width: 100%;
-            padding: 52px 56px;
+        .a4-page {{
+            width: 794px;
+            padding: 28px 36px;
+            box-sizing: border-box;
             background: #ffffff;
+            margin: 0;
+            position: relative;
         }}
+        table, tr, td {{ page-break-inside: avoid !important; }}
         .info-card {{
-             background: #f9fafb;
-                border: 1px solid #d0d5dd;
-                border-radius: 8px;
-                padding: 24px 26px;
-                vertical-align: top;
+            background: #f9fafb;
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            padding: 18px 20px;
+            vertical-align: top;
+            page-break-inside: avoid;
         }}
+        .no-break {{ page-break-inside: avoid; }}
+        .page-break {{ page-break-before: always; }}
         .card-title {{
-          font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: #0a0c10;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 18px;
-            padding-bottom: 10px;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
             border-bottom: 1px solid #d0d5dd;
         }}
         .row-label {{
-               font-size: 17px;
-                color: #0a0c10;
-                padding: 7px 0;
-                width: 42%;
-                font-weight: 500
+            font-size: 12px;
+            color: #0a0c10;
+            padding: 5px 0;
+            width: 42%;
+            font-weight: 500;
         }}
         .row-value {{
-                font-size: 14px;
-                color: #0a0f1e;
-                font-weight: 700;
-                padding: 7px 0;
-                text-align: right;
+            font-size: 12px;
+            color: #0a0f1e;
+            font-weight: 700;
+            padding: 5px 0;
+            text-align: right;
         }}
     </style>
 </head>
 <body>
-<div class='wrapper'>
+<div class='a4-page'>
 
     <!-- HEADER -->
-    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:36px;padding-bottom:30px;border-bottom:2px solid #d0d5dd;'>
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #d0d5dd;'>
         <tr>
             <td style='vertical-align:top;'>
-                <div style='font-size:30px;font-weight:700;color:#101828;letter-spacing:1px;margin-bottom:6px;'>VERNEKAR</div>
-                <div style='font-size:15px;color:#16181d;margin-bottom:14px;'>Radha Heritage Homestays</div>
-                <div style='font-size:13px;color:#2c313a;line-height:2;'>radhaheritagehomestay@gmail.com</div>
-                <div style='font-size:13px;color:#2c313a;'>www.radhaheritagehomestay.com</div>
+                <div style='font-size:24px;font-weight:700;color:#101828;letter-spacing:1px;margin-bottom:4px;'>VERNEKAR</div>
+                <div style='font-size:13px;color:#16181d;margin-bottom:6px;'>Radha Heritage Homestays</div>
+                <div style='font-size:11px;color:#2c313a;line-height:1.5;'>radhaheritagehomestay@gmail.com</div>
+                <div style='font-size:11px;color:#2c313a;line-height:1.5;'>www.radhaheritagehomestay.com</div>
             </td>
             <td style='vertical-align:top;text-align:right;'>
-                <div style='font-size:11px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Invoice No</div>
-                <div style='font-size:28px;font-weight:700;color:#101828;margin:4px 0 16px;'>#{booking.Id:D6}</div>
-                <div style='font-size:11px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Invoice Date</div>
-                <div style='font-size:15px;color:#101828;font-weight:500;margin:4px 0 16px;'>{DateTime.Now:dd MMM yyyy}</div>
-                <div style='font-size:11px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Status</div>
-                <div style='margin-top:8px;'>{statusBadge}</div>
+                <div style='font-size:9px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Invoice No</div>
+                <div style='font-size:20px;font-weight:700;color:#101828;margin:2px 0 8px;'>#{booking.Id:D6}</div>
+                <div style='font-size:9px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Invoice Date</div>
+                <div style='font-size:12px;color:#101828;font-weight:500;margin:2px 0 8px;'>{DateTime.Now:dd MMM yyyy}</div>
+                <div style='font-size:9px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Status</div>
+                <div style='margin-top:4px;'>{statusBadge}</div>
             </td>
         </tr>
     </table>
 
     <!-- GUEST + PROPERTY -->
-    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:18px;'>
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:10px;'>
         <tr>
             <td width='49%' class='info-card'>
                 <div class='card-title'>Guest Information</div>
@@ -679,7 +708,7 @@ namespace Assignment6.Controllers
     </table>
 
     <!-- BOOKING SUMMARY -->
-    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:18px;'>
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:10px;'>
         <tr>
             <td class='info-card'>
                 <div class='card-title'>Booking Summary</div>
@@ -699,35 +728,32 @@ namespace Assignment6.Controllers
     </table>
 
     <!-- LEDGER -->
-    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:18px;border:1px solid #d0d5dd;border-radius:8px;overflow:hidden;background:#ffffff;'>
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:10px;border:1px solid #d0d5dd;border-radius:8px;overflow:hidden;background:#ffffff;'>
         <tr style='background:#f9fafb;border-top:1px solid #d0d5dd;'>
-            <td style='padding:22px 22px;font-size:17px;font-weight:700;color:#101828;'>Total booking amount</td>
-            <td style='padding:22px 22px;font-size:22px;font-weight:700;color:#101828;text-align:right;'>&#8377;{booking.Price:N0}</td>
+            <td style='padding:12px 16px;font-size:13px;font-weight:700;color:#101828;'>Total booking amount</td>
+            <td style='padding:12px 16px;font-size:16px;font-weight:700;color:#101828;text-align:right;'>&#8377;{booking.Price:N0}</td>
         </tr>
     </table>
 
     <!-- NOTES (optional) -->
     {(string.IsNullOrEmpty(booking.Message) ? "" : $@"
-    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:18px;'>
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:10px;'>
         <tr>
-            <td style='background:#f9fafb;border:1px solid #eaecf0;border-radius:8px;padding:22px 26px;'>
-                <div style='font-size:11px;font-weight:600;color:#0a0c10;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #0a0c10;'>Special Requests &amp; Notes</div>
-                <div style='font-size:14px;color:#344054;line-height:1.8;'>{booking.Message}</div>
+            <td style='background:#f9fafb;border:1px solid #eaecf0;border-radius:8px;padding:12px 16px;'>
+                <div style='font-size:10px;font-weight:600;color:#0a0c10;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #0a0c10;'>Special Requests &amp; Notes</div>
+                <div style='font-size:11px;color:#344054;line-height:1.5;'>{booking.Message}</div>
             </td>
         </tr>
     </table>")}
 
-    <!-- SPACER - pushes footer toward bottom -->
-    <table width='100%' cellpadding='0' cellspacing='0' style='height:120px;'><tr><td></td></tr></table>
-
-    <!-- DIVIDER -->
-    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:0;'>
+    <!-- FOOTER -->
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-top:18px;'>
         <tr>
-            <td style='border-top:1px solid #eaecf0;padding-top:24px;'>
+            <td style='border-top:1px solid #eaecf0;padding-top:10px;'>
                 <table width='100%' cellpadding='0' cellspacing='0'>
                     <tr>
-                        <td style='font-size:13px;color:#2c313a;'>Thank you for choosing Vernekar HomeStays</td>
-                        <td style='text-align:right;font-size:12px;color:#373d49;line-height:1.9;'>
+                        <td style='font-size:11px;color:#2c313a;'>Thank you for choosing Vernekar HomeStays</td>
+                        <td style='text-align:right;font-size:10px;color:#373d49;line-height:1.6;'>
                             radhaheritagehomestay@gmail.com &nbsp;·&nbsp; www.radhaheritagehomestay.com<br>
                             Generated on {DateTime.Now:dd MMM yyyy, HH:mm}
                         </td>
@@ -858,7 +884,7 @@ namespace Assignment6.Controllers
 
                 var fileBytes = System.IO.File.ReadAllBytes(filePath);
                 var contentType = "application/pdf";
-               
+
 
                 // If you're serving HTML files for testing, use this:
                 // var contentType = "text/html";
