@@ -197,7 +197,9 @@ namespace DbService.Implementation
         // Helper method to safely convert CalDateTime to DateTime
 
 
-        // Updated SyncAirbnbBookings method using the helper
+        // Sync Airbnb bookings: handles INSERT (new event), UPDATE (event date changed)
+        // and DELETE (event removed/cancelled in Airbnb).
+        // The iCal UID is used as the stable identifier and stored in Booking.Document.
         public async Task<int> SyncAirbnbBookings(IList<CalendarEvent> calendarEvents, int homeId)
         {
             var syncedCount = 0;
@@ -206,110 +208,150 @@ namespace DbService.Implementation
             {
                 try
                 {
-                    // Get all rooms for this home to book all of them
+                    var hubContext = _serviceProvider.GetRequiredService<IHubContext<SignalRService>>();
+
+                    // All rooms for this home (we book/free all of them together for Airbnb)
                     var homeRooms = db.Rooms.Where(r => r.HomeId == homeId).ToList();
 
-                    // Get existing Airbnb bookings to avoid duplicates
+                    // Existing Airbnb bookings for this home (managed by sync)
                     var existingAirbnbBookings = db.Bookings
                         .Where(b => b.HomeId == homeId && b.CustomerName == "Airbnb Guest")
                         .ToList();
 
+                    var home = db.Homes.FirstOrDefault(h => h.Id == homeId);
+
+                    // Track which UIDs are present in the current Airbnb feed.
+                    // Anything Airbnb-managed in DB whose UID is not in this set is a deletion.
+                    var currentEventUids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                    // -------- 1. INSERT or UPDATE from the incoming Airbnb feed --------
                     foreach (var calendarEvent in calendarEvents)
                     {
                         try
                         {
-                            // Simple datetime extraction - just use .Value property
-                            DateTime eventStartDate;
-                            DateTime eventEndDate;
+                            if (calendarEvent.Start?.Value == null || calendarEvent.End?.Value == null)
+                                continue;
 
-                            // Handle Start date
-                            if (calendarEvent.Start?.Value != null)
-                            {
-                                eventStartDate = calendarEvent.Start.Value.Date;
-                            }
-                            else
-                            {
-                                continue; // Skip if we can't get start date
-                            }
+                            var eventStartDate = calendarEvent.Start.Value.Date;
+                            var eventEndDate = calendarEvent.End.Value.Date;
 
-                            // Handle End date
-                            if (calendarEvent.End?.Value != null)
-                            {
-                                eventEndDate = calendarEvent.End.Value.Date;
-                            }
-                            else
-                            {
-                                continue; // Skip if we can't get end date
-                            }
-
-                            // Skip if end date is not after start date
                             if (eventEndDate <= eventStartDate)
                                 continue;
 
-                            // Check if this booking already exists
-                            bool bookingExists = existingAirbnbBookings.Any(b =>
-                                b.BookingDateFrom.Date == eventStartDate &&
-                                b.BookingDateTo.Date == eventEndDate);
+                            var uid = calendarEvent.Uid;
+                            if (string.IsNullOrWhiteSpace(uid))
+                                continue; // Without a UID we can't track this event reliably.
 
-                            if (bookingExists)
+                            currentEventUids.Add(uid);
+
+                            var newFrom = eventStartDate.Date.AddHours(12);
+                            var newTo = eventEndDate.Date.AddHours(13);
+                            int days = (eventEndDate - eventStartDate).Days;
+                            long totalPrice = home != null ? (long)((home.PricePerDay ?? 0) * days) : 0;
+                            var summary = $"Airbnb booking - {calendarEvent.Summary ?? "Reserved"}";
+
+                            // Try to find an existing booking by UID first (stored in Document).
+                            // Fall back to a date match for legacy rows that pre-date UID tracking,
+                            // and back-fill the UID on them so future syncs are stable.
+                            var existing = existingAirbnbBookings
+                                .FirstOrDefault(b => !string.IsNullOrEmpty(b.Document) &&
+                                                     string.Equals(b.Document, uid, StringComparison.OrdinalIgnoreCase));
+
+                            if (existing == null)
+                            {
+                                existing = existingAirbnbBookings
+                                    .FirstOrDefault(b => string.IsNullOrEmpty(b.Document) &&
+                                                         b.BookingDateFrom.Date == eventStartDate &&
+                                                         b.BookingDateTo.Date == eventEndDate);
+
+                                if (existing != null)
+                                {
+                                    existing.Document = uid; // back-fill UID for legacy row
+                                }
+                            }
+
+                            if (existing != null)
+                            {
+                                // UPDATE path: dates may have shifted in Airbnb.
+                                bool datesChanged = existing.BookingDateFrom != newFrom ||
+                                                    existing.BookingDateTo != newTo;
+
+                                if (datesChanged)
+                                {
+                                    // Make sure the new range doesn't collide with another booking
+                                    // (other Airbnb rows or direct bookings). Skip if it does.
+                                    bool hasConflict = db.Bookings.Any(x =>
+                                        x.HomeId == homeId &&
+                                        x.IsBooked == true &&
+                                        x.Id != existing.Id &&
+                                        x.BookingDateFrom.Date < eventEndDate &&
+                                        x.BookingDateTo.Date.AddDays(-1) >= eventStartDate);
+
+                                    if (hasConflict)
+                                    {
+                                        Console.WriteLine($"Airbnb booking {existing.Id} update skipped due to conflict.");
+                                        continue;
+                                    }
+
+                                    existing.BookingDateFrom = newFrom;
+                                    existing.BookingDateTo = newTo;
+                                    existing.Price = totalPrice;
+                                }
+
+                                existing.Message = summary;
+                                db.Bookings.Update(existing);
+                                db.SaveChanges();
+
+                                hubContext.Clients.All.SendAsync("UpdateBookingFromAirbnb", existing);
+                                syncedCount++;
                                 continue;
+                            }
 
-                            // Check for conflicts using the SAME logic as your SaveBookingAlternative method
-                            bool hasConflict = db.Bookings.Any(x =>
+                            // INSERT path: brand new Airbnb event.
+                            bool conflictNew = db.Bookings.Any(x =>
                                 x.HomeId == homeId &&
-                                x.IsBooked == true && // Only check approved bookings
+                                x.IsBooked == true &&
                                 x.BookingDateFrom.Date < eventEndDate &&
                                 x.BookingDateTo.Date.AddDays(-1) >= eventStartDate);
 
-                            if (hasConflict)
+                            if (conflictNew)
                                 continue;
 
-                            // Get home data for pricing
-                            var home = db.Homes.FirstOrDefault(h => h.Id == homeId);
-                            int days = (eventEndDate - eventStartDate).Days;
-                            long totalPrice = 0;
-
-                            if (home != null)
-                            {
-                                totalPrice = (long)((home.PricePerDay ?? 0) * days);
-                            }
-
-                            // Create new Airbnb booking
                             var newBooking = new Booking
                             {
                                 CustomerName = "Airbnb Guest",
                                 CustomerEmail = "airbnb@guest.com",
                                 CustomerPhone = "N/A",
-                                Message = $"Airbnb booking - {calendarEvent.Summary ?? "Reserved"}",
-                                BookingDateFrom = eventStartDate.Date.AddHours(12),
-                                BookingDateTo = eventEndDate.Date.AddHours(13),
+                                Message = summary,
+                                BookingDateFrom = newFrom,
+                                BookingDateTo = newTo,
                                 HomeId = homeId,
                                 PaymentStatus = "pending",
                                 CreatedAt = DateTime.Now,
                                 Price = totalPrice,
                                 GuestNumbers = 1,
-                                Document = null,
+                                Document = uid, // store iCal UID for future sync matching
                                 IsBooked = true,
                                 CheckOut = false
                             };
-                            var hubContext = _serviceProvider.GetRequiredService<IHubContext<SignalRService>>();
-                            hubContext.Clients.All.SendAsync("BindBookingFromAirbnb", newBooking);
-                            // Add booking to database
+
                             db.Bookings.Add(newBooking);
                             db.SaveChanges();
 
-                            // Book all rooms for this home
                             foreach (var room in homeRooms)
                             {
-                                var bookingRoom = new BookingRoom
+                                db.BookingRooms.Add(new BookingRoom
                                 {
                                     BookingId = newBooking.Id,
                                     RoomId = room.Id
-                                };
-                                db.BookingRooms.Add(bookingRoom);
+                                });
                             }
-
                             db.SaveChanges();
+
+                            // Keep the in-memory list in sync so a later UPDATE/DELETE pass sees it.
+                            existingAirbnbBookings.Add(newBooking);
+
+                            hubContext.Clients.All.SendAsync("BindBookingFromAirbnb", newBooking);
                             syncedCount++;
                         }
                         catch (Exception ex)
@@ -318,6 +360,29 @@ namespace DbService.Implementation
                             System.Diagnostics.Debug.WriteLine($"Calendar event error details: {ex}");
                         }
                     }
+
+                    // -------- 2. DELETE bookings that no longer exist in the Airbnb feed --------
+                    // Only consider Airbnb-managed rows that have a tracked UID. Past stays
+                    // (BookingDateTo already in the past) are kept for history.
+                    var today = DateTime.Today;
+                    var bookingsToDelete = existingAirbnbBookings
+                        .Where(b => !string.IsNullOrEmpty(b.Document) &&
+                                    !currentEventUids.Contains(b.Document) &&
+                                    b.BookingDateTo.Date >= today)
+                        .ToList();
+
+                    foreach (var booking in bookingsToDelete)
+                    {
+                        var bookingRooms = db.BookingRooms.Where(br => br.BookingId == booking.Id);
+                        db.BookingRooms.RemoveRange(bookingRooms);
+                        db.Bookings.Remove(booking);
+
+                        hubContext.Clients.All.SendAsync("DeleteBookingFromAirbnb", booking.Id);
+                        syncedCount++;
+                    }
+
+                    if (bookingsToDelete.Count > 0)
+                        db.SaveChanges();
                 }
                 catch (Exception ex)
                 {
