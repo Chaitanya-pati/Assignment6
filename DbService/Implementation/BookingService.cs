@@ -362,13 +362,14 @@ namespace DbService.Implementation
                     }
 
                     // -------- 2. DELETE bookings that no longer exist in the Airbnb feed --------
-                    // Only consider Airbnb-managed rows that have a tracked UID. Past stays
-                    // (BookingDateTo already in the past) are kept for history.
+                    // Only consider Airbnb-managed rows that have a tracked UID.
+                    // Past stays AND in-progress stays (started in the past) are kept;
+                    // we only delete strictly-future reservations.
                     var today = DateTime.Today;
                     var bookingsToDelete = existingAirbnbBookings
                         .Where(b => !string.IsNullOrEmpty(b.Document) &&
                                     !currentEventUids.Contains(b.Document) &&
-                                    b.BookingDateTo.Date >= today)
+                                    b.BookingDateFrom.Date >= today)
                         .ToList();
 
                     foreach (var booking in bookingsToDelete)
