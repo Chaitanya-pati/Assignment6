@@ -286,7 +286,7 @@ namespace DbService.Implementation
                                 HomeId = homeId,
                                 PaymentStatus = "pending",
                                 CreatedAt = DateTime.Now,
-                                Price = totalPrice,
+                                Price = 0,
                                 GuestNumbers = 1,
                                 Document = null,
                                 IsBooked = true,

@@ -2208,48 +2208,93 @@
         showNotification(eventInfo, 'info', 0);
     }
 
-    // Frontend PDF generation: fetch invoice HTML from backend and render to a single-page A4 PDF
+    // Frontend PDF generation: fetch invoice HTML from backend and render to a single-page A4 PDF.
+    // We render the server HTML inside an <iframe> (NOT a <div>) because the response is a full
+    // HTML document including <style> rules in <head>. Setting innerHTML on a <div> would strip
+    // <html>/<head>/<body> wrappers and the styles inside them, leaving the .a4-page unstyled and
+    // causing html2canvas to capture an empty/broken canvas.
     function downloadInvoice(bookingId) {
         return fetch(`/Scheduler/GetInvoiceHtml?bookingId=${bookingId}`)
             .then(res => {
-                if (!res.ok) throw new Error('Failed to load invoice HTML');
+                if (!res.ok) throw new Error('Failed to load invoice HTML (HTTP ' + res.status + ')');
                 return res.text();
             })
-            .then(html => {
-                const container = document.createElement('div');
-                container.style.position = 'fixed';
-                container.style.left = '-10000px';
-                container.style.top = '0';
-                container.innerHTML = html;
-                document.body.appendChild(container);
+            .then(html => new Promise((resolve, reject) => {
+                const iframe = document.createElement('iframe');
+                iframe.style.position = 'fixed';
+                iframe.style.left = '-10000px';
+                iframe.style.top = '0';
+                iframe.style.width = '794px';
+                iframe.style.height = '1123px';
+                iframe.style.border = '0';
+                iframe.setAttribute('aria-hidden', 'true');
 
-                const element = container.querySelector('.a4-page') || container;
+                const cleanup = () => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); };
 
-                return html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' })
-                    .then(canvas => {
-                        const { jsPDF } = window.jspdf;
-                        const pageW = 794;
-                        const pageH = 1123;
-                        const pdf = new jsPDF({ unit: 'px', format: [pageW, pageH], orientation: 'portrait', hotfixes: ['px_scaling'] });
-                        const imgData = canvas.toDataURL('image/png');
+                iframe.onload = function () {
+                    try {
+                        const doc = iframe.contentDocument || iframe.contentWindow.document;
+                        const element = doc.querySelector('.a4-page') || doc.body;
 
-                        // Preserve aspect ratio: scale image to fit page width, keep natural height
-                        const imgW = pageW;
-                        const imgH = (canvas.height * imgW) / canvas.width;
-                        // If content fits the page height, render at full width; else scale down to fit height
-                        const finalW = imgH <= pageH ? imgW : (canvas.width * pageH) / canvas.height;
-                        const finalH = imgH <= pageH ? imgH : pageH;
-                        const offsetX = (pageW - finalW) / 2;
-                        const offsetY = 0;
-                        pdf.addImage(imgData, 'PNG', offsetX, offsetY, finalW, finalH);
-                        pdf.save(`Invoice_${bookingId}.pdf`);
-                        document.body.removeChild(container);
-                    });
-            })
-            .catch(err => {
-                console.error(err);
-                showNotification('PDF generation failed', 'error');
-            });
+                        const render = () => {
+                            html2canvas(element, {
+                                scale: 2,
+                                useCORS: true,
+                                backgroundColor: '#ffffff',
+                                windowWidth: 794
+                            })
+                            .then(canvas => {
+                                const { jsPDF } = window.jspdf;
+                                const pageW = 794;
+                                const pageH = 1123;
+                                const pdf = new jsPDF({ unit: 'px', format: [pageW, pageH], orientation: 'portrait', hotfixes: ['px_scaling'] });
+                                const imgData = canvas.toDataURL('image/png');
+
+                                // Preserve aspect ratio: scale image to fit page width, keep natural height
+                                const imgW = pageW;
+                                const imgH = (canvas.height * imgW) / canvas.width;
+                                const finalW = imgH <= pageH ? imgW : (canvas.width * pageH) / canvas.height;
+                                const finalH = imgH <= pageH ? imgH : pageH;
+                                const offsetX = (pageW - finalW) / 2;
+                                const offsetY = 0;
+                                pdf.addImage(imgData, 'PNG', offsetX, offsetY, finalW, finalH);
+                                pdf.save(`Invoice_${bookingId}.pdf`);
+                                cleanup();
+                                resolve();
+                            })
+                            .catch(err => { cleanup(); reject(err); });
+                        };
+
+                        // Wait for any web fonts inside the iframe to be ready before rasterizing
+                        if (doc.fonts && doc.fonts.ready && typeof doc.fonts.ready.then === 'function') {
+                            doc.fonts.ready.then(render).catch(render);
+                        } else {
+                            render();
+                        }
+                    } catch (err) {
+                        cleanup();
+                        reject(err);
+                    }
+                };
+
+                iframe.onerror = function (err) {
+                    cleanup();
+                    reject(err || new Error('Iframe failed to load invoice HTML'));
+                };
+
+                document.body.appendChild(iframe);
+
+                // Use srcdoc when supported (preserves the full document including <style> tags),
+                // fall back to document.write for older browsers.
+                if ('srcdoc' in iframe) {
+                    iframe.srcdoc = html;
+                } else {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(html);
+                    doc.close();
+                }
+            }));
     }
 
     function completeBookingWithInvoice(bookingId, bookingTitle) {
