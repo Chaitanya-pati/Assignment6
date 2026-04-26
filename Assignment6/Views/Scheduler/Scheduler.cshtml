@@ -1931,6 +1931,39 @@
         fetchBookingsForDateRange(startDate, endDate, 'initial');
     }
 
+    // Force-refresh the calendar from the server (used after add/delete/update of a booking).
+    // Without this, fetchBookingsForDateRange() short-circuits because the date range is
+    // already cached in `loadedDateRanges`, so newly saved bookings never get rendered.
+    function refreshCalendarData() {
+        // 1) Clear the cached server data so the next fetch actually goes to the backend.
+        loadedDateRanges = [];
+        allBookingsData = [];
+
+        // 2) Remove all events currently rendered on every visible month so we don't
+        //    end up with duplicates or stale entries.
+        Object.keys(calendars).forEach(monthKey => {
+            const cal = calendars[monthKey];
+            if (cal && typeof cal.removeAllEvents === 'function') {
+                cal.removeAllEvents();
+            }
+        });
+
+        // 3) Strip the per-day booking overlays we appended in eventDidMount, otherwise
+        //    deleted/updated events would leave orphaned overlays behind.
+        document.querySelectorAll('.booking-overlay').forEach(el => el.remove());
+        document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
+            cell.style.backgroundColor = '';
+            cell.style.color = '';
+            cell.style.opacity = '';
+        });
+
+        // 4) Re-fetch bookings for the visible window.
+        loadInitialBookings();
+    }
+
+    // Expose globally so the booking form (loaded as a partial) can call it.
+    window.refreshCalendarData = refreshCalendarData;
+
     function getHomeName(homeId) {
         const homeSelector = document.getElementById('homeSelector');
         for (let option of homeSelector.options) {
@@ -2004,7 +2037,7 @@
         $("#searchBookingBtn").on("click", searchBooking);
 
         $(window).on('bookingSaved', function () {
-            loadInitialBookings();
+            refreshCalendarData();
             showNotification('Booking saved!', 'success');
         });
     });
@@ -2228,26 +2261,43 @@
 
         if (!confirm(`Generate invoice for: ${bookingTitle}?`)) return;
 
-        showLoading('Generating invoice...');
+        showLoading('Marking as paid...');
 
+        // 1) Mark the booking as paid on the server.
+        // 2) Once that succeeds, actually generate the invoice PDF on the client
+        //    (downloadInvoice returns a promise — we MUST await it so the spinner
+        //    stays open until the PDF is built, otherwise the download silently
+        //    fails for the user).
         $.ajax({
             url: '/Scheduler/CompleteBookingWithInvoice',
             type: 'POST',
-            data: { bookingId },
-            success: function (response) {
-                if (response.success) {
+            data: { bookingId }
+        })
+        .done(function (response) {
+            if (!response || !response.success) {
+                hideLoading();
+                showNotification((response && response.message) || 'Failed to mark booking as paid.', 'error');
+                return;
+            }
+
+            showLoading('Generating invoice...');
+            downloadInvoice(bookingId)
+                .then(() => {
                     showNotification('Invoice generated successfully!', 'success');
-                    setTimeout(() => $('.notification').remove(), 2000);
-                    setTimeout(() => loadInitialBookings(), 1000);
-                    downloadInvoice(bookingId);
-                } else {
-                    showNotification(response.message || 'Failed to generate invoice.', 'error');
-                }
-            },
-            error: function () {
-                showNotification('Error generating invoice.', 'error');
-            },
-            complete: hideLoading
+                    // Refresh the calendar so the new "Paid" status is reflected.
+                    if (typeof refreshCalendarData === 'function') {
+                        refreshCalendarData();
+                    }
+                })
+                .catch(err => {
+                    console.error('Invoice download failed:', err);
+                    showNotification('Invoice download failed. Please try again.', 'error');
+                })
+                .finally(hideLoading);
+        })
+        .fail(function () {
+            hideLoading();
+            showNotification('Error marking booking as paid.', 'error');
         });
     }
 

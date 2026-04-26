@@ -391,14 +391,44 @@ namespace Assignment6.Controllers
                 if (home != null)
                 {
                     int days = (bookingSaveModel.BookingData.BookingDateTo - bookingSaveModel.BookingData.BookingDateFrom).Days;
+                    if (days <= 0) days = 1;
+
+                    // Helper: a room is "chargeable" if its name doesn't refer to a common/shared area.
+                    // This must mirror the frontend logic in _AddBookingForm.cshtml -> isChargeableRoom().
+                    var freeRoomKeywords = new[] { "hall", "balcony", "living room", "lounge", "kitchen", "dining room", "corridor" };
+                    Func<Room, bool> isChargeable = r =>
+                    {
+                        var label = (r?.Name ?? string.Empty).ToLowerInvariant();
+                        return !freeRoomKeywords.Any(k => label.Contains(k));
+                    };
+
+                    var homeRooms = homeData.Rooms?.Where(r => r.HomeId == home.Id).ToList() ?? new List<Room>();
+                    var chargeableHomeRooms = homeRooms.Where(isChargeable).ToList();
 
                     if (bookingSaveModel.Rooms != null && bookingSaveModel.Rooms.Any())
                     {
-                        // Individual room pricing
-                        var roomIds = bookingSaveModel.Rooms.Select(r => r.Id).ToList();
-                        var selectedRooms = homeData.Rooms?.Where(r => roomIds.Contains(r.Id)).ToList() ?? new List<Room>();
-                        var dailyRoomTotal = selectedRooms.Sum(r => r.PricePerDay ?? 0);
-                        bookingSaveModel.BookingData.Price = (long)(dailyRoomTotal * days);
+                        var selectedRoomIds = bookingSaveModel.Rooms.Select(r => r.Id).ToHashSet();
+                        var selectedChargeableRooms = chargeableHomeRooms
+                            .Where(r => selectedRoomIds.Contains(r.Id))
+                            .ToList();
+
+                        // Entire property = every chargeable room of the home is selected.
+                        bool entirePropertySelected =
+                            chargeableHomeRooms.Count > 0 &&
+                            selectedChargeableRooms.Count >= chargeableHomeRooms.Count;
+
+                        if (entirePropertySelected)
+                        {
+                            // Flat per-day price for the whole property (matches the value
+                            // shown to the user on the booking form).
+                            bookingSaveModel.BookingData.Price = (long)((home.PricePerDay ?? 0) * days);
+                        }
+                        else
+                        {
+                            // Partial selection -> sum of selected (chargeable) room prices.
+                            var dailyRoomTotal = selectedChargeableRooms.Sum(r => r.PricePerDay ?? 0);
+                            bookingSaveModel.BookingData.Price = (long)(dailyRoomTotal * days);
+                        }
                     }
                     else
                     {
