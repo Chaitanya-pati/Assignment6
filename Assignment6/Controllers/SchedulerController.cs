@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -588,6 +587,8 @@ namespace Assignment6.Controllers
         {
             bool isAirbnbBooking = booking.CustomerName == "Airbnb Guest" || booking.CustomerName?.Contains("Airbnb") == true;
             bool isPastBooking = booking.BookingDateTo < DateTime.Now;
+            bool isPaid = booking.PaymentStatus == "Paid";
+
             int nights = (booking.BookingDateTo - booking.BookingDateFrom).Days;
             long advancePaid = booking.AdvancePrice ?? 0;
             long remaining = booking.Price - advancePaid;
@@ -606,24 +607,47 @@ namespace Assignment6.Controllers
             string bookingType = isAirbnbBooking ? "Airbnb" : "Direct Booking";
 
             string notesSection = string.IsNullOrEmpty(booking.Message) ? "" : $@"
-        <tr>
-            <td colspan='2' style='padding-top:12px;'>
-                <table width='100%' cellpadding='0' cellspacing='0' style='background:#f9fafb;border:0.5px solid #eaecf0;border-radius:8px;'>
-                    <tr>
-                        <td style='padding:14px 18px;'>
-                            <div style='font-size:10px;font-weight:600;color:#98a2b3;text-transform:uppercase;letter-spacing:0.9px;margin-bottom:8px;'>Special Requests &amp; Notes</div>
-                            <div style='font-size:12px;color:#344054;line-height:1.7;'>{booking.Message}</div>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>";
+<tr>
+    <td colspan='2' style='padding-top:12px;'>
+        <table width='100%' cellpadding='0' cellspacing='0' style='background:#f9fafb;border:0.5px solid #eaecf0;border-radius:8px;'>
+            <tr>
+                <td style='padding:14px 18px;'>
+                    <div style='font-size:10px;font-weight:600;color:#98a2b3;text-transform:uppercase;letter-spacing:0.9px;margin-bottom:8px;'>Special Requests &amp; Notes</div>
+                    <div style='font-size:12px;color:#344054;line-height:1.7;'>{booking.Message}</div>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>";
 
-            string amountDueRow = remaining > 0 ? $@"
-        <tr style='border-bottom:0.5px solid #f2f4f7;'>
-            <td style='padding:11px 18px;font-size:12px;color:#667085;'>Amount due</td>
-            <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:500;text-align:right;'>&#8377;{remaining:N0}</td>
-        </tr>" : "";
+            // ================= UPDATED PAYMENT LOGIC =================
+            string advanceRow = "";
+            string amountDueRow = "";
+            string totalPaidRow = "";
+
+            if (isPaid)
+            {
+                totalPaidRow = $@"
+<tr style='border-bottom:0.5px solid #f2f4f7;'>
+    <td style='padding:11px 18px;font-size:12px;color:#667085;'>Total Paid</td>
+    <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:600;text-align:right;'>&#8377;{booking.Price:N0}</td>
+</tr>";
+            }
+            else
+            {
+                advanceRow = $@"
+<tr style='border-bottom:0.5px solid #f2f4f7;'>
+    <td style='padding:11px 18px;font-size:12px;color:#667085;'>Advance paid</td>
+    <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:500;text-align:right;'>&#8377;{advancePaid:N0}</td>
+</tr>";
+
+                amountDueRow = remaining > 0 ? $@"
+<tr style='border-bottom:0.5px solid #f2f4f7;'>
+    <td style='padding:11px 18px;font-size:12px;color:#667085;'>Amount due</td>
+    <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:500;text-align:right;'>&#8377;{remaining:N0}</td>
+</tr>" : "";
+            }
+            // ========================================================
 
             var html = $@"
 <!DOCTYPE html>
@@ -763,9 +787,12 @@ namespace Assignment6.Controllers
             <td style='padding:12px 16px;font-size:13px;font-weight:700;color:#101828;'>Total booking amount</td>
             <td style='padding:12px 16px;font-size:16px;font-weight:700;color:#101828;text-align:right;'>&#8377;{booking.Price:N0}</td>
         </tr>
+        {totalPaidRow}
+        {advanceRow}
+        {amountDueRow}
     </table>
 
-    <!-- NOTES (optional) -->
+    <!-- NOTES -->
     {(string.IsNullOrEmpty(booking.Message) ? "" : $@"
     <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:10px;'>
         <tr>
@@ -784,7 +811,7 @@ namespace Assignment6.Controllers
                     <tr>
                         <td style='font-size:11px;color:#2c313a;'>Thank you for choosing Vernekar HomeStays</td>
                         <td style='text-align:right;font-size:10px;color:#373d49;line-height:1.6;'>
-                            radhaheritagehomestay@gmail.com &nbsp;·&nbsp; www.radhaheritagehomestay.com<br>
+                            radhaheritagehomestay@gmail.com · www.radhaheritagehomestay.com<br>
                             Generated on {DateTime.Now:dd MMM yyyy, HH:mm}
                         </td>
                     </tr>
@@ -1140,5 +1167,3 @@ namespace Assignment6.Controllers
 
 
 }
-
-
