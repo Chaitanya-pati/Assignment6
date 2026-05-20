@@ -730,8 +730,6 @@ namespace Assignment6.Controllers
                 <div style='font-size:20px;font-weight:700;color:#101828;margin:2px 0 8px;'>#{booking.Id:D6}</div>
                 <div style='font-size:9px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Invoice Date</div>
                 <div style='font-size:12px;color:#101828;font-weight:500;margin:2px 0 8px;'>{DateTime.Now:dd MMM yyyy}</div>
-                <div style='font-size:9px;color:#98a2b3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;'>Status</div>
-                <div style='margin-top:4px;'>{statusBadge}</div>
             </td>
         </tr>
     </table>
