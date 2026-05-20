@@ -700,6 +700,64 @@ namespace DbService.Implementation
             }
         }
 
+        public bool ConfirmBookingWithPayment(DbService.SaveModels.BookingConfirmationModel model)
+        {
+            try
+            {
+                using var context = new Assignment6Context(_dbconnection);
+                var booking = context.Bookings.FirstOrDefault(b => b.Id == model.BookingId);
+
+                if (booking == null)
+                    return false;
+
+                booking.IsBooked = true;
+                booking.PaymentMethod = model.PaymentMethod;
+
+                // Update final price if admin changed it (negotiation)
+                if (model.FinalRoomPrice.HasValue && model.FinalRoomPrice.Value > 0)
+                    booking.Price = (long)model.FinalRoomPrice.Value;
+
+                // Update advance/payment amount
+                booking.AdvancePrice = (long)model.AmountPaid;
+
+                bool isPartial = model.IsPartialPayment || model.IsAdvancePayment;
+
+                if (!isPartial)
+                {
+                    booking.PaymentStatus = "Paid";
+                }
+                else
+                {
+                    booking.PaymentStatus = "Partial";
+                }
+
+                // Save a Payment record
+                var payment = new Payment
+                {
+                    BookingId = model.BookingId,
+                    Amount = (decimal)booking.Price,
+                    AmountPaid = model.AmountPaid,
+                    FinalRoomPrice = model.FinalRoomPrice,
+                    Currency = "INR",
+                    Status = isPartial ? "partial" : "paid",
+                    PaymentMethod = model.PaymentMethod,
+                    IsPartialPayment = isPartial,
+                    IsAdvancePayment = isPartial,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+
+                context.Payments.Add(payment);
+                context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error confirming booking with payment: {ex.Message}");
+                return false;
+            }
+        }
+
         public BookingViewModel GetBookingForm(DateTime date)
         {
             var model = new BookingViewModel();

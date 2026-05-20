@@ -285,10 +285,10 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="GuestNumbers" class="form-label">
-                        <i class="fas fa-users mr-3"></i>Number of Guests *
+                        <i class="fas fa-users mr-3"></i>Total Guests *
                     </label>
                     <input type="number" class="form-control" id="GuestNumbers" name="GuestNumbers"
-                           placeholder="Enter number of guests" value="@Model?.GuestNumbers" min="1" max="50" required>
+                           placeholder="Enter total number of guests" value="@Model?.GuestNumbers" min="1" max="50" required>
                     <div id="GuestNumbers-feedback" class="invalid-feedback" style="display: none;"></div>
                 </div>
                 <div class="col-md-6 mb-3">
@@ -299,6 +299,33 @@
                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
                     <div id="Document-feedback" class="invalid-feedback" style="display: none;"></div>
                 </div>
+            </div>
+
+            <!-- Guest Breakdown Row -->
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="TotalAdults" class="form-label"><i class="fas fa-male"></i>Adults</label>
+                    <input type="number" class="form-control" id="TotalAdults" name="BookingData.TotalAdults"
+                           placeholder="0" min="0" max="50">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="TotalKids" class="form-label"><i class="fas fa-child"></i>Kids (Below 10)</label>
+                    <input type="number" class="form-control" id="TotalKids" name="BookingData.TotalKids"
+                           placeholder="0" min="0" max="20">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="MaleCount" class="form-label"><i class="fas fa-mars"></i>Male Count</label>
+                    <input type="number" class="form-control" id="MaleCount" name="BookingData.MaleCount"
+                           placeholder="0" min="0" max="50">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="FemaleCount" class="form-label"><i class="fas fa-venus"></i>Female Count</label>
+                    <input type="number" class="form-control" id="FemaleCount" name="BookingData.FemaleCount"
+                           placeholder="0" min="0" max="50">
+                </div>
+            </div>
+            <small class="text-muted d-block mb-2">Male/Female count includes both adults and children.</small>
+            <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="BookingRange" class="form-label">
                         <i class="fas fa-calendar"></i>Booking Date Range *
@@ -353,6 +380,61 @@
                             <span id="roomSelectionBadge" class="room-badge d-none">0</span>
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Details Section (Optional) -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-building"></i>Business Details <small class="text-muted ms-2" style="font-size:0.8rem;font-weight:400;">(Optional – for GST invoice)</small>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="BusinessName" class="form-label"><i class="fas fa-briefcase"></i>Business Name</label>
+                    <input type="text" class="form-control" id="BusinessName" name="BookingData.BusinessName"
+                           placeholder="Enter business name">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="GstNumber" class="form-label"><i class="fas fa-file-invoice"></i>GST Number</label>
+                    <input type="text" class="form-control" id="GstNumber" name="BookingData.GstNumber"
+                           placeholder="Enter GST number">
+                </div>
+            </div>
+        </div>
+
+        <!-- Purpose of Visit & Payment Method -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-info-circle"></i>Additional Details
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="PurposeOfVisit" class="form-label"><i class="fas fa-compass"></i>Purpose of Visit <small class="text-muted">(Optional)</small></label>
+                    <select class="form-select" id="PurposeOfVisit" name="BookingData.PurposeOfVisit">
+                        <option value="">-- Select Purpose --</option>
+                        <option value="Family Function">Family Function</option>
+                        <option value="Leisure">Leisure</option>
+                        <option value="Corporate Business Visit">Corporate Business Visit</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3" id="purposeOtherDiv" style="display:none;">
+                    <label for="PurposeOfVisitOther" class="form-label"><i class="fas fa-pen"></i>Specify Purpose</label>
+                    <input type="text" class="form-control" id="PurposeOfVisitOther" name="BookingData.PurposeOfVisitOther"
+                           placeholder="Describe purpose of visit">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="PaymentMethod" class="form-label"><i class="fas fa-credit-card"></i>Payment Method</label>
+                    <select class="form-select" id="PaymentMethod" name="BookingData.PaymentMethod">
+                        <option value="">-- Select Payment Method --</option>
+                        <option value="Cash">Cash</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Card">Card</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Online">Online Payment</option>
+                        <option value="Pay Later">Pay Later</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -959,6 +1041,15 @@
             Price: pricing.totalPrice,
             AdvancePrice: parseFloat($('#AdvancePrice').val()) || 0,
             GuestNumbers: parseInt($('#GuestNumbers').val()),
+            TotalAdults: parseInt($('#TotalAdults').val()) || null,
+            TotalKids: parseInt($('#TotalKids').val()) || null,
+            MaleCount: parseInt($('#MaleCount').val()) || null,
+            FemaleCount: parseInt($('#FemaleCount').val()) || null,
+            BusinessName: $('#BusinessName').val().trim() || null,
+            GstNumber: $('#GstNumber').val().trim() || null,
+            PurposeOfVisit: $('#PurposeOfVisit').val() || null,
+            PurposeOfVisitOther: $('#PurposeOfVisitOther').val().trim() || null,
+            PaymentMethod: $('#PaymentMethod').val() || null,
             Document: $('#Document')[0].files[0] ? $('#Document')[0].files[0].name : null,
             IsBooked: true,
             CheckOut: false
@@ -1057,4 +1148,14 @@
 
     // Initialize home selection state
     $('#HomeId').trigger('change');
+
+    // Purpose of Visit "Other" toggle
+    $('#PurposeOfVisit').on('change', function () {
+        if ($(this).val() === 'Other') {
+            $('#purposeOtherDiv').show();
+        } else {
+            $('#purposeOtherDiv').hide();
+            $('#PurposeOfVisitOther').val('');
+        }
+    });
 </script>

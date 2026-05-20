@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Assignment6.twillio;
 using Twilio.TwiML.Messaging;
+using System.Linq;
 namespace Assignment6.Controllers
 {
     public class SchedulerController : Controller
@@ -503,8 +504,16 @@ namespace Assignment6.Controllers
                     advancePaid = b.AdvancePrice ?? 0,
                     amountToBePaid = b.Price - (b.AdvancePrice ?? 0),
                     guestNumbers = b.GuestNumbers,
+                    totalAdults = b.TotalAdults,
+                    totalKids = b.TotalKids,
+                    maleCount = b.MaleCount,
+                    femaleCount = b.FemaleCount,
+                    businessName = b.BusinessName,
+                    gstNumber = b.GstNumber,
+                    purposeOfVisit = b.PurposeOfVisit,
+                    purposeOfVisitOther = b.PurposeOfVisitOther,
+                    paymentMethod = b.PaymentMethod,
                     document = b.Document,
-                    // isAirbnbBooking = b.IsAirbnbBooking ?? false, // Include Airbnb flag
                     bookingRooms = b.BookingRooms?.Select(br => new
                     {
                         roomId = br.RoomId,
@@ -605,6 +614,50 @@ namespace Assignment6.Controllers
 
             string roomCount = $"{booking.BookingRooms?.Count ?? 0} {(booking.BookingRooms?.Count == 1 ? "room" : "rooms")}";
             string bookingType = isAirbnbBooking ? "Airbnb" : "Direct Booking";
+
+            // Guest breakdown
+            string guestBreakdownRows = "";
+            if (booking.TotalAdults.HasValue || booking.TotalKids.HasValue)
+            {
+                if (booking.TotalAdults.HasValue)
+                    guestBreakdownRows += $"<tr><td class='row-label'>Adults</td><td class='row-value'>{booking.TotalAdults}</td></tr>";
+                if (booking.TotalKids.HasValue)
+                    guestBreakdownRows += $"<tr><td class='row-label'>Kids (Below 10)</td><td class='row-value'>{booking.TotalKids}</td></tr>";
+                if (booking.MaleCount.HasValue)
+                    guestBreakdownRows += $"<tr><td class='row-label'>Male</td><td class='row-value'>{booking.MaleCount}</td></tr>";
+                if (booking.FemaleCount.HasValue)
+                    guestBreakdownRows += $"<tr><td class='row-label'>Female</td><td class='row-value'>{booking.FemaleCount}</td></tr>";
+            }
+
+            // Business details section
+            string businessSection = "";
+            if (!string.IsNullOrEmpty(booking.BusinessName))
+            {
+                businessSection = $@"
+    <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:10px;'>
+        <tr>
+            <td class='info-card'>
+                <div class='card-title'>Business Details</div>
+                <table width='100%' cellpadding='0' cellspacing='0'>
+                    <tr><td class='row-label'>Business Name</td><td class='row-value'>{booking.BusinessName}</td></tr>
+                    {(!string.IsNullOrEmpty(booking.GstNumber) ? $"<tr><td class='row-label'>GST Number</td><td class='row-value'>{booking.GstNumber}</td></tr>" : "")}
+                </table>
+            </td>
+        </tr>
+    </table>";
+            }
+
+            // Purpose of visit
+            string purposeDisplay = "";
+            if (!string.IsNullOrEmpty(booking.PurposeOfVisit))
+            {
+                purposeDisplay = booking.PurposeOfVisit == "Other" && !string.IsNullOrEmpty(booking.PurposeOfVisitOther)
+                    ? booking.PurposeOfVisitOther
+                    : booking.PurposeOfVisit;
+            }
+
+            // Payment method
+            string paymentMethodDisplay = !string.IsNullOrEmpty(booking.PaymentMethod) ? booking.PaymentMethod : "N/A";
 
             string notesSection = string.IsNullOrEmpty(booking.Message) ? "" : $@"
 <tr>
@@ -738,12 +791,14 @@ namespace Assignment6.Controllers
     <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:10px;'>
         <tr>
             <td width='49%' class='info-card'>
-                <div class='card-title'>Guest Information</div>
+                <div class='card-title'>{(!string.IsNullOrEmpty(booking.BusinessName) ? $"Bill To: {booking.BusinessName}" : "Guest Information")}</div>
                 <table width='100%' cellpadding='0' cellspacing='0'>
                     <tr><td class='row-label'>Name</td><td class='row-value'>{booking.CustomerName ?? "N/A"}</td></tr>
                     <tr><td class='row-label'>Email</td><td class='row-value'>{booking.CustomerEmail ?? "N/A"}</td></tr>
                     <tr><td class='row-label'>Phone</td><td class='row-value'>{booking.CustomerPhone ?? "N/A"}</td></tr>
-                    <tr><td class='row-label'>Guests</td><td class='row-value'>{booking.GuestNumbers}</td></tr>
+                    <tr><td class='row-label'>Total Guests</td><td class='row-value'>{booking.GuestNumbers}</td></tr>
+                    {guestBreakdownRows}
+                    {(!string.IsNullOrEmpty(booking.GstNumber) ? $"<tr><td class='row-label'>GST No.</td><td class='row-value'>{booking.GstNumber}</td></tr>" : "")}
                 </table>
             </td>
             <td width='2%'>&nbsp;</td>
@@ -771,6 +826,8 @@ namespace Assignment6.Controllers
                                 <tr><td class='row-label'>Rooms booked</td><td class='row-value'>{roomCount}</td></tr>
                                 <tr><td class='row-label'>Booking type</td><td class='row-value'>{bookingType}</td></tr>
                                 <tr><td class='row-label'>Booked on</td><td class='row-value'>{booking.CreatedAt:dd MMM yyyy}</td></tr>
+                                <tr><td class='row-label'>Payment method</td><td class='row-value'>{paymentMethodDisplay}</td></tr>
+                                {(!string.IsNullOrEmpty(purposeDisplay) ? $"<tr><td class='row-label'>Purpose of visit</td><td class='row-value'>{purposeDisplay}</td></tr>" : "")}
                             </table>
                         </td>
                     </tr>
@@ -1090,7 +1147,7 @@ namespace Assignment6.Controllers
             try
             {
                 var pendingBookings = _bookingService.GetAllBookings(null, null, null)
-                    .Where(b => !b.IsBooked) // Only get requests that haven't been approved
+                    .Where(b => !b.IsBooked)
                     .OrderByDescending(b => b.CreatedAt)
                     .Select(b => new
                     {
@@ -1106,6 +1163,15 @@ namespace Assignment6.Controllers
                         advance = b.AdvancePrice ?? 0,
                         pending = b.Price - (b.AdvancePrice ?? 0),
                         guestNumbers = b.GuestNumbers,
+                        totalAdults = b.TotalAdults,
+                        totalKids = b.TotalKids,
+                        maleCount = b.MaleCount,
+                        femaleCount = b.FemaleCount,
+                        businessName = b.BusinessName,
+                        gstNumber = b.GstNumber,
+                        purposeOfVisit = b.PurposeOfVisit,
+                        purposeOfVisitOther = b.PurposeOfVisitOther,
+                        paymentMethod = b.PaymentMethod,
                         createdAt = b.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ss"),
                         paymentStatus = b.PaymentStatus
                     });
@@ -1120,34 +1186,41 @@ namespace Assignment6.Controllers
         }
 
         [HttpPost]
+        public IActionResult ConfirmBookingWithPayment([FromBody] BookingConfirmationModel model)
+        {
+            try
+            {
+                if (model == null || model.BookingId <= 0)
+                    return Json(new { success = false, message = "Invalid request" });
+
+                bool confirmed = _bookingService.ConfirmBookingWithPayment(model);
+
+                if (confirmed)
+                    return Json(new { success = true, message = "Booking confirmed and payment recorded successfully" });
+                else
+                    return Json(new { success = false, message = "Failed to confirm booking" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ConfirmBookingWithPayment: {ex.Message}");
+                return Json(new { success = false, message = "An unexpected error occurred" });
+            }
+        }
+
+        [HttpPost]
         public IActionResult ApproveBookingRequest(int bookingId)
         {
             try
             {
                 if (bookingId <= 0)
-                {
                     return Json(new { success = false, message = "Invalid booking ID" });
-                }
 
-                // Update the booking to set IsBooked = true
                 bool approved = _bookingService.ApproveBookingRequest(bookingId);
 
                 if (approved)
-                {
-                    return Json(new
-                    {
-                        success = true,
-                        message = "Booking request approved successfully"
-                    });
-                }
+                    return Json(new { success = true, message = "Booking request approved successfully" });
                 else
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Failed to approve booking request"
-                    });
-                }
+                    return Json(new { success = false, message = "Failed to approve booking request" });
             }
             catch (Exception ex)
             {

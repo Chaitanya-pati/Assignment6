@@ -1,4 +1,5 @@
-﻿using DbService.Models;
+using DbService.Models;
+using DbService.SaveModels;
 using DbService.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,6 @@ namespace DbService.Interface
         public bool SaveBooking(Booking bookingData,List<Room> rooms);
         public HomeMasterViewModel GetSchedularData();
         public bool CheckBookings(DateTime startDate, DateTime endDate, int homeId);
-        //   public  List<Booking> GetBookingsBetween(DateTime start, DateTime end, int? homeId = null);
         public List<Booking> GetBookingsBetween(DateTime startDate, DateTime endDate, int? homeId = null);
 
         public List<Booking> GetAllBookings(DateTime? startDate = null, DateTime? endDate = null, int? homeId = null);
@@ -30,12 +30,12 @@ namespace DbService.Interface
         bool DeleteBooking(int bookingId);
         bool CompleteBookingWithInvoice(int bookingId);
         bool ApproveBookingRequest(int bookingId);
+        bool ConfirmBookingWithPayment(BookingConfirmationModel model);
         public bool CheckBookingsAlternative(DateTime startDate, DateTime endDate, int homeId);
         public bool SaveBookingAlternative(Booking bookingData, List<Room> rooms);
         public BookingViewModel GetBookingForm(DateTime date);
 
         Task<int> SyncAirbnbBookings(IList<Ical.Net.CalendarComponents.CalendarEvent> calendarEvents, int homeId);
-        // Optional: Method to clean up old Airbnb bookings that are no longer in the calendar
         Task<int> CleanupOldAirbnbBookings(int homeId, DateTime cutoffDate);
         public string GetRoomDetailsByRoomId(int roomId);
     }

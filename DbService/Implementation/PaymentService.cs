@@ -57,9 +57,12 @@ namespace DbService.Implementation
                 // Get the appropriate Razorpay credentials based on HomeId
                 var (razorpayClient, keyId, keySecret) = GetRazorpayCredentials(booking.HomeId);
 
-                // Create Razorpay Order
+                // Charge only 50% as advance payment
+                decimal advanceAmount = Math.Round(booking.Price * 0.5m, 2);
+
+                // Create Razorpay Order with 50% advance
                 Dictionary<string, object> options = new Dictionary<string, object>();
-                options.Add("amount", booking.Price * 100); // Amount in paise
+                options.Add("amount", (long)(advanceAmount * 100)); // Amount in paise
                 options.Add("currency", "INR");
                 options.Add("receipt", $"booking_{bookingId}_{DateTime.Now:yyyyMMddHHmmss}");
                 options.Add("payment_capture", 1);
@@ -67,14 +70,22 @@ namespace DbService.Implementation
                 Order order = razorpayClient.Order.Create(options);
                 string orderId = order["id"].ToString();
 
+                // Update booking advance price
+                booking.AdvancePrice = (long)advanceAmount;
+                db.SaveChanges();
+
                 // Save payment record
                 var payment = new Payment
                 {
                     BookingId = bookingId,
                     RazorpayOrderId = orderId,
-                    Amount = booking.Price,
+                    Amount = advanceAmount,
+                    AmountPaid = advanceAmount,
                     Currency = "INR",
                     Status = "created",
+                    IsAdvancePayment = true,
+                    IsPartialPayment = true,
+                    PaymentMethod = "Online",
                     CreatedAt = DateTime.Now
                 };
 
@@ -87,7 +98,7 @@ namespace DbService.Implementation
                     CustomerName = booking.CustomerName,
                     CustomerEmail = booking.CustomerEmail,
                     CustomerPhone = booking.CustomerPhone,
-                    Amount = booking.Price,
+                    Amount = advanceAmount,
                     Currency = "INR",
                     RazorpayOrderId = orderId,
                     RazorpayKeyId = keyId,

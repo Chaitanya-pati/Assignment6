@@ -252,15 +252,21 @@
                     <span class="summary-label">Guests</span>
                     <span class="summary-value">@Model.BookingDetails.GuestNumbers</span>
                 </div>
+
+                <div class="summary-item">
+                    <span class="summary-label" style="color:#333;font-weight:600;">Total Booking Amount</span>
+                    <span class="summary-value">₹@Model.BookingDetails.Price.ToString("N2")</span>
+                </div>
             </div>
 
-            <div class="total-amount">
-                <div class="total-amount-label">Total Amount to Pay</div>
+            <div class="total-amount" style="background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);">
+                <div class="total-amount-label" style="font-size:13px;opacity:0.95;margin-bottom:4px;">50% Advance Payment (Balance due at check-in)</div>
                 <div class="total-amount-value">₹@Model.Amount.ToString("N2")</div>
+                <div style="font-size:12px;opacity:0.85;margin-top:6px;">Remaining ₹@(((double)Model.BookingDetails.Price - (double)Model.Amount).ToString("N2")) to be paid on arrival</div>
             </div>
 
             <button type="button" id="payButton" class="pay-button">
-                <i class="fas fa-lock"></i> Pay Now
+                <i class="fas fa-lock"></i> Pay 50% Advance Now
             </button>
 
             <div class="security-badge">

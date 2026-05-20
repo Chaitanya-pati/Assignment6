@@ -453,12 +453,32 @@
                                 <div id="CustomerPhone-feedback" class="invalid-feedback" style="display: none;"></div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="GuestNumbers" class="form-label">Number of Guests *</label>
+                                <label for="GuestNumbers" class="form-label">Total Guests *</label>
                                 <input type="number" class="form-control" id="GuestNumbers" name="GuestNumbers"
-                                       placeholder="Enter number of guests" min="1" max="50" required>
+                                       placeholder="Enter total number of guests" min="1" max="50" required>
                                 <div id="GuestNumbers-feedback" class="invalid-feedback" style="display: none;"></div>
                             </div>
                         </div>
+                        <!-- Guest Breakdown -->
+                        <div class="row">
+                            <div class="col-6 col-md-3 mb-3">
+                                <label for="wb_TotalAdults" class="form-label"><i class="fas fa-male"></i> Adults</label>
+                                <input type="number" class="form-control" id="wb_TotalAdults" placeholder="0" min="0" max="50">
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <label for="wb_TotalKids" class="form-label"><i class="fas fa-child"></i> Kids (Below 10)</label>
+                                <input type="number" class="form-control" id="wb_TotalKids" placeholder="0" min="0" max="20">
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <label for="wb_MaleCount" class="form-label"><i class="fas fa-mars"></i> Male</label>
+                                <input type="number" class="form-control" id="wb_MaleCount" placeholder="0" min="0" max="50">
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <label for="wb_FemaleCount" class="form-label"><i class="fas fa-venus"></i> Female</label>
+                                <input type="number" class="form-control" id="wb_FemaleCount" placeholder="0" min="0" max="50">
+                            </div>
+                        </div>
+                        <small class="text-muted d-block mb-3">Male/Female count includes both adults and children.</small>
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <label for="Document" class="form-label">
@@ -524,6 +544,46 @@
                         </div>
                     </div>
 
+                    <!-- Business Details (Optional) -->
+                    <div class="form-section mb-4">
+                        <h6 class="section-title">
+                            <i class="fas fa-building"></i> Business Details <small class="text-muted ms-2" style="font-size:0.8rem;font-weight:400;">(Optional – for GST invoice)</small>
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="wb_BusinessName" class="form-label">Business Name</label>
+                                <input type="text" class="form-control" id="wb_BusinessName" placeholder="Enter business name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="wb_GstNumber" class="form-label">GST Number</label>
+                                <input type="text" class="form-control" id="wb_GstNumber" placeholder="Enter GST number">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Purpose of Visit -->
+                    <div class="form-section mb-4">
+                        <h6 class="section-title">
+                            <i class="fas fa-info-circle"></i> Visit Details
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="wb_PurposeOfVisit" class="form-label">Purpose of Visit <small class="text-muted">(Optional)</small></label>
+                                <select class="form-select" id="wb_PurposeOfVisit">
+                                    <option value="">-- Select Purpose --</option>
+                                    <option value="Family Function">Family Function</option>
+                                    <option value="Leisure">Leisure</option>
+                                    <option value="Corporate Business Visit">Corporate Business Visit</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3" id="wb_purposeOtherDiv" style="display:none;">
+                                <label for="wb_PurposeOfVisitOther" class="form-label">Specify Purpose</label>
+                                <input type="text" class="form-control" id="wb_PurposeOfVisitOther" placeholder="Describe purpose of visit">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Enhanced Special Requests Section -->
                     <div class="form-section mb-4">
                         <h6 class="section-title">
@@ -554,10 +614,13 @@
                         <p>By submitting this form, you agree to our  <a href="/Home/Privacy" target="_blank" class="reviews_terms_link">Privacy Policy.</a></p>
                     </form>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer flex-wrap gap-2">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="saveBookingBtn" onclick="saveBookingData()">
-                        <i class="fas fa-save"></i> Book Now
+                    <button type="button" class="btn btn-outline-success" id="payLaterBtn" onclick="saveBookingData('payLater')">
+                        <i class="fas fa-clock"></i> Pay Later
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveBookingBtn" onclick="saveBookingData('online')">
+                        <i class="fas fa-lock"></i> Pay Online (50% Advance)
                     </button>
                 </div>
             </div>
@@ -2022,52 +2085,95 @@
         validateMessage();
     }
 
-    function saveBookingData() {
+    // Purpose of Visit "Other" toggle (website booking modal)
+    document.addEventListener('DOMContentLoaded', function () {
+        var povSelect = document.getElementById('wb_PurposeOfVisit');
+        if (povSelect) {
+            povSelect.addEventListener('change', function () {
+                var otherDiv = document.getElementById('wb_purposeOtherDiv');
+                if (this.value === 'Other') {
+                    otherDiv.style.display = '';
+                } else {
+                    otherDiv.style.display = 'none';
+                    document.getElementById('wb_PurposeOfVisitOther').value = '';
+                }
+            });
+        }
+    });
+
+    function saveBookingData(paymentType) {
         if (!validateForm()) {
             showNotification('Please correct the validation errors before submitting.', 'error');
             return;
         }
 
+        const isPayLater = (paymentType === 'payLater');
         const selectedRooms = JSON.parse(localStorage.getItem('selectedRoomData') || '[]');
-        const submitBtn = document.getElementById('saveBookingBtn');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const payLaterBtn = document.getElementById('payLaterBtn');
+        const onlineBtn = document.getElementById('saveBookingBtn');
+        const activeBtn = isPayLater ? payLaterBtn : onlineBtn;
+        const originalText = activeBtn.innerHTML;
+        payLaterBtn.disabled = true;
+        onlineBtn.disabled = true;
+        activeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
+
+        const purposeVal = document.getElementById('wb_PurposeOfVisit').value;
+        const purposeOther = document.getElementById('wb_PurposeOfVisitOther').value.trim();
+
+        const bookingPayload = {
+            'BookingData.CustomerName': document.getElementById('CustomerName').value.trim(),
+            'BookingData.CustomerEmail': document.getElementById('CustomerEmail').value.trim(),
+            'BookingData.CustomerPhone': document.getElementById('CustomerPhone').value.trim(),
+            'BookingData.Message': document.getElementById('Message').value.trim(),
+            'BookingData.BookingDateFrom': document.getElementById('BookingDateFrom').value,
+            'BookingData.BookingDateTo': document.getElementById('BookingDateTo').value,
+            'BookingData.HomeId': document.getElementById('HomeId').value,
+            'BookingData.PaymentStatus': isPayLater ? 'Pay Later' : 'pending',
+            'BookingData.CreatedAt': new Date().toISOString(),
+            'BookingData.Price': document.getElementById('TotalPrice').value,
+            'BookingData.GuestNumbers': document.getElementById('GuestNumbers').value,
+            'BookingData.TotalAdults': document.getElementById('wb_TotalAdults').value || null,
+            'BookingData.TotalKids': document.getElementById('wb_TotalKids').value || null,
+            'BookingData.MaleCount': document.getElementById('wb_MaleCount').value || null,
+            'BookingData.FemaleCount': document.getElementById('wb_FemaleCount').value || null,
+            'BookingData.BusinessName': document.getElementById('wb_BusinessName').value.trim() || null,
+            'BookingData.GstNumber': document.getElementById('wb_GstNumber').value.trim() || null,
+            'BookingData.PurposeOfVisit': purposeVal || null,
+            'BookingData.PurposeOfVisitOther': purposeOther || null,
+            'BookingData.PaymentMethod': isPayLater ? 'Pay Later' : 'Online',
+            'BookingData.IsBooked': false,
+            'BookingData.CheckOut': false,
+            'BookingData.TotalDays': document.getElementById('TotalDays').value,
+            'Rooms': selectedRooms
+        };
+
+        const targetUrl = isPayLater ? '/Website/PayLaterBooking' : '/Scheduler/SaveBooking';
 
         $.ajax({
-            url: '/Scheduler/SaveBooking',
+            url: targetUrl,
             type: 'POST',
-            data: {
-                'BookingData.CustomerName': document.getElementById('CustomerName').value.trim(),
-                'BookingData.CustomerEmail': document.getElementById('CustomerEmail').value.trim(),
-                'BookingData.CustomerPhone': document.getElementById('CustomerPhone').value.trim(),
-                'BookingData.Message': document.getElementById('Message').value.trim(),
-                'BookingData.BookingDateFrom': document.getElementById('BookingDateFrom').value,
-                'BookingData.BookingDateTo': document.getElementById('BookingDateTo').value,
-                'BookingData.HomeId': document.getElementById('HomeId').value,
-                'BookingData.PaymentStatus': "pending",
-                'BookingData.CreatedAt': new Date().toISOString(),
-                'BookingData.Price': document.getElementById('TotalPrice').value,
-                'BookingData.GuestNumbers': document.getElementById('GuestNumbers').value,
-                'BookingData.Document': document.getElementById('Document').files[0] ? document.getElementById('Document').files[0].name : null,
-                'BookingData.IsBooked': false,
-                'BookingData.CheckOut': false,
-                'BookingData.TotalDays': document.getElementById('TotalDays').value,
-                'Rooms': selectedRooms
-            },
+            data: bookingPayload,
             success: function (response) {
                 if (response.success) {
-                    showNotification('Booking saved! Redirecting to payment...', 'success');
-                    $('#bookingModal').modal('hide');
-
-                    // Redirect to payment page after 1.5 seconds
-                    setTimeout(function () {
-                        window.location.href = `/Payment/InitiatePayment?bookingId=${response.bookingId}`;
-                    }, 1500);
+                    if (isPayLater) {
+                        showNotification(response.message || 'Booking request submitted! We will contact you to confirm.', 'success');
+                        $('#bookingModal').modal('hide');
+                        setTimeout(function () {
+                            location.reload();
+                        }, 3000);
+                    } else {
+                        showNotification('Booking saved! Redirecting to payment...', 'success');
+                        $('#bookingModal').modal('hide');
+                        setTimeout(function () {
+                            window.location.href = `/Payment/InitiatePayment?bookingId=${response.bookingId}`;
+                        }, 1500);
+                    }
                 } else {
                     showNotification(response.message || 'Failed to save booking.', 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
+                    payLaterBtn.disabled = false;
+                    onlineBtn.disabled = false;
+                    activeBtn.innerHTML = originalText;
                 }
             },
             error: function (xhr, status, error) {
@@ -2077,8 +2183,9 @@
                     errorMessage = xhr.responseJSON.message;
                 }
                 showNotification(errorMessage, 'error');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+                payLaterBtn.disabled = false;
+                onlineBtn.disabled = false;
+                activeBtn.innerHTML = originalText;
             }
         });
     }
