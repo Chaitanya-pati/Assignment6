@@ -737,7 +737,6 @@ namespace DbService.Implementation
                     BookingId = model.BookingId,
                     Amount = (decimal)booking.Price,
                     AmountPaid = model.AmountPaid,
-                    FinalRoomPrice = model.FinalRoomPrice,
                     Currency = "INR",
                     Status = isPartial ? "partial" : "paid",
                     PaymentMethod = model.PaymentMethod,

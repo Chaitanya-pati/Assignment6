@@ -39,8 +39,5 @@ public partial class Payment
     // Whether the payment is partial (true) or full (false)
     public bool IsPartialPayment { get; set; }
 
-    // Final negotiated room price set by admin at confirmation
-    public decimal? FinalRoomPrice { get; set; }
-
     public virtual Booking Booking { get; set; }
 }

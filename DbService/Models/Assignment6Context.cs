@@ -126,7 +126,6 @@ public partial class Assignment6Context : DbContext
 
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.AmountPaid).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.FinalRoomPrice).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Currency)
                 .IsRequired()
