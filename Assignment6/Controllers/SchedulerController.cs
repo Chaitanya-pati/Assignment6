@@ -28,15 +28,15 @@ namespace Assignment6.Controllers
     {
         private readonly HttpClient _httpClient;
         private readonly IBookingService _bookingService;
+        private readonly IWebService _webService;
         private readonly TwilioSmsService _sms;
-        //private readonly DbContextOptions<Assignment6Context> _dbconnection;
 
-        public SchedulerController(IBookingService bookingService, TwilioSmsService sms)
+        public SchedulerController(IBookingService bookingService, IWebService webService, TwilioSmsService sms)
         {
             _bookingService = bookingService;
+            _webService = webService;
             _httpClient = new HttpClient();
             _sms = sms;
-            //SendWhatsappMsg();
         }
 
         public async void SendWhatsappMsg()
@@ -460,6 +460,38 @@ namespace Assignment6.Controllers
             }
             catch (Exception ex)
             {
+                return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult CheckAllHomesAvailability(DateTime startDate, DateTime endDate, int selectedHomeId)
+        {
+            try
+            {
+                var webData = _webService.GetWebSiteData();
+                var allHomeIds = webData.Homes.Select(h => h.Id).ToList();
+
+                var results = allHomeIds.Select(homeId => new
+                {
+                    homeId,
+                    homeName = webData.Homes.FirstOrDefault(h => h.Id == homeId)?.Name ?? $"Property {homeId}",
+                    isBooked = _bookingService.CheckBookingsAlternative(startDate, endDate, homeId)
+                }).ToList();
+
+                var selected = results.FirstOrDefault(r => r.homeId == selectedHomeId);
+                var alternatives = results.Where(r => r.homeId != selectedHomeId && !r.isBooked).ToList();
+
+                return Json(new
+                {
+                    selectedIsBooked = selected?.isBooked ?? false,
+                    selectedHomeName = selected?.homeName ?? $"Property {selectedHomeId}",
+                    alternatives = alternatives.Select(a => new { a.homeId, a.homeName })
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CheckAllHomesAvailability: {ex.Message}");
                 return Json(new { error = ex.Message });
             }
         }
