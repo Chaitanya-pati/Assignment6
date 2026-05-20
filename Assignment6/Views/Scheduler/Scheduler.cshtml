@@ -1115,23 +1115,29 @@
     </div>
 </div>
 
-<!-- Confirm Booking with Payment Modal -->
+<!-- Approve Booking with Payment Modal -->
 <div class="modal fade" id="confirmBookingPaymentModal" tabindex="-1" aria-labelledby="confirmBookingPaymentLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="confirmBookingPaymentLabel">
-                    <i class="fas fa-check-circle me-2"></i>Confirm Booking & Record Payment
+                    <i class="fas fa-check-circle me-2"></i>Approve Booking &amp; Record Payment
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Booking Info Summary -->
-                <div id="confirmBookingInfo" class="alert alert-info mb-3"></div>
+
+                <!-- Booking summary banner -->
+                <div id="confirmBookingInfo" class="alert alert-info mb-3 py-2"></div>
+
+                <!-- Submission error -->
+                <div id="cbp_ModalError" class="alert alert-danger py-2 mb-3" style="display:none;"></div>
 
                 <div class="row g-3">
+
+                    <!-- Payment Method -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Payment Method *</label>
+                        <label class="form-label fw-semibold">Payment Method <span class="text-danger">*</span></label>
                         <select class="form-select" id="cbp_PaymentMethod">
                             <option value="">-- Select --</option>
                             <option value="Cash">Cash</option>
@@ -1140,32 +1146,49 @@
                             <option value="Bank Transfer">Bank Transfer</option>
                             <option value="Online">Online</option>
                         </select>
+                        <div id="cbp_MethodError" class="text-danger small mt-1" style="display:none;"></div>
                     </div>
+
+                    <!-- Payment Status -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Amount Paid (₹)</label>
-                        <input type="number" class="form-control" id="cbp_AmountPaid" placeholder="Enter amount paid" min="0" step="0.01">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Override Booking Price (₹) <small class="text-muted">(Leave blank to keep original)</small></label>
-                        <input type="number" class="form-control" id="cbp_FinalRoomPrice" placeholder="e.g. 5000 — updates booking price" min="0" step="0.01">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Payment Status</label>
+                        <label class="form-label fw-semibold">Payment Type</label>
                         <select class="form-select" id="cbp_PaymentStatus">
-                            <option value="Paid">Paid (Full)</option>
-                            <option value="Partial">Partial (Advance only)</option>
+                            <option value="Partial">Advance / Partial</option>
+                            <option value="Paid">Full Payment</option>
                         </select>
                     </div>
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Notes <small class="text-muted">(Optional)</small></label>
-                        <textarea class="form-control" id="cbp_Notes" rows="2" placeholder="Any notes about this booking confirmation..."></textarea>
+
+                    <!-- Amount Paid -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Amount Received (₹) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="cbp_AmountPaid"
+                               placeholder="Enter amount collected" min="0" step="0.01">
+                        <div id="cbp_AdvanceSuggestion" class="form-text text-muted small mt-1"></div>
                     </div>
+
+                    <!-- Override Price -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Override Booking Price (₹)
+                            <small class="text-muted fw-normal"> — leave blank to keep original</small>
+                        </label>
+                        <input type="number" class="form-control" id="cbp_FinalRoomPrice"
+                               placeholder="e.g. 5000 — updates booking price" min="0" step="0.01">
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Notes <small class="text-muted fw-normal">(Optional)</small></label>
+                        <textarea class="form-control" id="cbp_Notes" rows="2"
+                                  placeholder="Any notes about this approval..."></textarea>
+                    </div>
+
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-success" id="cbp_ConfirmBtn" onclick="submitConfirmBookingPayment()">
-                    <i class="fas fa-check me-1"></i>Confirm Booking
+                    <i class="fas fa-check me-1"></i>Approve Booking
                 </button>
             </div>
         </div>
@@ -2515,6 +2538,9 @@
         });
     }
 
+    // Safe store for pending booking data — avoids embedding JSON in onclick attributes
+    const pendingBookingStore = {};
+
     function renderPendingRequests(requests) {
         const container = document.getElementById('pendingRequestsContent');
         if (!requests || requests.length === 0) {
@@ -2522,39 +2548,52 @@
             return;
         }
 
+        // Store data by ID so onclick only passes the ID (avoids JSON-in-attribute issues)
+        requests.forEach(function (b) { pendingBookingStore[b.id] = b; });
+
         let html = '<div class="table-responsive"><table class="table table-hover booking-requests-table mb-0">';
-        html += `<thead><tr>
+        html += `<thead class="table-light"><tr>
             <th>Guest</th><th>Contact</th><th>Property</th><th>Dates</th>
-            <th>Guests</th><th>Purpose</th><th>Payment</th><th>Price</th><th>Submitted</th><th>Actions</th>
+            <th>Guests</th><th>Purpose</th><th>Requested Payment</th><th>Price</th><th>Submitted</th><th>Action</th>
         </tr></thead><tbody>`;
 
         requests.forEach(function (b) {
             const guestBreakdown = [
                 b.totalAdults ? `Adults: ${b.totalAdults}` : '',
-                b.totalKids ? `Kids: ${b.totalKids}` : '',
-                b.maleCount ? `M: ${b.maleCount}` : '',
-                b.femaleCount ? `F: ${b.femaleCount}` : ''
+                b.totalKids   ? `Kids: ${b.totalKids}`   : '',
+                b.maleCount   ? `M: ${b.maleCount}`      : '',
+                b.femaleCount ? `F: ${b.femaleCount}`    : ''
             ].filter(Boolean).join(', ');
 
             const purposeDisplay = (b.purposeOfVisit === 'Other' && b.purposeOfVisitOther)
                 ? b.purposeOfVisitOther : (b.purposeOfVisit || '—');
 
-            const dataAttr = encodeURIComponent(JSON.stringify(b));
-            const businessInfo = b.businessName ? `<br><small class="text-muted">${b.businessName}${b.gstNumber ? ' | GST: ' + b.gstNumber : ''}</small>` : '';
+            const businessInfo = b.businessName
+                ? `<br><small class="text-muted">${b.businessName}${b.gstNumber ? ' · GST: ' + b.gstNumber : ''}</small>`
+                : '';
+
+            const propertyName = b.homeId === 1 ? 'Ground Floor Classic'
+                               : b.homeId === 2 ? '1st Floor Heritage'
+                               : 'Property ' + b.homeId;
+
+            const submittedDate = b.createdAt
+                ? new Date(b.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })
+                : '—';
 
             html += `<tr>
                 <td><strong>${b.customerName || '—'}</strong>${businessInfo}</td>
                 <td><small>${b.customerEmail || ''}<br>${b.customerPhone || ''}</small></td>
-                <td>${b.homeId === 1 ? 'Ground Floor Classic' : b.homeId === 2 ? '1st Floor Heritage' : 'Home ' + b.homeId}</td>
-                <td><small>${b.bookingDateFrom} to<br>${b.bookingDateTo}</small></td>
-                <td>${b.guestNumbers || '—'}<br><small class="text-muted">${guestBreakdown}</small></td>
+                <td><small>${propertyName}</small></td>
+                <td><small>${b.bookingDateFrom}<br>to ${b.bookingDateTo}</small></td>
+                <td>${b.guestNumbers || '—'}${guestBreakdown ? '<br><small class="text-muted">' + guestBreakdown + '</small>' : ''}</td>
                 <td><small>${purposeDisplay}</small></td>
                 <td><span class="badge bg-secondary">${b.paymentMethod || b.paymentStatus || '—'}</span></td>
-                <td><strong>₹${(b.price || 0).toLocaleString()}</strong></td>
-                <td><small>${new Date(b.createdAt).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}</small></td>
+                <td><strong>₹${(b.price || 0).toLocaleString('en-IN')}</strong></td>
+                <td><small>${submittedDate}</small></td>
                 <td>
-                    <button class="btn btn-success btn-sm mb-1 w-100" onclick='openConfirmBookingModal(${b.id}, ${JSON.stringify(b)})'>
-                        <i class="fas fa-check me-1"></i>Confirm
+                    <button class="btn btn-success btn-sm w-100 approve-btn"
+                            onclick="openConfirmBookingModal(${b.id})">
+                        <i class="fas fa-check me-1"></i>Approve
                     </button>
                 </td>
             </tr>`;
@@ -2564,60 +2603,77 @@
         container.innerHTML = html;
     }
 
-    function openConfirmBookingModal(bookingId, bookingData) {
+    function openConfirmBookingModal(bookingId) {
+        const b = pendingBookingStore[bookingId];
+        if (!b) { showToast('Booking data not found. Please refresh.', 'error'); return; }
+
         currentConfirmBookingId = bookingId;
 
-        // Pre-fill the info summary
-        const info = document.getElementById('confirmBookingInfo');
-        info.innerHTML = `
-            <strong>${bookingData.customerName}</strong> &nbsp;|&nbsp;
-            ${bookingData.bookingDateFrom} → ${bookingData.bookingDateTo} &nbsp;|&nbsp;
-            Guests: ${bookingData.guestNumbers} &nbsp;|&nbsp;
-            <strong>Price: ₹${(bookingData.price || 0).toLocaleString()}</strong>
-            ${bookingData.paymentMethod ? ' &nbsp;|&nbsp; Requested payment: <em>' + bookingData.paymentMethod + '</em>' : ''}`;
+        // Summary banner
+        const advanceSuggestion = Math.round((b.price || 0) / 2);
+        document.getElementById('confirmBookingInfo').innerHTML = `
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <span><i class="fas fa-user me-1"></i><strong>${b.customerName || '—'}</strong></span>
+                <span><i class="fas fa-calendar me-1"></i>${b.bookingDateFrom} → ${b.bookingDateTo}</span>
+                <span><i class="fas fa-users me-1"></i>Guests: ${b.guestNumbers || '—'}</span>
+                <span class="ms-auto"><i class="fas fa-rupee-sign me-1"></i><strong>Total: ₹${(b.price || 0).toLocaleString('en-IN')}</strong></span>
+            </div>`;
 
-        // Pre-fill amount
-        document.getElementById('cbp_AmountPaid').value = bookingData.price || '';
-        document.getElementById('cbp_FinalRoomPrice').value = '';
-        document.getElementById('cbp_Notes').value = '';
+        // Pre-fill fields
+        document.getElementById('cbp_AmountPaid').value        = advanceSuggestion;   // suggest 50%
+        document.getElementById('cbp_FinalRoomPrice').value    = '';
+        document.getElementById('cbp_Notes').value             = '';
+        document.getElementById('cbp_PaymentStatus').value     = 'Partial';            // default: advance
+        document.getElementById('cbp_AdvanceSuggestion').textContent =
+            `Suggested 50% advance: ₹${advanceSuggestion.toLocaleString('en-IN')} · Full: ₹${(b.price || 0).toLocaleString('en-IN')}`;
 
-        // Pre-set payment method if available
+        // Pre-set payment method if it matches a known option
         const methodSel = document.getElementById('cbp_PaymentMethod');
         const knownMethods = ['Cash', 'UPI', 'Card', 'Bank Transfer', 'Online'];
-        if (bookingData.paymentMethod && knownMethods.includes(bookingData.paymentMethod)) {
-            methodSel.value = bookingData.paymentMethod;
-        } else {
-            methodSel.value = '';
-        }
-        document.getElementById('cbp_PaymentStatus').value = 'Paid';
+        methodSel.value = (b.paymentMethod && knownMethods.includes(b.paymentMethod)) ? b.paymentMethod : '';
 
-        // Close pending modal, open confirm modal
-        bootstrap.Modal.getInstance(document.getElementById('pendingRequestsModal'))?.hide();
-        const confirmModal = new bootstrap.Modal(document.getElementById('confirmBookingPaymentModal'));
-        confirmModal.show();
+        // Clear any previous inline errors
+        document.getElementById('cbp_MethodError').style.display = 'none';
+        document.getElementById('cbp_ModalError').style.display  = 'none';
+
+        // Transition: hide pending list → show confirm modal
+        const pendingModal = bootstrap.Modal.getInstance(document.getElementById('pendingRequestsModal'));
+        if (pendingModal) {
+            pendingModal.hide();
+            document.getElementById('pendingRequestsModal').addEventListener('hidden.bs.modal', function openConfirm() {
+                document.getElementById('pendingRequestsModal').removeEventListener('hidden.bs.modal', openConfirm);
+                new bootstrap.Modal(document.getElementById('confirmBookingPaymentModal')).show();
+            }, { once: true });
+        } else {
+            new bootstrap.Modal(document.getElementById('confirmBookingPaymentModal')).show();
+        }
     }
 
     function submitConfirmBookingPayment() {
         if (!currentConfirmBookingId) return;
 
         const paymentMethod = document.getElementById('cbp_PaymentMethod').value;
+        const errEl = document.getElementById('cbp_MethodError');
         if (!paymentMethod) {
-            alert('Please select a payment method.');
+            errEl.textContent = 'Please select a payment method.';
+            errEl.style.display = 'block';
+            document.getElementById('cbp_PaymentMethod').focus();
             return;
         }
+        errEl.style.display = 'none';
 
-        const amountPaid = parseFloat(document.getElementById('cbp_AmountPaid').value) || 0;
+        const amountPaid     = parseFloat(document.getElementById('cbp_AmountPaid').value)     || 0;
         const finalRoomPrice = parseFloat(document.getElementById('cbp_FinalRoomPrice').value) || null;
-        const paymentStatus = document.getElementById('cbp_PaymentStatus').value;
-        const notes = document.getElementById('cbp_Notes').value.trim();
+        const paymentStatus  = document.getElementById('cbp_PaymentStatus').value;
+        const notes          = document.getElementById('cbp_Notes').value.trim();
 
         const payload = {
-            BookingId: currentConfirmBookingId,
-            PaymentMethod: paymentMethod,
-            AmountPaid: amountPaid,
-            FinalRoomPrice: finalRoomPrice,
+            BookingId:       currentConfirmBookingId,
+            PaymentMethod:   paymentMethod,
+            AmountPaid:      amountPaid,
+            FinalRoomPrice:  finalRoomPrice,
             IsAdvancePayment: paymentStatus === 'Partial',
-            Notes: notes
+            Notes:           notes
         };
 
         const btn = document.getElementById('cbp_ConfirmBtn');
@@ -2631,22 +2687,32 @@
             data: JSON.stringify(payload),
             success: function (result) {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check me-1"></i>Confirm Booking';
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Approve Booking';
                 if (result.success) {
                     bootstrap.Modal.getInstance(document.getElementById('confirmBookingPaymentModal'))?.hide();
-                    showToast('Booking confirmed and payment recorded!', 'success');
-                    // Refresh calendar
-                    setTimeout(function() { loadInitialBookings(); }, 800);
-                    // Update badge
-                    document.getElementById('pendingRequestsBadge').classList.add('d-none');
+                    showToast('Booking approved and payment recorded!', 'success');
+                    loadInitialBookings();
+                    // Remove from store and refresh pending count
+                    delete pendingBookingStore[currentConfirmBookingId];
+                    currentConfirmBookingId = null;
+                    $.ajax({
+                        url: '/Scheduler/GetPendingBookingRequests', type: 'GET',
+                        success: function (data) {
+                            const badge = document.getElementById('pendingRequestsBadge');
+                            if (data && data.length > 0) { badge.textContent = data.length; badge.classList.remove('d-none'); }
+                            else { badge.classList.add('d-none'); }
+                        }
+                    });
                 } else {
-                    alert(result.message || 'Failed to confirm booking.');
+                    document.getElementById('cbp_ModalError').textContent = result.message || 'Failed to confirm booking.';
+                    document.getElementById('cbp_ModalError').style.display = 'block';
                 }
             },
             error: function () {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check me-1"></i>Confirm Booking';
-                alert('An error occurred. Please try again.');
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Approve Booking';
+                document.getElementById('cbp_ModalError').textContent = 'A server error occurred. Please try again.';
+                document.getElementById('cbp_ModalError').style.display = 'block';
             }
         });
     }
