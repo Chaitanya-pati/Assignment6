@@ -1,0 +1,103 @@
+Enhance the Booking Form and Booking Flow with the following requirements:
+
+1. Guest Details Enhancement
+   In the guest section, capture detailed guest counts including:
+
+* Total Adults
+* Total Kids (Below Age 10)
+* Male Count
+* Female Count
+
+The male/female count should include both adults and children.
+
+2. Business Details (Optional)
+   In both:
+
+* Website Booking Form
+* Scheduler/Admin Booking View
+
+Add optional fields:
+
+* Business Name
+* GST Number
+
+If business details are provided:
+
+* The invoice should be generated using the Business Name.
+* GST details should be included in the invoice.
+
+3. Purpose of Visit (Optional for Everyone)
+   Add an optional dropdown field:
+
+* Purpose of Visit
+
+Options:
+
+* Family Function
+* Leisure
+* Corporate Business Visit
+* Other
+
+If "Other" is selected:
+
+* Show a manual text input field for custom entry.
+
+This field should be available for all bookings.
+
+4. Payment Method Option
+   Add Payment Method selection in:
+
+* Website Booking Flow
+* Scheduler/Admin Booking View
+
+Examples:
+
+* Online Payment
+* Cash
+* UPI
+* Card
+* Bank Transfer
+* Pay Later
+
+5. Website Booking Payment Flow Enhancement
+   Currently, the website redirects users to Razorpay payment immediately on clicking Book.
+
+Enhance this flow by adding another option:
+
+* "Pay Later"
+
+Flow for Pay Later:
+
+* The customer can submit the room booking request without making payment immediately.
+* The booking request should be sent to the admin for approval.
+* The room should remain in pending/request status until approved by admin.
+
+6. Razorpay Advance Payment Logic
+   When the user selects Online Payment (Razorpay):
+
+* Do not charge the full booking amount.
+* Only 50% of the total booking amount should be charged as advance payment.
+* Clearly display to the customer that only advance payment is being collected online.
+* Remaining payment can be collected later during check-in or final settlement.
+
+7. Admin Booking Confirmation Enhancement
+   The booking confirmation feature already exists. Enhance it with the following:
+
+While approving/confirming a booking request, the admin should be able to:
+
+* Enter Amount Paid
+* Select Payment Method
+* Update Final Room Price after negotiation/bargaining
+* Confirm whether payment is Partial or Full
+
+After confirmation:
+
+* The booking status should be updated accordingly.
+* Payment and pricing details should be saved properly.
+
+8. General Requirements
+
+* Keep the UI clean and user-friendly.
+* Use conditional fields wherever required.
+* Ensure all new fields are available in both frontend and admin/scheduler views.
+* Ensure booking, invoice, payment, and approval data are properly stored in the database.
