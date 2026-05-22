@@ -61,6 +61,7 @@ public partial class Assignment6Context : DbContext
             entity.Property(e => e.PurposeOfVisit).HasMaxLength(100);
             entity.Property(e => e.PurposeOfVisitOther).HasMaxLength(500);
             entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+            entity.Property(e => e.FinalPaymentMethod).HasMaxLength(50);
 
             entity.HasOne(d => d.Home).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.HomeId)

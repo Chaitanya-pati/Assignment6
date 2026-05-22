@@ -38,6 +38,8 @@ namespace DbService.Interface
         Task<int> SyncAirbnbBookings(IList<Ical.Net.CalendarComponents.CalendarEvent> calendarEvents, int homeId);
         Task<int> CleanupOldAirbnbBookings(int homeId, DateTime cutoffDate);
         public string GetRoomDetailsByRoomId(int roomId);
+        bool UpdateAdvancePayment(int bookingId, long advanceAmount, string advancePaymentMethod);
+        bool CaptureRemainingPayment(int bookingId, string finalPaymentMethod);
     }
 
 }

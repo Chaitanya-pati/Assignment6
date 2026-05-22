@@ -545,6 +545,7 @@ namespace Assignment6.Controllers
                     purposeOfVisit = b.PurposeOfVisit,
                     purposeOfVisitOther = b.PurposeOfVisitOther,
                     paymentMethod = b.PaymentMethod,
+                    finalPaymentMethod = b.FinalPaymentMethod,
                     document = b.Document,
                     bookingRooms = b.BookingRooms?.Select(br => new
                     {
@@ -690,6 +691,7 @@ namespace Assignment6.Controllers
 
             // Payment method
             string paymentMethodDisplay = !string.IsNullOrEmpty(booking.PaymentMethod) ? booking.PaymentMethod : "N/A";
+            string finalPaymentMethodDisplay = !string.IsNullOrEmpty(booking.FinalPaymentMethod) ? booking.FinalPaymentMethod : null;
 
             string notesSection = string.IsNullOrEmpty(booking.Message) ? "" : $@"
 <tr>
@@ -858,7 +860,8 @@ namespace Assignment6.Controllers
                                 <tr><td class='row-label'>Rooms booked</td><td class='row-value'>{roomCount}</td></tr>
                                 <tr><td class='row-label'>Booking type</td><td class='row-value'>{bookingType}</td></tr>
                                 <tr><td class='row-label'>Booked on</td><td class='row-value'>{booking.CreatedAt:dd MMM yyyy}</td></tr>
-                                <tr><td class='row-label'>Payment method</td><td class='row-value'>{paymentMethodDisplay}</td></tr>
+                                <tr><td class='row-label'>Advance payment method</td><td class='row-value'>{paymentMethodDisplay}</td></tr>
+                                {(finalPaymentMethodDisplay != null ? $"<tr><td class='row-label'>Final payment method</td><td class='row-value'>{finalPaymentMethodDisplay}</td></tr>" : "")}
                                 {(!string.IsNullOrEmpty(purposeDisplay) ? $"<tr><td class='row-label'>Purpose of visit</td><td class='row-value'>{purposeDisplay}</td></tr>" : "")}
                             </table>
                         </td>
@@ -1236,6 +1239,44 @@ namespace Assignment6.Controllers
             {
                 Console.WriteLine($"Error in ConfirmBookingWithPayment: {ex.Message}");
                 return Json(new { success = false, message = "An unexpected error occurred" });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult UpdateAdvancePayment(int bookingId, long advanceAmount, string advancePaymentMethod)
+        {
+            try
+            {
+                if (bookingId <= 0)
+                    return Json(new { success = false, message = "Invalid booking ID" });
+
+                bool updated = _bookingService.UpdateAdvancePayment(bookingId, advanceAmount, advancePaymentMethod);
+                return Json(updated
+                    ? new { success = true, message = "Advance payment updated successfully" }
+                    : new { success = false, message = "Failed to update advance payment" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult CaptureRemainingPayment(int bookingId, string finalPaymentMethod)
+        {
+            try
+            {
+                if (bookingId <= 0)
+                    return Json(new { success = false, message = "Invalid booking ID" });
+
+                bool captured = _bookingService.CaptureRemainingPayment(bookingId, finalPaymentMethod);
+                return Json(captured
+                    ? new { success = true, message = "Remaining payment captured. Booking marked as Paid." }
+                    : new { success = false, message = "Failed to capture remaining payment" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
 

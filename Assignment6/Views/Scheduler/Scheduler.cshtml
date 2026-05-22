@@ -1728,6 +1728,8 @@
                     advancePaid: booking.advancePaid,
                     amountToBePaid: booking.amountToBePaid,
                     paymentStatus: booking.paymentStatus,
+                    paymentMethod: booking.paymentMethod,
+                    finalPaymentMethod: booking.finalPaymentMethod,
                     homeId: booking.homeId,
                     homeName: homeName,
                     roomCount: roomCount,
@@ -2235,25 +2237,57 @@
         // Check if Airbnb booking
         const isAirbnbBooking = props.customerName === "Airbnb Guest" || props.customerName?.includes("Airbnb");
 
+        const paymentMethods = ['Cash', 'UPI', 'Card', 'Online', 'Bank Transfer', 'Pay Later'];
+        const methodOptions = paymentMethods.map(m => `<option value="${m}">${m}</option>`).join('');
+
         let paymentSection = '';
-        // Show payment options or invoice generation for all bookings (except Airbnb for payment actions)
         if (!isAirbnbBooking) {
-            if (props.paymentStatus && props.paymentStatus.toLowerCase() === 'pending') {
+            const status = (props.paymentStatus || '').toLowerCase();
+            const isPaid = status === 'paid';
+
+            if (!isPaid) {
+                // Partial / Pending — show Update Advance + Capture Remaining sections
+                const advMethod = props.paymentMethod || '';
+                const advMethodOptions = paymentMethods.map(m =>
+                    `<option value="${m}" ${m === advMethod ? 'selected' : ''}>${m}</option>`).join('');
+
                 paymentSection = `
                     <div class="mt-3 p-2 border-top">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="paymentPaidCheck_${event.id}">
-                            <label class="form-check-label" for="paymentPaidCheck_${event.id}">
-                                <strong>Mark as Paid</strong>
-                            </label>
+                        <div class="mb-3">
+                            <div class="fw-semibold small mb-2 text-secondary text-uppercase" style="letter-spacing:.5px;font-size:10px;">Update Advance Payment</div>
+                            <div class="d-flex gap-2 mb-2">
+                                <input type="number" id="advAmt_${event.id}" class="form-control form-control-sm" placeholder="Amount" value="${props.advancePaid || 0}" min="0" max="${props.price || 0}" style="width:50%;">
+                                <select id="advMethod_${event.id}" class="form-select form-select-sm" style="width:50%;">
+                                    ${advMethodOptions}
+                                </select>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="updateAdvancePayment(${event.id})">
+                                <i class="fas fa-edit me-1"></i>Update Advance
+                            </button>
                         </div>
-                        <button class="btn btn-success btn-sm w-100 mb-2" onclick="completeBookingWithInvoice(${event.id}, '${props.customerName}')">
-                            <i class="fas fa-check me-1"></i>Complete & Invoice
+                        <hr class="my-2">
+                        <div class="mb-3">
+                            <div class="fw-semibold small mb-2 text-secondary text-uppercase" style="letter-spacing:.5px;font-size:10px;">Capture Remaining Payment</div>
+                            <div class="d-flex align-items-center justify-content-between mb-2 small">
+                                <span class="text-muted">Remaining amount:</span>
+                                <strong id="remainingDisplay_${event.id}">₹${remainingAmount}</strong>
+                            </div>
+                            <select id="finalMethod_${event.id}" class="form-select form-select-sm mb-2">
+                                <option value="">-- Select payment method --</option>
+                                ${methodOptions}
+                            </select>
+                            <button class="btn btn-success btn-sm w-100" onclick="captureRemainingPayment(${event.id}, '${props.customerName}')">
+                                <i class="fas fa-check-circle me-1"></i>Capture & Mark Paid
+                            </button>
+                        </div>
+                        <hr class="my-2">
+                        <button class="btn btn-primary btn-sm w-100" onclick="generateBookingInvoice(${event.id}, '${props.customerName}')">
+                            <i class="fas fa-file-pdf me-1"></i>Generate Invoice
                         </button>
                     </div>
                 `;
             } else {
-                // For non-pending bookings (paid, completed), allow invoice generation
+                // Fully paid — show invoice only
                 paymentSection = `
                     <div class="mt-3 p-2 border-top">
                         <button class="btn btn-primary btn-sm w-100 mb-2" onclick="generateBookingInvoice(${event.id}, '${props.customerName}')">
@@ -2263,7 +2297,7 @@
                 `;
             }
         } else {
-            // For Airbnb bookings, always show invoice generation button (no payment tracking)
+            // Airbnb bookings — invoice only
             paymentSection = `
                 <div class="mt-3 p-2 border-top">
                     <button class="btn btn-primary btn-sm w-100 mb-2" onclick="generateBookingInvoice(${event.id}, '${props.customerName}')">
@@ -2482,6 +2516,71 @@
                     showNotification(response.message || 'Failed.', 'error');
                 }
             },
+            complete: hideLoading
+        });
+    }
+
+    function updateAdvancePayment(bookingId) {
+        const amtInput = document.getElementById(`advAmt_${bookingId}`);
+        const methodSelect = document.getElementById(`advMethod_${bookingId}`);
+        const advanceAmount = parseInt(amtInput ? amtInput.value : 0, 10);
+        const advancePaymentMethod = methodSelect ? methodSelect.value : '';
+
+        if (!advancePaymentMethod) {
+            showNotification('Please select a payment method for the advance.', 'error');
+            return;
+        }
+        if (isNaN(advanceAmount) || advanceAmount < 0) {
+            showNotification('Please enter a valid advance amount.', 'error');
+            return;
+        }
+
+        showLoading('Updating advance payment...');
+        $.ajax({
+            url: '/Scheduler/UpdateAdvancePayment',
+            type: 'POST',
+            data: { bookingId, advanceAmount, advancePaymentMethod },
+            success: function (response) {
+                if (response.success) {
+                    showNotification(response.message || 'Advance payment updated!', 'success');
+                    setTimeout(() => { $('.notification').remove(); if (typeof refreshCalendarData === 'function') refreshCalendarData(); }, 1500);
+                } else {
+                    showNotification(response.message || 'Failed to update advance payment.', 'error');
+                }
+            },
+            error: function () { showNotification('Error updating advance payment.', 'error'); },
+            complete: hideLoading
+        });
+    }
+
+    function captureRemainingPayment(bookingId, bookingTitle) {
+        const methodSelect = document.getElementById(`finalMethod_${bookingId}`);
+        const finalPaymentMethod = methodSelect ? methodSelect.value : '';
+
+        if (!finalPaymentMethod) {
+            showNotification('Please select a payment method for the remaining amount.', 'error');
+            return;
+        }
+
+        if (!confirm(`Capture remaining payment for: ${bookingTitle}?\nThis will mark the booking as fully Paid.`)) return;
+
+        showLoading('Capturing remaining payment...');
+        $.ajax({
+            url: '/Scheduler/CaptureRemainingPayment',
+            type: 'POST',
+            data: { bookingId, finalPaymentMethod },
+            success: function (response) {
+                if (response.success) {
+                    showNotification(response.message || 'Remaining payment captured!', 'success');
+                    setTimeout(() => {
+                        $('.notification').remove();
+                        if (typeof refreshCalendarData === 'function') refreshCalendarData();
+                    }, 1500);
+                } else {
+                    showNotification(response.message || 'Failed to capture payment.', 'error');
+                }
+            },
+            error: function () { showNotification('Error capturing remaining payment.', 'error'); },
             complete: hideLoading
         });
     }

@@ -58,8 +58,11 @@ public partial class Booking
 
     public string PurposeOfVisitOther { get; set; }
 
-    // Payment method selected
+    // Payment method for advance/initial payment
     public string PaymentMethod { get; set; }
+
+    // Payment method for final/remaining payment
+    public string FinalPaymentMethod { get; set; }
 
     public virtual ICollection<BookingRoom> BookingRooms { get; set; } = new List<BookingRoom>();
 

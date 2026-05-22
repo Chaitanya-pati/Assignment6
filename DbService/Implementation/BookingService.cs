@@ -786,5 +786,76 @@ namespace DbService.Implementation
                 return ex.Message;
             }
         }
+
+        public bool UpdateAdvancePayment(int bookingId, long advanceAmount, string advancePaymentMethod)
+        {
+            try
+            {
+                using (var db = new Assignment6Context(_dbconnection))
+                {
+                    var booking = db.Bookings.FirstOrDefault(b => b.Id == bookingId);
+                    if (booking == null) return false;
+
+                    booking.AdvancePrice = advanceAmount;
+                    booking.PaymentMethod = advancePaymentMethod;
+
+                    long remaining = booking.Price - advanceAmount;
+                    booking.PaymentStatus = remaining <= 0 ? "Paid" : "Partial";
+
+                    db.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating advance payment for booking {bookingId}: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool CaptureRemainingPayment(int bookingId, string finalPaymentMethod)
+        {
+            try
+            {
+                using (var db = new Assignment6Context(_dbconnection))
+                {
+                    var booking = db.Bookings.FirstOrDefault(b => b.Id == bookingId);
+                    if (booking == null) return false;
+
+                    booking.FinalPaymentMethod = finalPaymentMethod;
+                    booking.PaymentStatus = "Paid";
+
+                    // Record the final payment in the Payments table
+                    long advancePaid = booking.AdvancePrice ?? 0;
+                    long remaining = booking.Price - advancePaid;
+
+                    if (remaining > 0)
+                    {
+                        var payment = new Payment
+                        {
+                            BookingId = bookingId,
+                            Amount = (decimal)booking.Price,
+                            AmountPaid = (decimal)remaining,
+                            Currency = "INR",
+                            Status = "paid",
+                            PaymentMethod = finalPaymentMethod,
+                            IsPartialPayment = false,
+                            IsAdvancePayment = false,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now
+                        };
+                        db.Payments.Add(payment);
+                    }
+
+                    db.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error capturing remaining payment for booking {bookingId}: {ex.Message}");
+                return false;
+            }
+        }
     }
 }
