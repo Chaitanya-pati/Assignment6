@@ -295,14 +295,25 @@
             customerPhone: "@Model.CustomerPhone"
         };
 
+        // Flag: set to true only when Razorpay confirms payment — prevents accidental deletion
+        let paymentCompleted = false;
+
         document.getElementById('payButton').addEventListener('click', function () {
             initiatePayment();
+        });
+
+        // Safety net: if the user closes the tab or navigates away before completing
+        // payment, delete the pending (unpaid) booking so it does not linger in the DB.
+        window.addEventListener('beforeunload', function () {
+            if (!paymentCompleted) {
+                navigator.sendBeacon('/Scheduler/DeleteBooking?bookingId=' + paymentData.bookingId);
+            }
         });
 
         function initiatePayment() {
             const options = {
                 key: paymentData.keyId,
-                amount: paymentData.amount * 100, // Amount in paise
+                amount: paymentData.amount * 100,
                 currency: paymentData.currency,
                 name: "Vernekar HomeStays",
                 description: "Booking Payment",
@@ -316,11 +327,19 @@
                     color: "#667eea"
                 },
                 handler: function (response) {
+                    // Mark payment as completed BEFORE doing anything else so that
+                    // the beforeunload listener does not delete this booking.
+                    paymentCompleted = true;
                     handlePaymentSuccess(response);
                 },
                 modal: {
                     ondismiss: function () {
+                        // User closed the Razorpay popup without paying.
+                        // Delete the pending booking so it does not remain in the DB.
                         hideLoading();
+                        if (!paymentCompleted) {
+                            deletePendingBookingAndRedirect();
+                        }
                     }
                 }
             };
@@ -329,6 +348,21 @@
             const rzp = new Razorpay(options);
             rzp.open();
             hideLoading();
+        }
+
+        function deletePendingBookingAndRedirect() {
+            // Remove beforeunload listener first so sendBeacon doesn't also fire
+            window.onbeforeunload = null;
+
+            $.ajax({
+                url: '/Scheduler/DeleteBooking',
+                type: 'GET',
+                data: { bookingId: paymentData.bookingId },
+                complete: function () {
+                    // Redirect regardless of delete outcome
+                    window.location.href = '/Website/Website';
+                }
+            });
         }
 
         function handlePaymentSuccess(response) {
@@ -351,14 +385,12 @@
                     if (result.success) {
                         window.location.href = `/Payment/PaymentSuccess?bookingId=${paymentData.bookingId}`;
                     } else {
-                        alert(result.message);
+                        // Verification failed — payment did not go through; delete booking
                         window.location.href = `/Payment/PaymentFailed?bookingId=${paymentData.bookingId}`;
                     }
                 },
-                error: function (xhr, status, error) {
+                error: function () {
                     hideLoading();
-                    console.error('Verification error:', error);
-                    alert('Payment verification failed. Please contact support.');
                     window.location.href = `/Payment/PaymentFailed?bookingId=${paymentData.bookingId}`;
                 }
             });

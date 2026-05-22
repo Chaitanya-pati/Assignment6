@@ -82,8 +82,12 @@ namespace Assignment6.Controllers
         [HttpGet]
         public IActionResult PaymentFailed(int bookingId)
         {
-            var booking = _bookingService.GetBookingById(bookingId);
-            ViewBag.Booking = booking;
+            // Payment verification failed — delete the unpaid pending booking so it
+            // does not stay in the DB as an unresolved IsBooked=false record.
+            if (bookingId > 0)
+            {
+                _bookingService.DeleteBooking(bookingId);
+            }
 
             return View();
         }
