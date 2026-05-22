@@ -787,6 +787,81 @@ namespace DbService.Implementation
             }
         }
 
+        public bool SavePaymentDetails(int bookingId, long advanceAmount, string advancePaymentMethod, long? finalAmount, string finalPaymentMethod)
+        {
+            try
+            {
+                using (var db = new Assignment6Context(_dbconnection))
+                {
+                    var booking = db.Bookings.FirstOrDefault(b => b.Id == bookingId);
+                    if (booking == null) return false;
+
+                    // Store advance / first payment
+                    booking.AdvancePrice = advanceAmount;
+                    booking.PaymentMethod = advancePaymentMethod;
+
+                    // Store final / second payment (only when two-part)
+                    bool hasFinalPayment = finalAmount.HasValue && finalAmount.Value > 0 && !string.IsNullOrWhiteSpace(finalPaymentMethod);
+                    booking.FinalPaymentAmount = hasFinalPayment ? finalAmount : null;
+                    booking.FinalPaymentMethod = hasFinalPayment ? finalPaymentMethod : null;
+
+                    long totalPaid = advanceAmount + (hasFinalPayment ? finalAmount!.Value : 0);
+                    booking.PaymentStatus = totalPaid >= booking.Price ? "Paid" : "Partial";
+
+                    // Log advance payment record
+                    if (advanceAmount > 0 && !string.IsNullOrWhiteSpace(advancePaymentMethod))
+                    {
+                        // Remove stale advance Payment records for this booking so we don't duplicate
+                        var oldAdvance = db.Payments.Where(p => p.BookingId == bookingId && p.IsAdvancePayment).ToList();
+                        db.Payments.RemoveRange(oldAdvance);
+
+                        db.Payments.Add(new Payment
+                        {
+                            BookingId = bookingId,
+                            Amount = (decimal)booking.Price,
+                            AmountPaid = (decimal)advanceAmount,
+                            Currency = "INR",
+                            Status = "paid",
+                            PaymentMethod = advancePaymentMethod,
+                            IsAdvancePayment = true,
+                            IsPartialPayment = hasFinalPayment || totalPaid < booking.Price,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now
+                        });
+                    }
+
+                    // Log final payment record
+                    if (hasFinalPayment)
+                    {
+                        var oldFinal = db.Payments.Where(p => p.BookingId == bookingId && !p.IsAdvancePayment).ToList();
+                        db.Payments.RemoveRange(oldFinal);
+
+                        db.Payments.Add(new Payment
+                        {
+                            BookingId = bookingId,
+                            Amount = (decimal)booking.Price,
+                            AmountPaid = (decimal)finalAmount!.Value,
+                            Currency = "INR",
+                            Status = "paid",
+                            PaymentMethod = finalPaymentMethod,
+                            IsAdvancePayment = false,
+                            IsPartialPayment = false,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now
+                        });
+                    }
+
+                    db.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving payment details for booking {bookingId}: {ex.Message}");
+                return false;
+            }
+        }
+
         public bool UpdateAdvancePayment(int bookingId, long advanceAmount, string advancePaymentMethod)
         {
             try

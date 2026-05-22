@@ -40,6 +40,7 @@ namespace DbService.Interface
         public string GetRoomDetailsByRoomId(int roomId);
         bool UpdateAdvancePayment(int bookingId, long advanceAmount, string advancePaymentMethod);
         bool CaptureRemainingPayment(int bookingId, string finalPaymentMethod);
+        bool SavePaymentDetails(int bookingId, long advanceAmount, string advancePaymentMethod, long? finalAmount, string finalPaymentMethod);
     }
 
 }

@@ -546,6 +546,7 @@ namespace Assignment6.Controllers
                     purposeOfVisitOther = b.PurposeOfVisitOther,
                     paymentMethod = b.PaymentMethod,
                     finalPaymentMethod = b.FinalPaymentMethod,
+                    finalPaymentAmount = b.FinalPaymentAmount ?? 0,
                     document = b.Document,
                     bookingRooms = b.BookingRooms?.Select(br => new
                     {
@@ -707,34 +708,66 @@ namespace Assignment6.Controllers
     </td>
 </tr>";
 
-            // ================= UPDATED PAYMENT LOGIC =================
-            string advanceRow = "";
-            string amountDueRow = "";
-            string totalPaidRow = "";
+            // ================= PAYMENT BREAKDOWN =================
+            long finalPaid  = booking.FinalPaymentAmount ?? 0;
+            long totalPaid  = advancePaid + finalPaid;
+            long balanceDue = booking.Price - totalPaid;
 
-            if (isPaid)
+            string advanceLabel  = !string.IsNullOrEmpty(booking.PaymentMethod)      ? $"Advance paid ({booking.PaymentMethod})"      : "Advance paid";
+            string finalLabel    = !string.IsNullOrEmpty(booking.FinalPaymentMethod) ? $"Final paid ({booking.FinalPaymentMethod})"   : "Final paid";
+
+            string advanceRow    = "";
+            string finalRow      = "";
+            string amountDueRow  = "";
+            string totalPaidRow  = "";
+
+            if (isPaid && advancePaid > 0 && finalPaid > 0)
             {
-                totalPaidRow = $@"
+                // Two-part payment — show each line
+                advanceRow = $@"
 <tr style='border-bottom:0.5px solid #f2f4f7;'>
-    <td style='padding:11px 18px;font-size:12px;color:#667085;'>Total Paid</td>
-    <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:600;text-align:right;'>&#8377;{booking.Price:N0}</td>
+    <td style='padding:11px 18px;font-size:12px;color:#667085;'>{advanceLabel}</td>
+    <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:500;text-align:right;'>&#8377;{advancePaid:N0}</td>
+</tr>";
+                finalRow = $@"
+<tr style='border-bottom:0.5px solid #f2f4f7;'>
+    <td style='padding:11px 18px;font-size:12px;color:#667085;'>{finalLabel}</td>
+    <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:500;text-align:right;'>&#8377;{finalPaid:N0}</td>
+</tr>";
+                totalPaidRow = $@"
+<tr style='border-bottom:0.5px solid #f2f4f7;background:#ecfdf3;'>
+    <td style='padding:11px 18px;font-size:12px;color:#027a48;font-weight:600;'>Total Paid</td>
+    <td style='padding:11px 18px;font-size:12px;color:#027a48;font-weight:700;text-align:right;'>&#8377;{totalPaid:N0}</td>
+</tr>";
+            }
+            else if (isPaid)
+            {
+                // Paid in one shot
+                string oneLabel = !string.IsNullOrEmpty(booking.PaymentMethod) ? $"Paid ({booking.PaymentMethod})" : "Total Paid";
+                totalPaidRow = $@"
+<tr style='border-bottom:0.5px solid #f2f4f7;background:#ecfdf3;'>
+    <td style='padding:11px 18px;font-size:12px;color:#027a48;font-weight:600;'>{oneLabel}</td>
+    <td style='padding:11px 18px;font-size:12px;color:#027a48;font-weight:700;text-align:right;'>&#8377;{booking.Price:N0}</td>
 </tr>";
             }
             else
             {
-                advanceRow = $@"
+                // Partial — show advance and balance due
+                if (advancePaid > 0)
+                {
+                    advanceRow = $@"
 <tr style='border-bottom:0.5px solid #f2f4f7;'>
-    <td style='padding:11px 18px;font-size:12px;color:#667085;'>Advance paid</td>
+    <td style='padding:11px 18px;font-size:12px;color:#667085;'>{advanceLabel}</td>
     <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:500;text-align:right;'>&#8377;{advancePaid:N0}</td>
 </tr>";
-
-                amountDueRow = remaining > 0 ? $@"
-<tr style='border-bottom:0.5px solid #f2f4f7;'>
-    <td style='padding:11px 18px;font-size:12px;color:#667085;'>Amount due</td>
-    <td style='padding:11px 18px;font-size:12px;color:#101828;font-weight:500;text-align:right;'>&#8377;{remaining:N0}</td>
+                }
+                amountDueRow = balanceDue > 0 ? $@"
+<tr style='border-bottom:0.5px solid #f2f4f7;background:#fff8f0;'>
+    <td style='padding:11px 18px;font-size:12px;color:#b54708;font-weight:600;'>Balance due</td>
+    <td style='padding:11px 18px;font-size:12px;color:#b54708;font-weight:700;text-align:right;'>&#8377;{balanceDue:N0}</td>
 </tr>" : "";
             }
-            // ========================================================
+            // =====================================================
 
             var html = $@"
 <!DOCTYPE html>
@@ -879,6 +912,7 @@ namespace Assignment6.Controllers
         </tr>
         {totalPaidRow}
         {advanceRow}
+        {finalRow}
         {amountDueRow}
     </table>
 
@@ -1239,6 +1273,32 @@ namespace Assignment6.Controllers
             {
                 Console.WriteLine($"Error in ConfirmBookingWithPayment: {ex.Message}");
                 return Json(new { success = false, message = "An unexpected error occurred" });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult SavePaymentDetails(int bookingId, long advanceAmount, string advancePaymentMethod, long? finalAmount, string finalPaymentMethod)
+        {
+            try
+            {
+                if (bookingId <= 0)
+                    return Json(new { success = false, message = "Invalid booking ID" });
+
+                bool saved = _bookingService.SavePaymentDetails(bookingId, advanceAmount, advancePaymentMethod, finalAmount, finalPaymentMethod);
+                if (!saved)
+                    return Json(new { success = false, message = "Failed to save payment details" });
+
+                var booking = _bookingService.GetBookingById(bookingId);
+                return Json(new
+                {
+                    success = true,
+                    message = booking?.PaymentStatus == "Paid" ? "Payment saved. Booking marked as Paid." : "Advance payment saved. Remaining balance recorded.",
+                    paymentStatus = booking?.PaymentStatus
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
 

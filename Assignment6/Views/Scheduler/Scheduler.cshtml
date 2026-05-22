@@ -1730,6 +1730,7 @@
                     paymentStatus: booking.paymentStatus,
                     paymentMethod: booking.paymentMethod,
                     finalPaymentMethod: booking.finalPaymentMethod,
+                    finalPaymentAmount: booking.finalPaymentAmount || 0,
                     homeId: booking.homeId,
                     homeName: homeName,
                     roomCount: roomCount,
@@ -2246,46 +2247,84 @@
             const isPaid = status === 'paid';
 
             if (!isPaid) {
-                // Partial / Pending — show Update Advance + Capture Remaining sections
-                const advMethod = props.paymentMethod || '';
+                const advMethod  = props.paymentMethod      || '';
+                const finMethod  = props.finalPaymentMethod || '';
+                const finAmt     = props.finalPaymentAmount || 0;
+                const totalPrice = props.price || 0;
+                const advAmt     = props.advancePaid || 0;
+
                 const advMethodOptions = paymentMethods.map(m =>
                     `<option value="${m}" ${m === advMethod ? 'selected' : ''}>${m}</option>`).join('');
+                const finMethodOptions = paymentMethods.map(m =>
+                    `<option value="${m}" ${m === finMethod ? 'selected' : ''}>${m}</option>`).join('');
 
                 paymentSection = `
                     <div class="mt-3 p-2 border-top">
-                        <div class="mb-3">
-                            <div class="fw-semibold small mb-2 text-secondary text-uppercase" style="letter-spacing:.5px;font-size:10px;">Update Advance Payment</div>
-                            <div class="d-flex gap-2 mb-2">
-                                <input type="number" id="advAmt_${event.id}" class="form-control form-control-sm" placeholder="Amount" value="${props.advancePaid || 0}" min="0" max="${props.price || 0}" style="width:50%;">
-                                <select id="advMethod_${event.id}" class="form-select form-select-sm" style="width:50%;">
+                        <div class="fw-semibold small mb-3 text-center text-uppercase" style="letter-spacing:.6px;font-size:10px;color:#6c757d;">
+                            <i class="fas fa-rupee-sign me-1"></i>Payment Details
+                        </div>
+
+                        <!-- Total booked amount display -->
+                        <div class="d-flex justify-content-between small mb-3 px-1 py-2 rounded" style="background:#f8f9fa;border:1px solid #e9ecef;">
+                            <span class="text-muted">Total Amount</span>
+                            <strong>₹${totalPrice.toLocaleString('en-IN')}</strong>
+                        </div>
+
+                        <!-- Advance / First Payment -->
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold mb-1" style="font-size:11px;">
+                                <i class="fas fa-hand-holding-usd me-1 text-primary"></i>Advance / Full Payment
+                            </label>
+                            <div class="d-flex gap-2">
+                                <input  type="number" id="advAmt_${event.id}"
+                                        class="form-control form-control-sm"
+                                        placeholder="₹ Amount" value="${advAmt}"
+                                        min="0" max="${totalPrice}"
+                                        oninput="updatePaymentSummary_${event.id}()"
+                                        style="width:45%;">
+                                <select id="advMethod_${event.id}" class="form-select form-select-sm" style="width:55%;">
+                                    <option value="">-- Method --</option>
                                     ${advMethodOptions}
                                 </select>
                             </div>
-                            <button class="btn btn-outline-primary btn-sm w-100" onclick="updateAdvancePayment(${event.id})">
-                                <i class="fas fa-edit me-1"></i>Update Advance
-                            </button>
                         </div>
-                        <hr class="my-2">
-                        <div class="mb-3">
-                            <div class="fw-semibold small mb-2 text-secondary text-uppercase" style="letter-spacing:.5px;font-size:10px;">Capture Remaining Payment</div>
-                            <div class="d-flex align-items-center justify-content-between mb-2 small">
-                                <span class="text-muted">Remaining amount:</span>
-                                <strong id="remainingDisplay_${event.id}">₹${remainingAmount}</strong>
+
+                        <!-- Final / Second Payment (optional) -->
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold mb-1" style="font-size:11px;">
+                                <i class="fas fa-check-circle me-1 text-success"></i>Final / Remaining Payment <span class="fw-normal text-muted">(optional)</span>
+                            </label>
+                            <div class="d-flex gap-2">
+                                <input  type="number" id="finalAmt_${event.id}"
+                                        class="form-control form-control-sm"
+                                        placeholder="₹ Amount" value="${finAmt > 0 ? finAmt : ''}"
+                                        min="0" max="${totalPrice}"
+                                        oninput="updatePaymentSummary_${event.id}()"
+                                        style="width:45%;">
+                                <select id="finalMethod_${event.id}" class="form-select form-select-sm" style="width:55%;">
+                                    <option value="">-- Method --</option>
+                                    ${finMethodOptions}
+                                </select>
                             </div>
-                            <select id="finalMethod_${event.id}" class="form-select form-select-sm mb-2">
-                                <option value="">-- Select payment method --</option>
-                                ${methodOptions}
-                            </select>
-                            <button class="btn btn-success btn-sm w-100" onclick="captureRemainingPayment(${event.id}, '${props.customerName}')">
-                                <i class="fas fa-check-circle me-1"></i>Capture & Mark Paid
-                            </button>
                         </div>
+
+                        <!-- Live summary -->
+                        <div id="paySummary_${event.id}" class="small px-2 py-2 mt-2 rounded" style="background:#f0f9ff;border:1px solid #bae6fd;font-size:11px;">
+                            <div class="d-flex justify-content-between"><span class="text-muted">Total paid:</span><strong id="paySummaryPaid_${event.id}">₹0</strong></div>
+                            <div class="d-flex justify-content-between"><span class="text-muted">Balance:</span><strong id="paySummaryBal_${event.id}" class="text-danger">₹${totalPrice.toLocaleString('en-IN')}</strong></div>
+                            <div id="paySummaryStatus_${event.id}" class="text-center mt-1 fw-semibold" style="font-size:10px;"></div>
+                        </div>
+
+                        <button class="btn btn-success btn-sm w-100 mt-3" onclick="savePaymentDetails(${event.id}, '${props.customerName}', ${totalPrice})">
+                            <i class="fas fa-save me-1"></i>Save Payment
+                        </button>
                         <hr class="my-2">
                         <button class="btn btn-primary btn-sm w-100" onclick="generateBookingInvoice(${event.id}, '${props.customerName}')">
                             <i class="fas fa-file-pdf me-1"></i>Generate Invoice
                         </button>
                     </div>
                 `;
+
             } else {
                 // Fully paid — show invoice only
                 paymentSection = `
@@ -2520,70 +2559,96 @@
         });
     }
 
-    function updateAdvancePayment(bookingId) {
-        const amtInput = document.getElementById(`advAmt_${bookingId}`);
-        const methodSelect = document.getElementById(`advMethod_${bookingId}`);
-        const advanceAmount = parseInt(amtInput ? amtInput.value : 0, 10);
-        const advancePaymentMethod = methodSelect ? methodSelect.value : '';
+    function savePaymentDetails(bookingId, bookingTitle, totalPrice) {
+        const advAmt    = parseFloat(document.getElementById(`advAmt_${bookingId}`)?.value   || 0) || 0;
+        const advMethod = document.getElementById(`advMethod_${bookingId}`)?.value  || '';
+        const finAmt    = parseFloat(document.getElementById(`finalAmt_${bookingId}`)?.value  || 0) || 0;
+        const finMethod = document.getElementById(`finalMethod_${bookingId}`)?.value || '';
 
-        if (!advancePaymentMethod) {
-            showNotification('Please select a payment method for the advance.', 'error');
+        // Validate: need at least advance amount + method  OR  final amount + method
+        if (advAmt <= 0 && finAmt <= 0) {
+            showNotification('Please enter at least one payment amount.', 'error');
             return;
         }
-        if (isNaN(advanceAmount) || advanceAmount < 0) {
-            showNotification('Please enter a valid advance amount.', 'error');
+        if (advAmt > 0 && !advMethod) {
+            showNotification('Please select a payment method for the advance/full payment.', 'error');
+            return;
+        }
+        if (finAmt > 0 && !finMethod) {
+            showNotification('Please select a payment method for the final/remaining payment.', 'error');
             return;
         }
 
-        showLoading('Updating advance payment...');
+        const totalPaid = advAmt + finAmt;
+        const willBePaid = totalPaid >= totalPrice;
+        const confirmMsg = willBePaid
+            ? `Save payment and mark "${bookingTitle}" as fully Paid?`
+            : `Save advance payment of ₹${advAmt.toLocaleString('en-IN')} for "${bookingTitle}"?\nRemaining ₹${(totalPrice - totalPaid).toLocaleString('en-IN')} will be recorded as pending.`;
+
+        if (!confirm(confirmMsg)) return;
+
+        showLoading('Saving payment...');
         $.ajax({
-            url: '/Scheduler/UpdateAdvancePayment',
+            url: '/Scheduler/SavePaymentDetails',
             type: 'POST',
-            data: { bookingId, advanceAmount, advancePaymentMethod },
-            success: function (response) {
-                if (response.success) {
-                    showNotification(response.message || 'Advance payment updated!', 'success');
-                    setTimeout(() => { $('.notification').remove(); if (typeof refreshCalendarData === 'function') refreshCalendarData(); }, 1500);
-                } else {
-                    showNotification(response.message || 'Failed to update advance payment.', 'error');
-                }
+            data: {
+                bookingId,
+                advanceAmount: advAmt,
+                advancePaymentMethod: advMethod,
+                finalAmount: finAmt > 0 ? finAmt : null,
+                finalPaymentMethod: finAmt > 0 ? finMethod : null
             },
-            error: function () { showNotification('Error updating advance payment.', 'error'); },
-            complete: hideLoading
-        });
-    }
-
-    function captureRemainingPayment(bookingId, bookingTitle) {
-        const methodSelect = document.getElementById(`finalMethod_${bookingId}`);
-        const finalPaymentMethod = methodSelect ? methodSelect.value : '';
-
-        if (!finalPaymentMethod) {
-            showNotification('Please select a payment method for the remaining amount.', 'error');
-            return;
-        }
-
-        if (!confirm(`Capture remaining payment for: ${bookingTitle}?\nThis will mark the booking as fully Paid.`)) return;
-
-        showLoading('Capturing remaining payment...');
-        $.ajax({
-            url: '/Scheduler/CaptureRemainingPayment',
-            type: 'POST',
-            data: { bookingId, finalPaymentMethod },
             success: function (response) {
                 if (response.success) {
-                    showNotification(response.message || 'Remaining payment captured!', 'success');
+                    showNotification(response.message || 'Payment saved!', 'success');
                     setTimeout(() => {
                         $('.notification').remove();
                         if (typeof refreshCalendarData === 'function') refreshCalendarData();
                     }, 1500);
                 } else {
-                    showNotification(response.message || 'Failed to capture payment.', 'error');
+                    showNotification(response.message || 'Failed to save payment.', 'error');
                 }
             },
-            error: function () { showNotification('Error capturing remaining payment.', 'error'); },
+            error: function () { showNotification('Error saving payment details.', 'error'); },
             complete: hideLoading
         });
     }
+
+    // Called by oninput on amount fields — dynamically updates the live summary
+    // We use a factory approach because bookingId is dynamic at render time.
+    function _makePaymentSummaryUpdater(bookingId, totalPrice) {
+        return function () {
+            const advAmt = parseFloat(document.getElementById(`advAmt_${bookingId}`)?.value  || 0) || 0;
+            const finAmt = parseFloat(document.getElementById(`finalAmt_${bookingId}`)?.value || 0) || 0;
+            const paid   = advAmt + finAmt;
+            const bal    = Math.max(0, totalPrice - paid);
+
+            const paidEl   = document.getElementById(`paySummaryPaid_${bookingId}`);
+            const balEl    = document.getElementById(`paySummaryBal_${bookingId}`);
+            const statusEl = document.getElementById(`paySummaryStatus_${bookingId}`);
+
+            if (paidEl)   paidEl.textContent   = `₹${paid.toLocaleString('en-IN')}`;
+            if (balEl) {
+                balEl.textContent = `₹${bal.toLocaleString('en-IN')}`;
+                balEl.style.color = bal === 0 ? '#198754' : '#dc3545';
+            }
+            if (statusEl) {
+                if (bal === 0)        { statusEl.textContent = '✓ Fully paid'; statusEl.style.color = '#198754'; }
+                else if (paid > 0)    { statusEl.textContent = `Partial — ₹${bal.toLocaleString('en-IN')} remaining`; statusEl.style.color = '#fd7e14'; }
+                else                  { statusEl.textContent = ''; }
+            }
+        };
+    }
+
+    // Dynamically register the updater after each popup render (delegated event)
+    $(document).on('input', '[id^="advAmt_"],[id^="finalAmt_"]', function () {
+        const id    = this.id.replace('advAmt_', '').replace('finalAmt_', '');
+        const total = parseFloat(this.closest('[data-booking-price]')?.dataset?.bookingPrice || 0);
+        // Try to read total from advAmt max attribute as fallback
+        const maxAttr = document.getElementById(`advAmt_${id}`)?.getAttribute('max');
+        const price   = total || parseFloat(maxAttr || 0) || 0;
+        _makePaymentSummaryUpdater(id, price)();
+    });
 
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("/signalR")
