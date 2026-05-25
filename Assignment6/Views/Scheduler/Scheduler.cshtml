@@ -384,6 +384,196 @@
         border: 1px solid;
     }
 
+    /* ── Booking Detail Offcanvas ─────────────────────────── */
+    .booking-detail-offcanvas {
+        width: 400px !important;
+        max-width: 100vw;
+        border-left: none;
+        box-shadow: -4px 0 32px rgba(0,0,0,.18);
+    }
+
+    .booking-detail-header {
+        background: linear-gradient(135deg, #1a3c5e 0%, #2563a8 100%);
+        padding: 16px 18px 14px;
+        flex-shrink: 0;
+    }
+
+    .booking-detail-header .offcanvas-title {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .booking-detail-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        background: #f5f7fa;
+    }
+
+    /* Info card inside offcanvas */
+    .bdoc-card {
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #e8edf3;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        padding: 14px 16px;
+        margin-bottom: 12px;
+    }
+
+    .bdoc-card-title {
+        font-size: 10px;
+        font-weight: 700;
+        color: #8896a6;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+    .bdoc-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 5px 0;
+        font-size: 13px;
+        border-bottom: 1px solid #f5f7fa;
+    }
+
+    .bdoc-row:last-child { border-bottom: none; }
+
+    .bdoc-label {
+        color: #6b7a8d;
+        font-weight: 500;
+        min-width: 90px;
+        flex-shrink: 0;
+    }
+
+    .bdoc-value {
+        color: #1a2332;
+        font-weight: 600;
+        word-break: break-word;
+    }
+
+    .bdoc-value.highlight {
+        color: #1a3c5e;
+        font-size: 14px;
+    }
+
+    .bdoc-value.danger { color: #dc3545; }
+    .bdoc-value.success { color: #198754; }
+
+    /* Payment section inside offcanvas */
+    .bdoc-pay-section {
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #e8edf3;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        padding: 14px 16px;
+        margin-bottom: 12px;
+    }
+
+    .bdoc-pay-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f0f4ff;
+        border: 1px solid #c7d7f8;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 14px;
+        font-size: 13px;
+    }
+
+    .bdoc-pay-total strong { font-size: 15px; color: #1a3c5e; }
+
+    .bdoc-field-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #5a6a7a;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .bdoc-live-summary {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    .bdoc-live-summary .sum-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 2px 0;
+    }
+
+    /* Action buttons */
+    .bdoc-actions {
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #e8edf3;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .bdoc-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 9px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: filter .15s, transform .1s;
+        width: 100%;
+        text-align: center;
+    }
+
+    .bdoc-btn:active { transform: scale(.97); }
+    .bdoc-btn-primary  { background: #2563a8; color: #fff; }
+    .bdoc-btn-primary:hover  { filter: brightness(1.1); }
+    .bdoc-btn-success  { background: #198754; color: #fff; }
+    .bdoc-btn-success:hover  { filter: brightness(1.1); }
+    .bdoc-btn-danger   { background: #fff; color: #dc3545; border: 1.5px solid #dc3545; }
+    .bdoc-btn-danger:hover   { background: #dc3545; color: #fff; }
+    .bdoc-btn-outline  { background: #fff; color: #2563a8; border: 1.5px solid #2563a8; }
+    .bdoc-btn-outline:hover  { background: #2563a8; color: #fff; }
+
+    /* Status chips */
+    .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .chip-paid     { background: #dcfce7; color: #166534; }
+    .chip-partial  { background: #fef3c7; color: #92400e; }
+    .chip-pending  { background: #fee2e2; color: #991b1b; }
+    .chip-airbnb   { background: #fff7ed; color: #c2410c; }
+    .chip-past     { background: #f1f5f9; color: #475569; }
+
+    @media (max-width: 600px) {
+        .booking-detail-offcanvas { width: 100vw !important; }
+    }
+
     .alert-success {
         background-color: #d4edda;
         border-color: #c3e6cb;
@@ -1197,6 +1387,27 @@
 
 <!-- Container for Home Drawing Modal -->
 <div id="homeDrawingContainer"></div>
+
+<!-- Booking Detail Offcanvas -->
+<div class="offcanvas offcanvas-end booking-detail-offcanvas" tabindex="-1" id="bookingDetailOffcanvas" aria-labelledby="bookingDetailOffcanvasLabel">
+    <div class="offcanvas-header booking-detail-header">
+        <div class="d-flex flex-column w-100">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+                <h6 class="offcanvas-title mb-0 d-flex align-items-center gap-2" id="bookingDetailOffcanvasLabel">
+                    <i class="fas fa-calendar-check"></i>
+                    <span id="bdoc_GuestName">Booking</span>
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div id="bdoc_Badges" class="d-flex gap-2 flex-wrap mt-1"></div>
+        </div>
+    </div>
+    <div class="offcanvas-body booking-detail-body p-0">
+        <div id="bdoc_Content" class="p-3">
+            <!-- Populated by showEventDetails() -->
+        </div>
+    </div>
+</div>
 
 <!-- Scripts -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -2205,189 +2416,160 @@
     });
 
     function showEventDetails(event) {
-        const props = event.extendedProps;
-        const startDate = event.start.toLocaleDateString();
-        const endDate = event.end ? event.end.toLocaleDateString() : 'N/A';
+        const props      = event.extendedProps;
+        const fmt        = d => d ? new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : 'N/A';
+        const startDate  = fmt(event.start);
+        const endDate    = event.end ? fmt(new Date(event.end.getTime() - 86400000)) : 'N/A'; // FullCalendar end is exclusive
+        const totalPrice = props.price || 0;
+        const advancePaid = props.advancePaid || 0;
+        const remaining  = props.paymentStatus?.toLowerCase() === 'paid' ? 0
+            : (typeof props.amountToBePaid !== 'undefined' ? props.amountToBePaid : (totalPrice - advancePaid));
 
-        var remainingAmount = props.paymentStatus == 'Paid' ? 0 :
-            (typeof props.amountToBePaid !== 'undefined' ? props.amountToBePaid : ((props.price || 0) - (props.advancePaid || 0)));
+        const bookingEndDate = new Date(event.end || event.start);
+        const today = new Date(); today.setHours(0,0,0,0);
+        const isPastBooking   = bookingEndDate < today;
+        const isAirbnbBooking = props.customerName === 'Airbnb Guest' || props.customerName?.includes('Airbnb');
+        const isPaid          = (props.paymentStatus || '').toLowerCase() === 'paid';
 
-        let roomDetails = '';
+        // ── Header badges ─────────────────────────────────────────
+        let badgesHtml = '';
+        if (!isAirbnbBooking) {
+            const chipClass = isPaid ? 'chip-paid' : (props.paymentStatus?.toLowerCase() === 'partial' ? 'chip-partial' : 'chip-pending');
+            const chipIcon  = isPaid ? 'fa-check-circle' : 'fa-clock';
+            badgesHtml += `<span class="status-chip ${chipClass}"><i class="fas ${chipIcon}"></i>${props.paymentStatus || 'Unknown'}</span>`;
+        }
+        if (isAirbnbBooking) badgesHtml += `<span class="status-chip chip-airbnb"><i class="fas fa-home"></i>Airbnb</span>`;
+        if (isPastBooking)   badgesHtml += `<span class="status-chip chip-past"><i class="fas fa-history"></i>Past</span>`;
+
+        document.getElementById('bdoc_GuestName').textContent = props.customerName || 'Booking';
+        document.getElementById('bdoc_Badges').innerHTML = badgesHtml;
+
+        // ── Booking info card ──────────────────────────────────────
+        let roomsList = '';
         if (props.bookingRooms && props.bookingRooms.length > 0) {
-            roomDetails = '<div class="mt-2"><strong>Rooms:</strong><ul class="mb-0 mt-1">';
             props.bookingRooms.forEach(room => {
-                $.ajax({
-                    url: '/Scheduler/GetRoomDetailsById',
-                    type: 'POST',
-                    async: false,
+                $.ajax({ url: '/Scheduler/GetRoomDetailsById', type: 'POST', async: false,
                     data: { roomId: room.roomId },
-                    success: function (response) {
-                        if (response) roomDetails += `<li>${response}</li>`;
-                    }
+                    success: r => { if (r) roomsList += `<span class="badge bg-light text-dark border me-1 mb-1" style="font-size:11px;">${r}</span>`; }
                 });
             });
-            roomDetails += '</ul></div>';
         }
 
-        // Check if booking is in the past
-        const bookingEndDate = new Date(event.end || event.start);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const isPastBooking = bookingEndDate < today;
+        const infoCard = `
+            <div class="bdoc-card">
+                <div class="bdoc-card-title"><i class="fas fa-info-circle me-1"></i>Booking Info</div>
+                <div class="bdoc-row"><span class="bdoc-label">Customer</span><span class="bdoc-value">${props.customerName || 'N/A'}</span></div>
+                <div class="bdoc-row"><span class="bdoc-label">Check-in</span><span class="bdoc-value">${startDate}</span></div>
+                <div class="bdoc-row"><span class="bdoc-label">Check-out</span><span class="bdoc-value">${endDate}</span></div>
+                <div class="bdoc-row"><span class="bdoc-label">Property</span><span class="bdoc-value">${props.homeName || 'N/A'}</span></div>
+                ${props.customerPhone ? `<div class="bdoc-row"><span class="bdoc-label">Phone</span><span class="bdoc-value">${props.customerPhone}</span></div>` : ''}
+                ${props.guestNumbers  ? `<div class="bdoc-row"><span class="bdoc-label">Guests</span><span class="bdoc-value">${props.guestNumbers}</span></div>` : ''}
+                ${roomsList ? `<div class="bdoc-row"><span class="bdoc-label">Rooms</span><span class="bdoc-value d-flex flex-wrap">${roomsList}</span></div>` : ''}
+            </div>`;
 
-        // Check if Airbnb booking
-        const isAirbnbBooking = props.customerName === "Airbnb Guest" || props.customerName?.includes("Airbnb");
+        // ── Payment summary card ───────────────────────────────────
+        const paymentSummaryCard = !isAirbnbBooking ? `
+            <div class="bdoc-card">
+                <div class="bdoc-card-title"><i class="fas fa-rupee-sign me-1"></i>Payment Summary</div>
+                <div class="bdoc-row"><span class="bdoc-label">Total</span><span class="bdoc-value highlight">₹${totalPrice.toLocaleString('en-IN')}</span></div>
+                ${advancePaid > 0 ? `<div class="bdoc-row"><span class="bdoc-label">Advance paid</span><span class="bdoc-value success">₹${advancePaid.toLocaleString('en-IN')}${props.paymentMethod ? ` <span style="font-size:10px;color:#6b7a8d;">(${props.paymentMethod})</span>` : ''}</span></div>` : ''}
+                ${props.finalPaymentAmount > 0 ? `<div class="bdoc-row"><span class="bdoc-label">Final paid</span><span class="bdoc-value success">₹${(props.finalPaymentAmount||0).toLocaleString('en-IN')}${props.finalPaymentMethod ? ` <span style="font-size:10px;color:#6b7a8d;">(${props.finalPaymentMethod})</span>` : ''}</span></div>` : ''}
+                ${remaining > 0 ? `<div class="bdoc-row"><span class="bdoc-label">Balance due</span><span class="bdoc-value danger">₹${remaining.toLocaleString('en-IN')}</span></div>` : ''}
+            </div>` : '';
 
+        // ── Payment management card (non-Airbnb, not fully paid) ──
         const paymentMethods = ['Cash', 'UPI', 'Card', 'Online', 'Bank Transfer', 'Pay Later'];
-        const methodOptions = paymentMethods.map(m => `<option value="${m}">${m}</option>`).join('');
 
-        let paymentSection = '';
-        if (!isAirbnbBooking) {
-            const status = (props.paymentStatus || '').toLowerCase();
-            const isPaid = status === 'paid';
+        let paymentManageCard = '';
+        if (!isAirbnbBooking && !isPaid) {
+            const advMethod = props.paymentMethod      || '';
+            const finMethod = props.finalPaymentMethod || '';
+            const finAmt    = props.finalPaymentAmount || 0;
 
-            if (!isPaid) {
-                const advMethod  = props.paymentMethod      || '';
-                const finMethod  = props.finalPaymentMethod || '';
-                const finAmt     = props.finalPaymentAmount || 0;
-                const totalPrice = props.price || 0;
-                const advAmt     = props.advancePaid || 0;
+            const advMethodOpts = paymentMethods.map(m => `<option value="${m}" ${m===advMethod?'selected':''}>${m}</option>`).join('');
+            const finMethodOpts = paymentMethods.map(m => `<option value="${m}" ${m===finMethod?'selected':''}>${m}</option>`).join('');
 
-                const advMethodOptions = paymentMethods.map(m =>
-                    `<option value="${m}" ${m === advMethod ? 'selected' : ''}>${m}</option>`).join('');
-                const finMethodOptions = paymentMethods.map(m =>
-                    `<option value="${m}" ${m === finMethod ? 'selected' : ''}>${m}</option>`).join('');
-
-                paymentSection = `
-                    <div class="mt-3 p-2 border-top">
-                        <div class="fw-semibold small mb-3 text-center text-uppercase" style="letter-spacing:.6px;font-size:10px;color:#6c757d;">
-                            <i class="fas fa-rupee-sign me-1"></i>Payment Details
-                        </div>
-
-                        <!-- Total booked amount display -->
-                        <div class="d-flex justify-content-between small mb-3 px-1 py-2 rounded" style="background:#f8f9fa;border:1px solid #e9ecef;">
-                            <span class="text-muted">Total Amount</span>
-                            <strong>₹${totalPrice.toLocaleString('en-IN')}</strong>
-                        </div>
-
-                        <!-- Advance / First Payment -->
-                        <div class="mb-2">
-                            <label class="form-label small fw-semibold mb-1" style="font-size:11px;">
-                                <i class="fas fa-hand-holding-usd me-1 text-primary"></i>Advance / Full Payment
-                            </label>
-                            <div class="d-flex gap-2">
-                                <input  type="number" id="advAmt_${event.id}"
-                                        class="form-control form-control-sm"
-                                        placeholder="₹ Amount" value="${advAmt}"
-                                        min="0" max="${totalPrice}"
-                                        oninput="updatePaymentSummary_${event.id}()"
-                                        style="width:45%;">
-                                <select id="advMethod_${event.id}" class="form-select form-select-sm" style="width:55%;">
-                                    <option value="">-- Method --</option>
-                                    ${advMethodOptions}
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Final / Second Payment (optional) -->
-                        <div class="mb-2">
-                            <label class="form-label small fw-semibold mb-1" style="font-size:11px;">
-                                <i class="fas fa-check-circle me-1 text-success"></i>Final / Remaining Payment <span class="fw-normal text-muted">(optional)</span>
-                            </label>
-                            <div class="d-flex gap-2">
-                                <input  type="number" id="finalAmt_${event.id}"
-                                        class="form-control form-control-sm"
-                                        placeholder="₹ Amount" value="${finAmt > 0 ? finAmt : ''}"
-                                        min="0" max="${totalPrice}"
-                                        oninput="updatePaymentSummary_${event.id}()"
-                                        style="width:45%;">
-                                <select id="finalMethod_${event.id}" class="form-select form-select-sm" style="width:55%;">
-                                    <option value="">-- Method --</option>
-                                    ${finMethodOptions}
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Live summary -->
-                        <div id="paySummary_${event.id}" class="small px-2 py-2 mt-2 rounded" style="background:#f0f9ff;border:1px solid #bae6fd;font-size:11px;">
-                            <div class="d-flex justify-content-between"><span class="text-muted">Total paid:</span><strong id="paySummaryPaid_${event.id}">₹0</strong></div>
-                            <div class="d-flex justify-content-between"><span class="text-muted">Balance:</span><strong id="paySummaryBal_${event.id}" class="text-danger">₹${totalPrice.toLocaleString('en-IN')}</strong></div>
-                            <div id="paySummaryStatus_${event.id}" class="text-center mt-1 fw-semibold" style="font-size:10px;"></div>
-                        </div>
-
-                        <button class="btn btn-success btn-sm w-100 mt-3" onclick="savePaymentDetails(${event.id}, '${props.customerName}', ${totalPrice})">
-                            <i class="fas fa-save me-1"></i>Save Payment
-                        </button>
-                        <hr class="my-2">
-                        <button class="btn btn-primary btn-sm w-100" onclick="generateBookingInvoice(${event.id}, '${props.customerName}')">
-                            <i class="fas fa-file-pdf me-1"></i>Generate Invoice
-                        </button>
+            paymentManageCard = `
+                <div class="bdoc-pay-section">
+                    <div class="bdoc-card-title"><i class="fas fa-edit me-1"></i>Update Payments</div>
+                    <div class="bdoc-pay-total">
+                        <span style="color:#5a6a7a;font-size:12px;">Booking Total</span>
+                        <strong>₹${totalPrice.toLocaleString('en-IN')}</strong>
                     </div>
-                `;
-
-            } else {
-                // Fully paid — show invoice only
-                paymentSection = `
-                    <div class="mt-3 p-2 border-top">
-                        <button class="btn btn-primary btn-sm w-100 mb-2" onclick="generateBookingInvoice(${event.id}, '${props.customerName}')">
-                            <i class="fas fa-file-pdf me-1"></i>Generate Invoice
-                        </button>
+                    <div class="mb-3">
+                        <div class="bdoc-field-label"><i class="fas fa-hand-holding-usd" style="color:#2563a8;"></i>Advance / Full Payment</div>
+                        <div class="d-flex gap-2">
+                            <input type="number" id="advAmt_${event.id}" class="form-control form-control-sm"
+                                   placeholder="₹ Amount" value="${advancePaid}" min="0" max="${totalPrice}"
+                                   oninput="_bdocSummary('${event.id}',${totalPrice})" style="width:45%;">
+                            <select id="advMethod_${event.id}" class="form-select form-select-sm" style="width:55%;">
+                                <option value="">-- Method --</option>${advMethodOpts}
+                            </select>
+                        </div>
                     </div>
-                `;
-            }
-        } else {
-            // Airbnb bookings — invoice only
-            paymentSection = `
-                <div class="mt-3 p-2 border-top">
-                    <button class="btn btn-primary btn-sm w-100 mb-2" onclick="generateBookingInvoice(${event.id}, '${props.customerName}')">
-                        <i class="fas fa-file-pdf me-1"></i>Generate Invoice
-                    </button>
-                </div>
-            `;
+                    <div class="mb-3">
+                        <div class="bdoc-field-label"><i class="fas fa-check-circle" style="color:#198754;"></i>Final / Remaining Payment <span style="font-weight:400;color:#8896a6;font-size:10px;">(optional)</span></div>
+                        <div class="d-flex gap-2">
+                            <input type="number" id="finalAmt_${event.id}" class="form-control form-control-sm"
+                                   placeholder="₹ Amount" value="${finAmt > 0 ? finAmt : ''}" min="0" max="${totalPrice}"
+                                   oninput="_bdocSummary('${event.id}',${totalPrice})" style="width:45%;">
+                            <select id="finalMethod_${event.id}" class="form-select form-select-sm" style="width:55%;">
+                                <option value="">-- Method --</option>${finMethodOpts}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bdoc-live-summary" id="paySummary_${event.id}">
+                        <div class="sum-row"><span style="color:#5a6a7a;">Total paid</span><strong id="paySummaryPaid_${event.id}">₹${advancePaid.toLocaleString('en-IN')}</strong></div>
+                        <div class="sum-row"><span style="color:#5a6a7a;">Balance</span><strong id="paySummaryBal_${event.id}" style="color:${remaining>0?'#dc3545':'#198754'};">₹${remaining.toLocaleString('en-IN')}</strong></div>
+                        <div id="paySummaryStatus_${event.id}" class="text-center mt-1" style="font-size:11px;font-weight:600;color:${remaining===0?'#198754':'#f59e0b'};">
+                            ${remaining===0 ? '✓ Fully paid' : (advancePaid>0 ? `Partial — ₹${remaining.toLocaleString('en-IN')} remaining` : '')}
+                        </div>
+                    </div>
+                </div>`;
         }
 
-        const deleteSection = `
-            <div class="mt-3 p-2 border-top">
-                <button class="btn btn-danger btn-sm w-100" onclick="deleteBooking(${event.id}, '${props.customerName}')">
-                    <i class="fas fa-trash me-1"></i>Delete
-                </button>
-            </div>
-        `;
+        // ── Actions card ──────────────────────────────────────────
+        const safeTitle = (props.customerName||'').replace(/'/g,"\\'");
+        let actionsHtml = '';
+        if (!isAirbnbBooking && !isPaid) {
+            actionsHtml += `<button class="bdoc-btn bdoc-btn-success" onclick="savePaymentDetails(${event.id},'${safeTitle}',${totalPrice})"><i class="fas fa-save"></i>Save Payment</button>`;
+        }
+        actionsHtml += `<button class="bdoc-btn bdoc-btn-primary" onclick="generateBookingInvoice(${event.id},'${safeTitle}')"><i class="fas fa-file-pdf"></i>Generate Invoice</button>`;
+        actionsHtml += `<button class="bdoc-btn bdoc-btn-danger" onclick="deleteBooking(${event.id},'${safeTitle}')"><i class="fas fa-trash-alt"></i>Delete Booking</button>`;
 
-        const pastBadge = isPastBooking ? '<span class="badge bg-secondary ms-2">Past Booking</span>' : '';
-        const airbnbBadge = isAirbnbBooking ? '<span class="badge bg-info ms-2">🏠 Airbnb</span>' : '';
+        const actionsCard = `<div class="bdoc-actions">${actionsHtml}</div>`;
 
-        const eventInfo = `
-            <div class="event-details">
-                <h6 class="mb-2 text-center">
-                    <i class="fas fa-calendar-check me-2"></i>${event.title}${pastBadge}${airbnbBadge}
-                </h6>
-                ${(!isAirbnbBooking ? `<div class="text-center mb-3">
-                    <span class="status-badge ${getStatusBadgeClass(props.paymentStatus)}">
-                        ${props.paymentStatus || 'Unknown'}
-                    </span>
-                </div>` : '')}
-                <div class="row g-1 small">
-                    <div class="col-5"><strong>Customer:</strong></div>
-                    <div class="col-7">${props.customerName || 'N/A'}</div>
-                    <div class="col-5"><strong>Check-in:</strong></div>
-                    <div class="col-7">${startDate}</div>
-                    <div class="col-5"><strong>Check-out:</strong></div>
-                    <div class="col-7">${endDate}</div>
-                    <div class="col-5"><strong>Property:</strong></div>
-                    <div class="col-7">${props.homeName || 'N/A'}</div>
-                    <div class="col-5"><strong>Total:</strong></div>
-                    <div class="col-7"><strong>₹${props.price || 0}</strong></div>
-                    ${(!isAirbnbBooking ? `<div class="col-5"><strong>Remaining:</strong></div>
-                    <div class="col-7"><strong>₹${remainingAmount}</strong></div>` : '')}
-                </div>
-                ${roomDetails}
-                ${paymentSection}
-                ${deleteSection}
-            </div>
-        `;
+        // ── Assemble & open offcanvas ─────────────────────────────
+        document.getElementById('bdoc_Content').innerHTML = infoCard + paymentSummaryCard + paymentManageCard + actionsCard;
 
-        showNotification(eventInfo, 'info', 0);
+        // Initialize live summary with current values
+        _bdocSummary(event.id, totalPrice);
+
+        const oc = new bootstrap.Offcanvas(document.getElementById('bookingDetailOffcanvas'), { backdrop: true, scroll: false });
+        oc.show();
+    }
+
+    // Live payment summary updater (called by oninput)
+    function _bdocSummary(id, totalPrice) {
+        const adv  = parseFloat(document.getElementById(`advAmt_${id}`)?.value  || 0) || 0;
+        const fin  = parseFloat(document.getElementById(`finalAmt_${id}`)?.value || 0) || 0;
+        const paid = adv + fin;
+        const bal  = Math.max(0, totalPrice - paid);
+
+        const paidEl   = document.getElementById(`paySummaryPaid_${id}`);
+        const balEl    = document.getElementById(`paySummaryBal_${id}`);
+        const statusEl = document.getElementById(`paySummaryStatus_${id}`);
+
+        if (paidEl)   paidEl.textContent = `₹${paid.toLocaleString('en-IN')}`;
+        if (balEl) {
+            balEl.textContent = `₹${bal.toLocaleString('en-IN')}`;
+            balEl.style.color = bal === 0 ? '#198754' : '#dc3545';
+        }
+        if (statusEl) {
+            if (bal === 0)     { statusEl.textContent = '✓ Fully paid';  statusEl.style.color = '#198754'; }
+            else if (paid > 0) { statusEl.textContent = `Partial — ₹${bal.toLocaleString('en-IN')} remaining`; statusEl.style.color = '#f59e0b'; }
+            else               { statusEl.textContent = ''; }
+        }
     }
 
     // Frontend PDF generation: fetch invoice HTML from backend and render to a single-page A4 PDF.
