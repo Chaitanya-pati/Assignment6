@@ -1401,6 +1401,20 @@ namespace Assignment6.Controllers
             string name = _bookingService.GetRoomDetailsByRoomId(roomId);
             return Json(name);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> SendTestEmail(string to = null)
+        {
+            try
+            {
+                var (success, message) = await _emailService.SendTestEmailAsync(to);
+                return Json(new { success, message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Unexpected error: {ex.Message}" });
+            }
+        }
     }
 
 
