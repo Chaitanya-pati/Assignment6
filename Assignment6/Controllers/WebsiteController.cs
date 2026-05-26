@@ -134,12 +134,12 @@ namespace Assignment6.Controllers
                     catch { }
                 }
 
-                // Notify admin of new website booking (fire-and-forget)
+                // Notify admin of new website booking
                 if (resultSaved)
                 {
                     var savedBooking = _bookingService.GetBookingById(bookingSaveModel.BookingData.Id);
                     if (savedBooking != null)
-                        _ = Task.Run(async () => await _emailService.SendNewWebsiteBookingToAdminAsync(savedBooking));
+                        await _emailService.SendNewWebsiteBookingToAdminAsync(savedBooking);
                 }
 
                 return Json(new

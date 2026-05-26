@@ -70,17 +70,16 @@ namespace Assignment6.Controllers
         }
 
         [HttpGet]
-        public IActionResult PaymentSuccess(int bookingId)
+        public async Task<IActionResult> PaymentSuccess(int bookingId)
         {
             _bookingService.ApproveBookingRequest(bookingId);
             var booking = _bookingService.GetBookingById(bookingId);
             var payment = _paymentService.GetPaymentByBookingId(bookingId);
 
-            // Send booking-confirmed email to guest/host + notify admin (fire-and-forget)
             if (booking != null)
             {
-                _ = Task.Run(async () => await _emailService.SendBookingApprovedAsync(booking));
-                _ = Task.Run(async () => await _emailService.SendNewWebsiteBookingToAdminAsync(booking));
+                await _emailService.SendBookingApprovedAsync(booking);
+                await _emailService.SendNewWebsiteBookingToAdminAsync(booking);
             }
 
             ViewBag.Booking = booking;

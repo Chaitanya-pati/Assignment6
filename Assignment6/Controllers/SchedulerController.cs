@@ -1099,7 +1099,7 @@ namespace Assignment6.Controllers
         // ADD these methods to your existing SchedulerController class
 
         [HttpPost]
-        public IActionResult CompleteBookingWithInvoice(int bookingId, bool sendEmail = false)
+        public async Task<IActionResult> CompleteBookingWithInvoice(int bookingId, bool sendEmail = false)
         {
             try
             {
@@ -1110,7 +1110,6 @@ namespace Assignment6.Controllers
                 if (booking == null)
                     return Json(new { success = false, message = "Booking not found" });
 
-                // Generate invoice HTML (needed for both PDF and email)
                 string invoiceHtml = null;
                 string invoiceUrl  = null;
                 try
@@ -1127,9 +1126,8 @@ namespace Assignment6.Controllers
 
                 if (completed)
                 {
-                    // Fire-and-forget email — detached from request scope via Task.Run
                     if (sendEmail && invoiceHtml != null)
-                        _ = Task.Run(async () => await _emailService.SendInvoiceEmailAsync(booking, invoiceHtml));
+                        await _emailService.SendInvoiceEmailAsync(booking, invoiceHtml);
 
                     return Json(new { success = true, message = "Invoice generated successfully", invoiceUrl });
                 }
@@ -1349,7 +1347,7 @@ namespace Assignment6.Controllers
         }
 
         [HttpPost]
-        public IActionResult ApproveBookingRequest(int bookingId)
+        public async Task<IActionResult> ApproveBookingRequest(int bookingId)
         {
             try
             {
@@ -1362,7 +1360,7 @@ namespace Assignment6.Controllers
                 if (approved)
                 {
                     if (booking != null)
-                        _ = Task.Run(async () => await _emailService.SendBookingApprovedAsync(booking));
+                        await _emailService.SendBookingApprovedAsync(booking);
 
                     return Json(new { success = true, message = "Booking request approved successfully" });
                 }
