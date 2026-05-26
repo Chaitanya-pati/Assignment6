@@ -3,6 +3,7 @@ using MailKit.Security;
 using MimeKit;
 using DbService.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Assignment6.Services;
 
@@ -29,13 +30,28 @@ public interface IEmailService
 public class EmailService : IEmailService
 {
     private readonly EmailSettings _cfg;
+    private readonly ILogger<EmailService> _logger;
 
-    public EmailService(IOptions<EmailSettings> options) => _cfg = options.Value;
+    public EmailService(IOptions<EmailSettings> options, ILogger<EmailService> logger)
+    {
+        _cfg    = options.Value;
+        _logger = logger;
+    }
 
     // ── Core sender (MailKit) ──────────────────────────────────────────────
     private async Task SendAsync(string to, string subject, string htmlBody)
     {
-        if (string.IsNullOrWhiteSpace(to)) return;
+        if (string.IsNullOrWhiteSpace(to))
+        {
+            _logger.LogWarning("[Email] Skipped: recipient address is empty. Subject: {Subject}", subject);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_cfg.FromAddress) || string.IsNullOrWhiteSpace(_cfg.Password))
+        {
+            _logger.LogError("[Email] Cannot send — FromAddress or Password is not configured.");
+            return;
+        }
 
         try
         {
@@ -47,7 +63,7 @@ public class EmailService : IEmailService
 
             // Strip spaces from Gmail app password (Google displays them spaced
             // for readability but the actual credential has no spaces)
-            var password = (_cfg.Password ?? "").Replace(" ", "");
+            var password = _cfg.Password.Replace(" ", "");
 
             using var smtp = new SmtpClient();
             await smtp.ConnectAsync(_cfg.SmtpHost, _cfg.SmtpPort, SecureSocketOptions.StartTls);
@@ -55,11 +71,12 @@ public class EmailService : IEmailService
             await smtp.SendAsync(message);
             await smtp.DisconnectAsync(true);
 
-            Console.WriteLine($"[Email] Sent to {to}: {subject}");
+            _logger.LogInformation("[Email] Sent to {To} | Subject: {Subject}", to, subject);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Email] ERROR sending to {to}: {ex.GetType().Name} – {ex.Message}");
+            _logger.LogError(ex, "[Email] Failed to send to {To} | Subject: {Subject} | Error: {ErrorType} – {ErrorMessage}",
+                to, subject, ex.GetType().Name, ex.Message);
         }
     }
 

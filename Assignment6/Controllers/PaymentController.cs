@@ -79,8 +79,8 @@ namespace Assignment6.Controllers
             // Send booking-confirmed email to guest/host + notify admin (fire-and-forget)
             if (booking != null)
             {
-                _ = Task.Run(() => _emailService.SendBookingApprovedAsync(booking));
-                _ = Task.Run(() => _emailService.SendNewWebsiteBookingToAdminAsync(booking));
+                _ = Task.Run(async () => await _emailService.SendBookingApprovedAsync(booking));
+                _ = Task.Run(async () => await _emailService.SendNewWebsiteBookingToAdminAsync(booking));
             }
 
             ViewBag.Booking = booking;
