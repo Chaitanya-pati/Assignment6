@@ -69,6 +69,7 @@ public class EmailService : IEmailService
                 Host                  = _cfg.SmtpHost,
                 Port                  = _cfg.SmtpPort,
                 EnableSsl             = true,
+                UseDefaultCredentials = false,
                 Credentials           = new NetworkCredential(_cfg.FromAddress, _cfg.Password),
                 DeliveryMethod        = SmtpDeliveryMethod.Network,
                 Timeout               = 30_000
@@ -138,12 +139,13 @@ public class EmailService : IEmailService
 
             using var smtp = new System.Net.Mail.SmtpClient
             {
-                Host           = _cfg.SmtpHost,
-                Port           = _cfg.SmtpPort,
-                EnableSsl      = true,
-                Credentials    = new NetworkCredential(_cfg.FromAddress, _cfg.Password),
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Timeout        = 30_000
+                Host                  = _cfg.SmtpHost,
+                Port                  = _cfg.SmtpPort,
+                EnableSsl             = true,
+                UseDefaultCredentials = false,
+                Credentials           = new NetworkCredential(_cfg.FromAddress, _cfg.Password),
+                DeliveryMethod        = SmtpDeliveryMethod.Network,
+                Timeout               = 30_000
             };
 
             await smtp.SendMailAsync(mail);
