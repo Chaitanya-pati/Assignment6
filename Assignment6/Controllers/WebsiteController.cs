@@ -139,7 +139,7 @@ namespace Assignment6.Controllers
                 {
                     var savedBooking = _bookingService.GetBookingById(bookingSaveModel.BookingData.Id);
                     if (savedBooking != null)
-                        _ = _emailService.SendNewWebsiteBookingToAdminAsync(savedBooking);
+                        _ = Task.Run(() => _emailService.SendNewWebsiteBookingToAdminAsync(savedBooking));
                 }
 
                 return Json(new

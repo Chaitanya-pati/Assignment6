@@ -29,6 +29,7 @@
     <PackageReference Include="Select.HtmlToPdf" Version="25.2.0" />
     <PackageReference Include="Select.HtmlToPdf.NetCore" Version="25.2.0" />
     <PackageReference Include="Select.Pdf" Version="23.1.0" />
+    <PackageReference Include="MailKit" Version="4.8.0" />
   </ItemGroup>
 
   <ItemGroup>

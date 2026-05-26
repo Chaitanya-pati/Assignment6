@@ -1127,9 +1127,9 @@ namespace Assignment6.Controllers
 
                 if (completed)
                 {
-                    // Fire-and-forget email — never blocks the HTTP response
+                    // Fire-and-forget email — detached from request scope via Task.Run
                     if (sendEmail && invoiceHtml != null)
-                        _ = _emailService.SendInvoiceEmailAsync(booking, invoiceHtml);
+                        _ = Task.Run(() => _emailService.SendInvoiceEmailAsync(booking, invoiceHtml));
 
                     return Json(new { success = true, message = "Invoice generated successfully", invoiceUrl });
                 }
@@ -1362,7 +1362,7 @@ namespace Assignment6.Controllers
                 if (approved)
                 {
                     if (booking != null)
-                        _ = _emailService.SendBookingApprovedAsync(booking);
+                        _ = Task.Run(() => _emailService.SendBookingApprovedAsync(booking));
 
                     return Json(new { success = true, message = "Booking request approved successfully" });
                 }
