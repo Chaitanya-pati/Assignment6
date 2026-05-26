@@ -1,12 +1,12 @@
-using System.Net;
-using System.Net.Mail;
 using DbService.Models;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using MimeKit;
 
 namespace Assignment6.Services;
 
-// ── Settings bound from appsettings.json "EmailSettings" section ──────────
 public class EmailSettings
 {
     public string FromAddress { get; set; }
@@ -18,7 +18,6 @@ public class EmailSettings
     public string AdminEmail  { get; set; }
 }
 
-// ── Interface ──────────────────────────────────────────────────────────────
 public interface IEmailService
 {
     Task SendBookingApprovedAsync(Booking booking);
@@ -27,7 +26,6 @@ public interface IEmailService
     Task<(bool success, string message)> SendTestEmailAsync(string toAddress);
 }
 
-// ── Implementation ─────────────────────────────────────────────────────────
 public class EmailService : IEmailService
 {
     private readonly EmailSettings _cfg;
@@ -39,7 +37,6 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
-    // ── Core sender (System.Net.Mail) ─────────────────────────────────────
     private async Task SendAsync(string to, string subject, string htmlBody)
     {
         if (string.IsNullOrWhiteSpace(to))
@@ -49,6 +46,7 @@ public class EmailService : IEmailService
         }
 
         var smtpUser = !string.IsNullOrWhiteSpace(_cfg.Username) ? _cfg.Username : _cfg.FromAddress;
+
         if (string.IsNullOrWhiteSpace(smtpUser) || string.IsNullOrWhiteSpace(_cfg.Password))
         {
             _logger.LogError("[Email] Cannot send — Email Username or Password is not configured.");
@@ -57,27 +55,18 @@ public class EmailService : IEmailService
 
         try
         {
-            using var mail = new MailMessage
-            {
-                From       = new MailAddress(_cfg.FromAddress, _cfg.DisplayName),
-                Subject    = subject,
-                Body       = htmlBody,
-                IsBodyHtml = true
-            };
-            mail.To.Add(to);
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(_cfg.DisplayName, _cfg.FromAddress));
+            message.To.Add(MailboxAddress.Parse(to));
+            message.Subject = subject;
+            message.Body = new TextPart("html") { Text = htmlBody };
 
-            using var smtp = new System.Net.Mail.SmtpClient
-            {
-                Host                  = _cfg.SmtpHost,
-                Port                  = _cfg.SmtpPort,
-                EnableSsl             = true,
-                UseDefaultCredentials = false,
-                Credentials           = new NetworkCredential(smtpUser, _cfg.Password),
-                DeliveryMethod        = SmtpDeliveryMethod.Network,
-                Timeout               = 30_000
-            };
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_cfg.SmtpHost, _cfg.SmtpPort, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(smtpUser, _cfg.Password);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
 
-            await smtp.SendMailAsync(mail);
             _logger.LogInformation("[Email] Sent to {To} | Subject: {Subject}", to, subject);
         }
         catch (Exception ex)
@@ -86,8 +75,6 @@ public class EmailService : IEmailService
                 to, subject, ex.GetType().Name, ex.Message);
         }
     }
-
-    // ── Public methods ─────────────────────────────────────────────────────
 
     public async Task SendBookingApprovedAsync(Booking booking)
     {
@@ -124,34 +111,29 @@ public class EmailService : IEmailService
             return (false, "No recipient address provided and AdminEmail is not configured.");
 
         var smtpUser = !string.IsNullOrWhiteSpace(_cfg.Username) ? _cfg.Username : _cfg.FromAddress;
+
         if (string.IsNullOrWhiteSpace(smtpUser) || string.IsNullOrWhiteSpace(_cfg.Password))
             return (false, "Email Username or Password is not configured in EmailSettings.");
 
         try
         {
-            using var mail = new MailMessage
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(_cfg.DisplayName, _cfg.FromAddress));
+            message.To.Add(MailboxAddress.Parse(toAddress));
+            message.Subject = $"[Test Email] {_cfg.DisplayName} – Email Configuration Working";
+            message.Body = new TextPart("html")
             {
-                From       = new MailAddress(_cfg.FromAddress, _cfg.DisplayName),
-                Subject    = $"[Test Email] {_cfg.DisplayName} – Email Configuration Working",
-                Body       = $@"<p>This is a test email sent from <strong>{_cfg.DisplayName}</strong>.</p>
-                                <p>If you received this, your email configuration is working correctly.</p>
-                                <p>Sent at: {DateTime.Now:dd MMM yyyy HH:mm:ss}</p>",
-                IsBodyHtml = true
-            };
-            mail.To.Add(toAddress);
-
-            using var smtp = new System.Net.Mail.SmtpClient
-            {
-                Host                  = _cfg.SmtpHost,
-                Port                  = _cfg.SmtpPort,
-                EnableSsl             = true,
-                UseDefaultCredentials = false,
-                Credentials           = new NetworkCredential(smtpUser, _cfg.Password),
-                DeliveryMethod        = SmtpDeliveryMethod.Network,
-                Timeout               = 30_000
+                Text = $@"<p>This is a test email sent from <strong>{_cfg.DisplayName}</strong>.</p>
+                          <p>If you received this, your email configuration is working correctly.</p>
+                          <p>Sent at: {DateTime.Now:dd MMM yyyy HH:mm:ss}</p>"
             };
 
-            await smtp.SendMailAsync(mail);
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_cfg.SmtpHost, _cfg.SmtpPort, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(smtpUser, _cfg.Password);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
+
             _logger.LogInformation("[Email] Test email sent to {To}", toAddress);
             return (true, $"Test email sent successfully to {toAddress}.");
         }
@@ -168,8 +150,6 @@ public class EmailService : IEmailService
         var subject = $"New Booking Request – {booking.Home?.Name ?? "Property"} | {_cfg.DisplayName}";
         await SendAsync(_cfg.AdminEmail, subject, AdminNotificationHtml(booking));
     }
-
-    // ── HTML Templates ─────────────────────────────────────────────────────
 
     private string BookingApprovedHtml(Booking b)
     {
