@@ -2708,41 +2708,87 @@
 
         const sendEmail = document.getElementById(`sendInvoiceEmail_${bookingId}`)?.checked ?? false;
 
+        // Read payment fields entered in the popup
+        const advAmt    = parseFloat(document.getElementById(`advAmt_${bookingId}`)?.value   || 0) || 0;
+        const advMethod = document.getElementById(`advMethod_${bookingId}`)?.value  || '';
+        const finAmt    = parseFloat(document.getElementById(`finalAmt_${bookingId}`)?.value  || 0) || 0;
+        const finMethod = document.getElementById(`finalMethod_${bookingId}`)?.value || '';
+
+        // Validate payment method if amounts are entered
+        if (advAmt > 0 && !advMethod) {
+            showNotification('Please select a payment method for the advance/full payment.', 'error');
+            return;
+        }
+        if (finAmt > 0 && !finMethod) {
+            showNotification('Please select a payment method for the final/remaining payment.', 'error');
+            return;
+        }
+
         if (!confirm(`Complete checkout and generate invoice for: "${bookingTitle}"?`)) return;
 
-        showLoading('Marking as paid...');
+        const hasPaymentToSave = advAmt > 0 || finAmt > 0;
 
-        $.ajax({
-            url: '/Scheduler/CompleteBookingWithInvoice',
-            type: 'POST',
-            data: { bookingId, sendEmail }
-        })
-        .done(function (response) {
-            if (!response || !response.success) {
+        function doCompleteAndInvoice() {
+            showLoading('Completing booking...');
+            $.ajax({
+                url: '/Scheduler/CompleteBookingWithInvoice',
+                type: 'POST',
+                data: { bookingId, sendEmail }
+            })
+            .done(function (response) {
+                if (!response || !response.success) {
+                    hideLoading();
+                    showNotification((response && response.message) || 'Failed to complete booking.', 'error');
+                    return;
+                }
+
+                showLoading('Generating invoice...');
+                downloadInvoice(bookingId)
+                    .then(() => {
+                        showNotification('Invoice generated successfully!' + (sendEmail ? ' Email sent to customer.' : ''), 'success');
+                        if (typeof refreshCalendarData === 'function') refreshCalendarData();
+                    })
+                    .catch(err => {
+                        console.error('Invoice download failed:', err);
+                        showNotification('Invoice download failed. Please try again.', 'error');
+                    })
+                    .finally(hideLoading);
+            })
+            .fail(function () {
                 hideLoading();
-                showNotification((response && response.message) || 'Failed to mark booking as paid.', 'error');
-                return;
-            }
+                showNotification('Error completing booking.', 'error');
+            });
+        }
 
-            showLoading('Generating invoice...');
-            downloadInvoice(bookingId)
-                .then(() => {
-                    showNotification('Invoice generated successfully!', 'success');
-                    // Refresh the calendar so the new "Paid" status is reflected.
-                    if (typeof refreshCalendarData === 'function') {
-                        refreshCalendarData();
-                    }
-                })
-                .catch(err => {
-                    console.error('Invoice download failed:', err);
-                    showNotification('Invoice download failed. Please try again.', 'error');
-                })
-                .finally(hideLoading);
-        })
-        .fail(function () {
-            hideLoading();
-            showNotification('Error marking booking as paid.', 'error');
-        });
+        if (hasPaymentToSave) {
+            // Step 1: Save the payment details first, then complete + invoice
+            showLoading('Saving payment details...');
+            $.ajax({
+                url: '/Scheduler/SavePaymentDetails',
+                type: 'POST',
+                data: {
+                    bookingId,
+                    advanceAmount:       advAmt,
+                    advancePaymentMethod: advMethod,
+                    finalAmount:         finAmt > 0 ? finAmt : null,
+                    finalPaymentMethod:  finAmt > 0 ? finMethod : null
+                }
+            })
+            .done(function (res) {
+                hideLoading();
+                if (!res || !res.success) {
+                    showNotification((res && res.message) || 'Failed to save payment details.', 'error');
+                    return;
+                }
+                doCompleteAndInvoice();
+            })
+            .fail(function () {
+                hideLoading();
+                showNotification('Error saving payment details.', 'error');
+            });
+        } else {
+            doCompleteAndInvoice();
+        }
     }
 
     function generateBookingInvoice(bookingId, bookingTitle) {

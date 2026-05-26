@@ -1106,9 +1106,15 @@ namespace Assignment6.Controllers
                 if (bookingId <= 0)
                     return Json(new { success = false, message = "Invalid booking ID" });
 
+                // Mark booking as completed/paid first
+                bool completed = _bookingService.CompleteBookingWithInvoice(bookingId);
+                if (!completed)
+                    return Json(new { success = false, message = "Failed to complete booking" });
+
+                // Re-fetch booking AFTER completion so invoice & email reflect latest saved payment data
                 var booking = _bookingService.GetBookingById(bookingId);
                 if (booking == null)
-                    return Json(new { success = false, message = "Booking not found" });
+                    return Json(new { success = false, message = "Booking not found after completion" });
 
                 string invoiceHtml = null;
                 string invoiceUrl  = null;
@@ -1122,17 +1128,19 @@ namespace Assignment6.Controllers
                     Console.WriteLine($"Invoice generation failed: {ex.Message}");
                 }
 
-                bool completed = _bookingService.CompleteBookingWithInvoice(bookingId);
-
-                if (completed)
+                if (sendEmail && invoiceHtml != null)
                 {
-                    if (sendEmail && invoiceHtml != null)
+                    try
+                    {
                         await _emailService.SendInvoiceEmailAsync(booking, invoiceHtml);
-
-                    return Json(new { success = true, message = "Invoice generated successfully", invoiceUrl });
+                    }
+                    catch (Exception emailEx)
+                    {
+                        Console.WriteLine($"[Email] Invoice email failed: {emailEx.Message}");
+                    }
                 }
 
-                return Json(new { success = false, message = "Failed to generate invoice" });
+                return Json(new { success = true, message = "Booking completed and invoice generated successfully", invoiceUrl });
             }
             catch (Exception ex)
             {
