@@ -2545,7 +2545,20 @@
         // Initialize live summary with current values
         _bdocSummary(event.id, totalPrice);
 
-        const oc = new bootstrap.Offcanvas(document.getElementById('bookingDetailOffcanvas'), { backdrop: true, scroll: false });
+        const ocEl = document.getElementById('bookingDetailOffcanvas');
+
+        // Reuse existing instance to prevent stacked backdrops on repeat opens
+        const oc = bootstrap.Offcanvas.getOrCreateInstance(ocEl, { backdrop: true, scroll: false });
+
+        // One-time cleanup: when offcanvas hides, remove any orphaned backdrop immediately
+        ocEl.addEventListener('hidden.bs.offcanvas', function onHide() {
+            ocEl.removeEventListener('hidden.bs.offcanvas', onHide);
+            document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
+            document.body.classList.remove('offcanvas-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+        }, { once: true });
+
         oc.show();
     }
 
@@ -2899,8 +2912,8 @@
 
         let html = '<div class="table-responsive"><table class="table table-hover booking-requests-table mb-0">';
         html += `<thead class="table-light"><tr>
-            <th>Guest</th><th>Contact</th><th>Property</th><th>Dates</th>
-            <th>Guests</th><th>Purpose</th><th>Requested Payment</th><th>Price</th><th>Submitted</th><th style="min-width:160px;">Action</th>
+            <th>Guest</th><th>Contact</th><th>Property</th><th>Check-in</th><th>Check-out</th>
+            <th>Guests</th><th>Purpose</th><th>Req. Payment</th><th>Price</th><th>Submitted</th><th style="min-width:170px;">Action</th>
         </tr></thead><tbody>`;
 
         requests.forEach(function (b) {
@@ -2930,7 +2943,8 @@
                 <td><strong>${b.customerName || '—'}</strong>${businessInfo}</td>
                 <td><small>${b.customerEmail || ''}<br>${b.customerPhone || ''}</small></td>
                 <td><small>${propertyName}</small></td>
-                <td><small>${b.bookingDateFrom}<br>to ${b.bookingDateTo}</small></td>
+                <td><small>${b.bookingDateFrom}</small></td>
+                <td><small>${b.bookingDateTo}</small></td>
                 <td>${b.guestNumbers || '—'}${guestBreakdown ? '<br><small class="text-muted">' + guestBreakdown + '</small>' : ''}</td>
                 <td><small>${purposeDisplay}</small></td>
                 <td><span class="badge bg-secondary">${b.paymentMethod || b.paymentStatus || '—'}</span></td>
