@@ -1,6 +1,5 @@
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
+using System.Net;
+using System.Net.Mail;
 using DbService.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
@@ -39,7 +38,7 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
-    // ── Core sender (MailKit) ──────────────────────────────────────────────
+    // ── Core sender (System.Net.Mail) ─────────────────────────────────────
     private async Task SendAsync(string to, string subject, string htmlBody)
     {
         if (string.IsNullOrWhiteSpace(to))
@@ -54,50 +53,35 @@ public class EmailService : IEmailService
             return;
         }
 
-        var password = _cfg.Password;
-
-        var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(_cfg.DisplayName ?? _cfg.FromAddress, _cfg.FromAddress));
-        message.To.Add(MailboxAddress.Parse(to));
-        message.Subject = subject;
-
-        // Use BodyBuilder for proper MIME structure and encoding
-        var bodyBuilder = new BodyBuilder { HtmlBody = htmlBody };
-        message.Body = bodyBuilder.ToMessageBody();
-
-        // Try primary port first, then fallback
-        var attempts = new[]
+        try
         {
-            (_cfg.SmtpHost, _cfg.SmtpPort,    SecureSocketOptions.Auto),
-            (_cfg.SmtpHost, 465,              SecureSocketOptions.SslOnConnect),
-            (_cfg.SmtpHost, 587,              SecureSocketOptions.StartTls),
-        };
-
-        Exception lastEx = null;
-        foreach (var (host, port, security) in attempts)
-        {
-            try
+            using var mail = new MailMessage
             {
-                using var smtp = new SmtpClient();
-                smtp.Timeout = 30_000; // 30 seconds
+                From       = new MailAddress(_cfg.FromAddress, _cfg.DisplayName),
+                Subject    = subject,
+                Body       = htmlBody,
+                IsBodyHtml = true
+            };
+            mail.To.Add(to);
 
-                await smtp.ConnectAsync(host, port, security);
-                await smtp.AuthenticateAsync(_cfg.FromAddress, password);
-                await smtp.SendAsync(message);
-                await smtp.DisconnectAsync(true);
-
-                _logger.LogInformation("[Email] Sent to {To} via {Host}:{Port} | Subject: {Subject}", to, host, port, subject);
-                return; // success — stop trying
-            }
-            catch (Exception ex)
+            using var smtp = new System.Net.Mail.SmtpClient
             {
-                lastEx = ex;
-                _logger.LogWarning("[Email] Attempt failed ({Host}:{Port} {Security}): {ErrorType} – {ErrorMessage}",
-                    host, port, security, ex.GetType().Name, ex.Message);
-            }
+                Host                  = _cfg.SmtpHost,
+                Port                  = _cfg.SmtpPort,
+                EnableSsl             = true,
+                Credentials           = new NetworkCredential(_cfg.FromAddress, _cfg.Password),
+                DeliveryMethod        = SmtpDeliveryMethod.Network,
+                Timeout               = 30_000
+            };
+
+            await smtp.SendMailAsync(mail);
+            _logger.LogInformation("[Email] Sent to {To} | Subject: {Subject}", to, subject);
         }
-
-        _logger.LogError(lastEx, "[Email] All delivery attempts failed for {To} | Subject: {Subject}", to, subject);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[Email] Failed to send to {To} | Subject: {Subject} | {ErrorType}: {ErrorMessage}",
+                to, subject, ex.GetType().Name, ex.Message);
+        }
     }
 
     // ── Public methods ─────────────────────────────────────────────────────
@@ -139,51 +123,38 @@ public class EmailService : IEmailService
         if (string.IsNullOrWhiteSpace(_cfg.FromAddress) || string.IsNullOrWhiteSpace(_cfg.Password))
             return (false, "FromAddress or Password is not configured in EmailSettings.");
 
-        var password = _cfg.Password;
-
-        var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(_cfg.DisplayName ?? _cfg.FromAddress, _cfg.FromAddress));
-        message.To.Add(MailboxAddress.Parse(toAddress));
-        message.Subject = $"[Test Email] {_cfg.DisplayName} – Email Configuration Working";
-
-        var bodyBuilder = new BodyBuilder
+        try
         {
-            HtmlBody = $@"<p>This is a test email sent from <strong>{_cfg.DisplayName}</strong>.</p>
-                          <p>If you received this, your email configuration is working correctly.</p>
-                          <p>Sent at: {DateTime.Now:dd MMM yyyy HH:mm:ss}</p>"
-        };
-        message.Body = bodyBuilder.ToMessageBody();
-
-        var attempts = new[]
-        {
-            (_cfg.SmtpHost, _cfg.SmtpPort, SecureSocketOptions.Auto),
-            (_cfg.SmtpHost, 465,           SecureSocketOptions.SslOnConnect),
-            (_cfg.SmtpHost, 587,           SecureSocketOptions.StartTls),
-        };
-
-        var errors = new System.Text.StringBuilder();
-        foreach (var (host, port, security) in attempts)
-        {
-            try
+            using var mail = new MailMessage
             {
-                using var smtp = new SmtpClient();
-                smtp.Timeout = 30_000;
-                await smtp.ConnectAsync(host, port, security);
-                await smtp.AuthenticateAsync(_cfg.FromAddress, password);
-                await smtp.SendAsync(message);
-                await smtp.DisconnectAsync(true);
-                _logger.LogInformation("[Email] Test email sent to {To} via {Host}:{Port}", toAddress, host, port);
-                return (true, $"Test email sent successfully to {toAddress} via {host}:{port}.");
-            }
-            catch (Exception ex)
+                From       = new MailAddress(_cfg.FromAddress, _cfg.DisplayName),
+                Subject    = $"[Test Email] {_cfg.DisplayName} – Email Configuration Working",
+                Body       = $@"<p>This is a test email sent from <strong>{_cfg.DisplayName}</strong>.</p>
+                                <p>If you received this, your email configuration is working correctly.</p>
+                                <p>Sent at: {DateTime.Now:dd MMM yyyy HH:mm:ss}</p>",
+                IsBodyHtml = true
+            };
+            mail.To.Add(toAddress);
+
+            using var smtp = new System.Net.Mail.SmtpClient
             {
-                var err = $"{host}:{port} ({security}): {ex.GetType().Name} – {ex.Message}";
-                errors.AppendLine(err);
-                _logger.LogWarning("[Email] Test attempt failed — {Error}", err);
-            }
+                Host           = _cfg.SmtpHost,
+                Port           = _cfg.SmtpPort,
+                EnableSsl      = true,
+                Credentials    = new NetworkCredential(_cfg.FromAddress, _cfg.Password),
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout        = 30_000
+            };
+
+            await smtp.SendMailAsync(mail);
+            _logger.LogInformation("[Email] Test email sent to {To}", toAddress);
+            return (true, $"Test email sent successfully to {toAddress}.");
         }
-
-        return (false, $"All attempts failed:\n{errors}");
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[Email] Test email failed: {ErrorType}: {ErrorMessage}", ex.GetType().Name, ex.Message);
+            return (false, $"{ex.GetType().Name}: {ex.Message}");
+        }
     }
 
     public async Task SendNewWebsiteBookingToAdminAsync(Booking booking)
