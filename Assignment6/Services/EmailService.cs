@@ -54,9 +54,7 @@ public class EmailService : IEmailService
             return;
         }
 
-        // Strip spaces from Gmail app password (Google displays them spaced
-        // for readability but the actual credential has no spaces)
-        var password = _cfg.Password.Replace(" ", "");
+        var password = _cfg.Password;
 
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_cfg.DisplayName ?? _cfg.FromAddress, _cfg.FromAddress));
@@ -141,7 +139,7 @@ public class EmailService : IEmailService
         if (string.IsNullOrWhiteSpace(_cfg.FromAddress) || string.IsNullOrWhiteSpace(_cfg.Password))
             return (false, "FromAddress or Password is not configured in EmailSettings.");
 
-        var password = _cfg.Password.Replace(" ", "");
+        var password = _cfg.Password;
 
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_cfg.DisplayName ?? _cfg.FromAddress, _cfg.FromAddress));
