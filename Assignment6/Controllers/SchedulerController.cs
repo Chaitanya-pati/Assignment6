@@ -1261,7 +1261,7 @@ namespace Assignment6.Controllers
         }
 
         [HttpPost]
-        public IActionResult ConfirmBookingWithPayment([FromBody] BookingConfirmationModel model)
+        public async Task<IActionResult> ConfirmBookingWithPayment([FromBody] BookingConfirmationModel model)
         {
             try
             {
@@ -1271,7 +1271,19 @@ namespace Assignment6.Controllers
                 bool confirmed = _bookingService.ConfirmBookingWithPayment(model);
 
                 if (confirmed)
+                {
+                    try
+                    {
+                        var booking = _bookingService.GetBookingById(model.BookingId);
+                        if (booking != null)
+                            await _emailService.SendBookingApprovedAsync(booking);
+                    }
+                    catch (Exception emailEx)
+                    {
+                        Console.WriteLine($"[Email] Failed to send confirmation email: {emailEx.Message}");
+                    }
                     return Json(new { success = true, message = "Booking confirmed and payment recorded successfully" });
+                }
                 else
                     return Json(new { success = false, message = "Failed to confirm booking" });
             }

@@ -2420,10 +2420,11 @@
         const fmt        = d => d ? new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : 'N/A';
         const startDate  = fmt(event.start);
         const endDate    = event.end ? fmt(new Date(event.end.getTime() - 86400000)) : 'N/A'; // FullCalendar end is exclusive
-        const totalPrice = props.price || 0;
-        const advancePaid = props.advancePaid || 0;
-        const remaining  = props.paymentStatus?.toLowerCase() === 'paid' ? 0
-            : (typeof props.amountToBePaid !== 'undefined' ? props.amountToBePaid : (totalPrice - advancePaid));
+        const totalPrice      = props.price || 0;
+        const advancePaid     = props.advancePaid || 0;
+        const finalPaid       = props.finalPaymentAmount || 0;
+        const actualRemaining = Math.max(0, totalPrice - advancePaid - finalPaid);
+        const remaining       = actualRemaining;
 
         const bookingEndDate = new Date(event.end || event.start);
         const today = new Date(); today.setHours(0,0,0,0);
@@ -2482,7 +2483,7 @@
         const safeTitle = (props.customerName||'').replace(/'/g,"\\'");
 
         let paymentManageCard = '';
-        if (!isAirbnbBooking && !isPaid) {
+        if (!isAirbnbBooking && actualRemaining > 0) {
             const advMethod = props.paymentMethod      || '';
             const finMethod = props.finalPaymentMethod || '';
             const finAmt    = props.finalPaymentAmount || 0;
@@ -2555,7 +2556,7 @@
 
         // ── Actions card ──────────────────────────────────────────
         let actionsHtml = '';
-        if (!isAirbnbBooking && !isPaid) {
+        if (!isAirbnbBooking && actualRemaining > 0) {
             actionsHtml += `<button class="bdoc-btn bdoc-btn-success" onclick="savePaymentDetails(${event.id},'${safeTitle}',${totalPrice})"><i class="fas fa-save"></i>Save Payment</button>`;
         }
         actionsHtml += `<button class="bdoc-btn bdoc-btn-primary" onclick="generateBookingInvoice(${event.id},'${safeTitle}')"><i class="fas fa-file-pdf"></i>Generate Invoice</button>`;
