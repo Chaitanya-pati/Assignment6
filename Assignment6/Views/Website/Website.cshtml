@@ -424,22 +424,60 @@
                 </div>
                 <div class="modal-body">
                     <form id="bookingForm">
-                    <!-- Customer Information Section -->
-                    <!-- Replace the existing Customer Information Section in your bookingModal with this enhanced version -->
+
+                    <!-- ── Booking For Someone Else Toggle ─────────────── -->
+                    <div class="mb-3 px-1">
+                        <div class="d-flex align-items-center gap-3 p-3 rounded" style="background:#f0f4ff;border:1.5px solid #c7d7f8;">
+                            <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
+                                <input class="form-check-input" type="checkbox" id="wb_BookingForOther" role="switch"
+                                       onchange="toggleHostBooking(this.checked)"
+                                       style="width:2.5em;height:1.4em;cursor:pointer;flex-shrink:0;">
+                                <label class="form-check-label fw-semibold" for="wb_BookingForOther" style="cursor:pointer;">
+                                    <i class="fas fa-user-friends me-1 text-primary"></i>I'm booking for someone else
+                                </label>
+                            </div>
+                            <small class="text-muted d-none d-md-inline">Toggle on if the person staying is different from you</small>
+                        </div>
+                    </div>
+
+                    <!-- ── Organiser / Booker Details (shown when toggle ON) ── -->
+                    <div class="form-section mb-4 d-none" id="wb_BookerSection">
+                        <h6 class="section-title">
+                            <i class="fas fa-id-card"></i> Your Contact Details
+                            <small class="text-muted ms-2" style="font-size:0.78rem;font-weight:400;">(Organiser – person making this booking)</small>
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="wb_BookedByName" class="form-label">Your Name *</label>
+                                <input type="text" class="form-control" id="wb_BookedByName" placeholder="Your full name">
+                                <div id="wb_BookedByName-feedback" class="invalid-feedback" style="display:none;">Please enter your name.</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="wb_BookedByPhone" class="form-label">Your Phone *</label>
+                                <input type="tel" class="form-control" id="wb_BookedByPhone" placeholder="Your phone number">
+                                <div id="wb_BookedByPhone-feedback" class="invalid-feedback" style="display:none;">Please enter your phone number.</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="wb_BookedByEmail" class="form-label">Your Email <small class="text-muted">(Optional)</small></label>
+                                <input type="email" class="form-control" id="wb_BookedByEmail" placeholder="Your email address">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Customer Information Section -->
                     <div class="form-section mb-4">
-                        <h6 class="section-title">
-                            <i class="fas fa-user"></i> Customer Information
+                        <h6 class="section-title" id="wb_customerSectionTitle">
+                            <i class="fas fa-user"></i> <span id="wb_customerSectionLabel">Customer Information</span>
                         </h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="CustomerName" class="form-label">Full Name *</label>
+                                <label for="CustomerName" class="form-label" id="wb_label_CustomerName">Full Name *</label>
                                 <input type="text" class="form-control" id="CustomerName" name="CustomerName"
                                        placeholder="Enter full name" required>
                                 <div id="CustomerName-feedback" class="invalid-feedback" style="display: none;"></div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="CustomerEmail" class="form-label">Email Address *</label>
+                                <label for="CustomerEmail" class="form-label" id="wb_label_CustomerEmail">Email Address *</label>
                                 <input type="email" class="form-control" id="CustomerEmail" name="CustomerEmail"
                                        placeholder="Enter email address" required>
                                 <div id="CustomerEmail-feedback" class="invalid-feedback" style="display: none;"></div>
@@ -447,7 +485,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="CustomerPhone" class="form-label">Phone Number *</label>
+                                <label for="CustomerPhone" class="form-label" id="wb_label_CustomerPhone">Phone Number *</label>
                                 <input type="tel" class="form-control" id="CustomerPhone" name="CustomerPhone"
                                        placeholder="Enter phone number" required>
                                 <div id="CustomerPhone-feedback" class="invalid-feedback" style="display: none;"></div>
@@ -478,7 +516,30 @@
                                 <input type="number" class="form-control" id="wb_FemaleCount" placeholder="0" min="0" max="50">
                             </div>
                         </div>
-                        <small class="text-muted d-block mb-3">Male/Female count includes both adults and children.</small>
+                        <small class="text-muted d-block mb-2">Male/Female count includes both adults and children.</small>
+
+                        <!-- ── Individual Guest Details (Optional) ──────── -->
+                        <div class="mt-2 mb-3" id="wb_guestListSection" style="display:none;">
+                            <div class="rounded p-3" style="background:#f8faff;border:1.5px solid #dbe7ff;">
+                                <div class="fw-semibold mb-2" style="font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:#5a6a7a;">
+                                    <i class="fas fa-users me-1"></i>Individual Guest Details
+                                    <span class="text-muted fw-normal ms-1" style="font-size:10px;">(Optional)</span>
+                                </div>
+                                <div class="d-flex gap-4 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="wb_guestFillMode"
+                                               id="wb_fillMain" value="main" checked onchange="updateGuestFields()">
+                                        <label class="form-check-label small" for="wb_fillMain">Only main guest info</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="wb_guestFillMode"
+                                               id="wb_fillAll" value="all" onchange="updateGuestFields()">
+                                        <label class="form-check-label small" for="wb_fillAll">Fill everyone's data</label>
+                                    </div>
+                                </div>
+                                <div id="wb_guestFieldsContainer"></div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <label for="Document" class="form-label">
@@ -611,6 +672,7 @@
                         <input type="hidden" id="TotalDays" name="TotalDays">
                         <input type="hidden" id="SelectedRoomIds" name="SelectedRoomIds">
                         <input type="hidden" id="SelectedRoomData" name="SelectedRoomData">
+                        <input type="hidden" id="wb_GuestsJson" name="GuestsJson">
                         <p>By submitting this form, you agree to our  <a href="/Home/Privacy" target="_blank" class="reviews_terms_link">Privacy Policy.</a></p>
                     </form>
                 </div>
@@ -1778,6 +1840,17 @@
         localStorage.removeItem('selectedRoomData');
         updateRoomSelectionDisplay([], false);
 
+        // Reset host-booking toggle & related sections
+        const toggleEl = document.getElementById('wb_BookingForOther');
+        if (toggleEl && toggleEl.checked) {
+            toggleEl.checked = false;
+            toggleHostBooking(false);
+        }
+        document.getElementById('wb_guestListSection').style.display = 'none';
+        document.getElementById('wb_guestFieldsContainer').innerHTML = '';
+        document.getElementById('wb_fillMain').checked = true;
+        document.getElementById('wb_GuestsJson').value = '';
+
         // Show modal
         const modal = document.getElementById('bookingModal');
         if (typeof bootstrap !== 'undefined') {
@@ -2158,6 +2231,146 @@
         validateMessage();
     }
 
+    // ── Host Booking toggle ────────────────────────────────────────
+    function toggleHostBooking(isOn) {
+        const bookerSection  = document.getElementById('wb_BookerSection');
+        const sectionLabel   = document.getElementById('wb_customerSectionLabel');
+        const lblName        = document.getElementById('wb_label_CustomerName');
+        const lblEmail       = document.getElementById('wb_label_CustomerEmail');
+        const lblPhone       = document.getElementById('wb_label_CustomerPhone');
+        const emailInput     = document.getElementById('CustomerEmail');
+        const phoneInput     = document.getElementById('CustomerPhone');
+
+        if (isOn) {
+            bookerSection.classList.remove('d-none');
+            sectionLabel.textContent  = 'Actual Guest';
+            lblName.innerHTML         = 'Guest Full Name *';
+            lblEmail.innerHTML        = 'Guest Email <small class="text-muted">(Optional)</small>';
+            lblPhone.innerHTML        = 'Guest Phone <small class="text-muted">(Optional)</small>';
+            emailInput.removeAttribute('required');
+            phoneInput.removeAttribute('required');
+        } else {
+            bookerSection.classList.add('d-none');
+            sectionLabel.textContent  = 'Customer Information';
+            lblName.innerHTML         = 'Full Name *';
+            lblEmail.innerHTML        = 'Email Address *';
+            lblPhone.innerHTML        = 'Phone Number *';
+            emailInput.setAttribute('required', '');
+            phoneInput.setAttribute('required', '');
+            document.getElementById('wb_BookedByName').value  = '';
+            document.getElementById('wb_BookedByPhone').value = '';
+            document.getElementById('wb_BookedByEmail').value = '';
+        }
+    }
+
+    // Show/hide guest list section when GuestNumbers changes
+    document.addEventListener('DOMContentLoaded', function () {
+        var guestNumInput = document.getElementById('GuestNumbers');
+        if (guestNumInput) {
+            guestNumInput.addEventListener('input', function () {
+                const n = parseInt(this.value) || 0;
+                const sec = document.getElementById('wb_guestListSection');
+                if (n >= 1) {
+                    sec.style.display = '';
+                    updateGuestFields();
+                } else {
+                    sec.style.display = 'none';
+                }
+            });
+        }
+    });
+
+    function updateGuestFields() {
+        const mode      = document.querySelector('input[name="wb_guestFillMode"]:checked')?.value || 'main';
+        const container = document.getElementById('wb_guestFieldsContainer');
+        if (mode !== 'all') { container.innerHTML = ''; return; }
+
+        const count = parseInt(document.getElementById('GuestNumbers').value) || 0;
+        if (count === 0) {
+            container.innerHTML = '<small class="text-muted">Please enter the number of guests first.</small>';
+            return;
+        }
+
+        let html = '';
+        for (let i = 1; i <= count; i++) {
+            html += `
+            <div class="rounded p-2 mb-2" style="background:#fff;border:1px solid #e2e8f0;">
+                <div class="small fw-semibold mb-2" style="color:#2563a8;">
+                    <i class="fas fa-user-circle me-1"></i>Guest ${i}
+                </div>
+                <div class="row g-2">
+                    <div class="col-6 col-md-3">
+                        <input type="text" class="form-control form-control-sm guest-name"
+                               placeholder="Name" data-guest="${i}">
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <input type="tel" class="form-control form-control-sm guest-contact"
+                               placeholder="Contact No." data-guest="${i}">
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <select class="form-select form-select-sm guest-gender" data-guest="${i}">
+                            <option value="">Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <input type="text" class="form-control form-control-sm guest-idproof"
+                               placeholder="ID Proof No." data-guest="${i}">
+                    </div>
+                </div>
+            </div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function buildGuestsJson() {
+        const mode  = document.querySelector('input[name="wb_guestFillMode"]:checked')?.value || 'main';
+        const count = parseInt(document.getElementById('GuestNumbers')?.value) || 0;
+        if (mode !== 'all' || count === 0) return null;
+
+        const guests = [];
+        for (let i = 1; i <= count; i++) {
+            const name    = document.querySelector(`.guest-name[data-guest="${i}"]`)?.value.trim()    || '';
+            const contact = document.querySelector(`.guest-contact[data-guest="${i}"]`)?.value.trim() || '';
+            const gender  = document.querySelector(`.guest-gender[data-guest="${i}"]`)?.value         || '';
+            const idProof = document.querySelector(`.guest-idproof[data-guest="${i}"]`)?.value.trim() || '';
+            guests.push({ guestOrder: i, guestName: name, contactNumber: contact, gender: gender, idProof: idProof });
+        }
+        return JSON.stringify(guests);
+    }
+
+    // ── Booker section validation ──────────────────────────────────
+    function validateBookerSection() {
+        if (!document.getElementById('wb_BookingForOther').checked) return true;
+        let valid = true;
+
+        const name  = document.getElementById('wb_BookedByName');
+        const phone = document.getElementById('wb_BookedByPhone');
+        const nameFb  = document.getElementById('wb_BookedByName-feedback');
+        const phoneFb = document.getElementById('wb_BookedByPhone-feedback');
+
+        if (!name.value.trim()) {
+            name.classList.add('is-invalid');
+            nameFb.style.display = 'block';
+            valid = false;
+        } else {
+            name.classList.remove('is-invalid');
+            nameFb.style.display = 'none';
+        }
+
+        if (!phone.value.trim()) {
+            phone.classList.add('is-invalid');
+            phoneFb.style.display = 'block';
+            valid = false;
+        } else {
+            phone.classList.remove('is-invalid');
+            phoneFb.style.display = 'none';
+        }
+        return valid;
+    }
+
     // Purpose of Visit "Other" toggle (website booking modal)
     document.addEventListener('DOMContentLoaded', function () {
         var povSelect = document.getElementById('wb_PurposeOfVisit');
@@ -2175,7 +2388,7 @@
     });
 
     function saveBookingData(paymentType) {
-        if (!validateForm()) {
+        if (!validateForm() | !validateBookerSection()) {
             showNotification('Please correct the validation errors before submitting.', 'error');
             return;
         }
@@ -2193,6 +2406,10 @@
 
         const purposeVal = document.getElementById('wb_PurposeOfVisit').value;
         const purposeOther = document.getElementById('wb_PurposeOfVisitOther').value.trim();
+
+        const isForOther = document.getElementById('wb_BookingForOther').checked;
+        const guestsJson = buildGuestsJson();
+        document.getElementById('wb_GuestsJson').value = guestsJson || '';
 
         const bookingPayload = {
             'BookingData.CustomerName': document.getElementById('CustomerName').value.trim(),
@@ -2218,6 +2435,10 @@
             'BookingData.IsBooked': false,
             'BookingData.CheckOut': false,
             'BookingData.TotalDays': document.getElementById('TotalDays').value,
+            'BookingData.BookedByName':  isForOther ? (document.getElementById('wb_BookedByName').value.trim() || null)  : null,
+            'BookingData.BookedByPhone': isForOther ? (document.getElementById('wb_BookedByPhone').value.trim() || null) : null,
+            'BookingData.BookedByEmail': isForOther ? (document.getElementById('wb_BookedByEmail').value.trim() || null)  : null,
+            'GuestsJson': guestsJson || null,
             'Rooms': selectedRooms
         };
 

@@ -438,6 +438,20 @@ namespace Assignment6.Controllers
                 }
 
                 bool resultSaved = _bookingService.SaveBookingAlternative(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
+
+                if (resultSaved && !string.IsNullOrWhiteSpace(bookingSaveModel.GuestsJson))
+                {
+                    try
+                    {
+                        var guests = System.Text.Json.JsonSerializer.Deserialize<List<DbService.Models.BookingGuest>>(
+                            bookingSaveModel.GuestsJson,
+                            new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (guests?.Count > 0)
+                            _bookingService.SaveBookingGuests(bookingSaveModel.BookingData.Id, guests);
+                    }
+                    catch { }
+                }
+
                 return Json(new
                 {
                     success = resultSaved,
@@ -858,9 +872,10 @@ namespace Assignment6.Controllers
     <table width='100%' cellpadding='0' cellspacing='0' style='margin-bottom:10px;'>
         <tr>
             <td width='49%' class='info-card'>
-                <div class='card-title'>{(!string.IsNullOrEmpty(booking.BusinessName) ? $"Bill To: {booking.BusinessName}" : "Guest Information")}</div>
+                <div class='card-title'>Bill To: {(!string.IsNullOrEmpty(booking.BusinessName) ? booking.BusinessName : booking.CustomerName)}</div>
                 <table width='100%' cellpadding='0' cellspacing='0'>
-                    <tr><td class='row-label'>Name</td><td class='row-value'>{booking.CustomerName ?? "N/A"}</td></tr>
+                    <tr><td class='row-label'>Guest Name</td><td class='row-value'>{booking.CustomerName ?? "N/A"}</td></tr>
+                    {(!string.IsNullOrEmpty(booking.BookedByName) ? $"<tr><td class='row-label'>Booked By</td><td class='row-value'>{booking.BookedByName}{(!string.IsNullOrEmpty(booking.BookedByPhone) ? " · " + booking.BookedByPhone : "")}</td></tr>" : "")}
                     <tr><td class='row-label'>Email</td><td class='row-value'>{booking.CustomerEmail ?? "N/A"}</td></tr>
                     <tr><td class='row-label'>Phone</td><td class='row-value'>{booking.CustomerPhone ?? "N/A"}</td></tr>
                     <tr><td class='row-label'>Total Guests</td><td class='row-value'>{booking.GuestNumbers}</td></tr>
@@ -1242,7 +1257,10 @@ namespace Assignment6.Controllers
                         purposeOfVisitOther = b.PurposeOfVisitOther,
                         paymentMethod = b.PaymentMethod,
                         createdAt = b.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ss"),
-                        paymentStatus = b.PaymentStatus
+                        paymentStatus = b.PaymentStatus,
+                        bookedByName = b.BookedByName,
+                        bookedByPhone = b.BookedByPhone,
+                        bookedByEmail = b.BookedByEmail
                     });
 
                 return Json(pendingBookings);

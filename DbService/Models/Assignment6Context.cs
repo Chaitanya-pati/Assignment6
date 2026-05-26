@@ -15,6 +15,8 @@ public partial class Assignment6Context : DbContext
 
     public virtual DbSet<Booking> Bookings { get; set; }
 
+    public virtual DbSet<BookingGuest> BookingGuests { get; set; }
+
     public virtual DbSet<BookingRoom> BookingRooms { get; set; }
 
     public virtual DbSet<Home> Homes { get; set; }
@@ -63,6 +65,9 @@ public partial class Assignment6Context : DbContext
             entity.Property(e => e.PaymentMethod).HasMaxLength(50);
             entity.Property(e => e.FinalPaymentMethod).HasMaxLength(50);
             entity.Property(e => e.FinalPaymentAmount);
+            entity.Property(e => e.BookedByName).HasMaxLength(100);
+            entity.Property(e => e.BookedByPhone).HasMaxLength(20);
+            entity.Property(e => e.BookedByEmail).HasMaxLength(100);
 
             entity.HasOne(d => d.Home).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.HomeId)
@@ -81,6 +86,23 @@ public partial class Assignment6Context : DbContext
             entity.HasOne(d => d.Room).WithMany(p => p.BookingRooms)
                 .HasForeignKey(d => d.RoomId)
                 .HasConstraintName("FK__BookingRo__RoomI__46E78A0C");
+        });
+
+        modelBuilder.Entity<BookingGuest>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_BookingGuests");
+            entity.ToTable("BookingGuests");
+            entity.Property(e => e.GuestName).HasMaxLength(100);
+            entity.Property(e => e.ContactNumber).HasMaxLength(20);
+            entity.Property(e => e.Gender).HasMaxLength(10);
+            entity.Property(e => e.IdProof).HasMaxLength(200);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.HasOne(d => d.Booking).WithMany(p => p.BookingGuests)
+                .HasForeignKey(d => d.BookingId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_BookingGuests_Booking");
         });
 
         modelBuilder.Entity<Home>(entity =>

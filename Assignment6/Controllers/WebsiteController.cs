@@ -118,6 +118,19 @@ namespace Assignment6.Controllers
 
                 bool resultSaved = _bookingService.SaveBookingAlternative(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
 
+                if (resultSaved && !string.IsNullOrWhiteSpace(bookingSaveModel.GuestsJson))
+                {
+                    try
+                    {
+                        var guests = System.Text.Json.JsonSerializer.Deserialize<List<DbService.Models.BookingGuest>>(
+                            bookingSaveModel.GuestsJson,
+                            new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (guests?.Count > 0)
+                            _bookingService.SaveBookingGuests(bookingSaveModel.BookingData.Id, guests);
+                    }
+                    catch { }
+                }
+
                 return Json(new
                 {
                     success = resultSaved,

@@ -379,6 +379,31 @@ namespace DbService.Implementation
         }
 
 
+        public bool SaveBookingGuests(int bookingId, List<BookingGuest> guests)
+        {
+            try
+            {
+                using var context = new Assignment6Context(_dbconnection);
+                var toSave = guests?.Where(g =>
+                    !string.IsNullOrWhiteSpace(g.GuestName) ||
+                    !string.IsNullOrWhiteSpace(g.ContactNumber)).ToList();
+                if (toSave == null || toSave.Count == 0) return true;
+                foreach (var g in toSave)
+                {
+                    g.BookingId = bookingId;
+                    g.CreatedAt = DateTime.Now;
+                    context.BookingGuests.Add(g);
+                }
+                context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving booking guests: {ex.Message}");
+                return false;
+            }
+        }
+
         public bool SaveBookingAlternative(Booking bookingData, List<Room> rooms)
         {
             var isSaved = false;

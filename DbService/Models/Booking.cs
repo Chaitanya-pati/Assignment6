@@ -66,9 +66,18 @@ public partial class Booking
 
     public long? FinalPaymentAmount { get; set; }
 
+    // Booked-on-behalf-of fields (set when someone books for another person)
+    public string BookedByName { get; set; }
+
+    public string BookedByPhone { get; set; }
+
+    public string BookedByEmail { get; set; }
+
     public virtual ICollection<BookingRoom> BookingRooms { get; set; } = new List<BookingRoom>();
 
     public virtual Home Home { get; set; }
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+    public virtual ICollection<BookingGuest> BookingGuests { get; set; } = new List<BookingGuest>();
 }
