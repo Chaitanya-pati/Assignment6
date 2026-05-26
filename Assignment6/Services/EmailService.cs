@@ -11,6 +11,7 @@ public class EmailSettings
 {
     public string FromAddress { get; set; }
     public string DisplayName { get; set; }
+    public string Username    { get; set; }
     public string Password    { get; set; }
     public string SmtpHost    { get; set; } = "smtp.gmail.com";
     public int    SmtpPort    { get; set; } = 587;
@@ -47,9 +48,10 @@ public class EmailService : IEmailService
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(_cfg.FromAddress) || string.IsNullOrWhiteSpace(_cfg.Password))
+        var smtpUser = !string.IsNullOrWhiteSpace(_cfg.Username) ? _cfg.Username : _cfg.FromAddress;
+        if (string.IsNullOrWhiteSpace(smtpUser) || string.IsNullOrWhiteSpace(_cfg.Password))
         {
-            _logger.LogError("[Email] Cannot send — FromAddress or Password is not configured.");
+            _logger.LogError("[Email] Cannot send — Email Username or Password is not configured.");
             return;
         }
 
@@ -70,7 +72,7 @@ public class EmailService : IEmailService
                 Port                  = _cfg.SmtpPort,
                 EnableSsl             = true,
                 UseDefaultCredentials = false,
-                Credentials           = new NetworkCredential(_cfg.FromAddress, _cfg.Password),
+                Credentials           = new NetworkCredential(smtpUser, _cfg.Password),
                 DeliveryMethod        = SmtpDeliveryMethod.Network,
                 Timeout               = 30_000
             };
@@ -121,8 +123,9 @@ public class EmailService : IEmailService
         if (string.IsNullOrWhiteSpace(toAddress))
             return (false, "No recipient address provided and AdminEmail is not configured.");
 
-        if (string.IsNullOrWhiteSpace(_cfg.FromAddress) || string.IsNullOrWhiteSpace(_cfg.Password))
-            return (false, "FromAddress or Password is not configured in EmailSettings.");
+        var smtpUser = !string.IsNullOrWhiteSpace(_cfg.Username) ? _cfg.Username : _cfg.FromAddress;
+        if (string.IsNullOrWhiteSpace(smtpUser) || string.IsNullOrWhiteSpace(_cfg.Password))
+            return (false, "Email Username or Password is not configured in EmailSettings.");
 
         try
         {
@@ -143,7 +146,7 @@ public class EmailService : IEmailService
                 Port                  = _cfg.SmtpPort,
                 EnableSsl             = true,
                 UseDefaultCredentials = false,
-                Credentials           = new NetworkCredential(_cfg.FromAddress, _cfg.Password),
+                Credentials           = new NetworkCredential(smtpUser, _cfg.Password),
                 DeliveryMethod        = SmtpDeliveryMethod.Network,
                 Timeout               = 30_000
             };
