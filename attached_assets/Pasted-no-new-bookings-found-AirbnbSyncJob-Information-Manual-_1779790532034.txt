@@ -1,0 +1,21 @@
+no new bookings found
+AirbnbSyncJob: Information: Manual Airbnb sync completed successfully
+The thread '.NET TP Worker' (38688) has exited with code 0 (0x0).
+Exception thrown: 'MailKit.Security.AuthenticationException' in System.Private.CoreLib.dll
+Assignment6.Services.EmailService: Warning: [Email] Attempt failed (smtp.gmail.com:465 SslOnConnect): AuthenticationException – 535: 5.7.8 Username and Password not accepted. For more information, go to
+5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-490454b7d57sm310659705e9.15 - gsmtp
+The thread '.NET TP Worker' (38508) has exited with code 0 (0x0).
+Exception thrown: 'MailKit.Security.AuthenticationException' in System.Private.CoreLib.dll
+Assignment6.Services.EmailService: Warning: [Email] Attempt failed (smtp.gmail.com:587 StartTls): AuthenticationException – 535: 5.7.8 Username and Password not accepted. For more information, go to
+5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-45eb6d5e363sm35150266f8f.28 - gsmtp
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.27\System.Reflection.Metadata.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Assignment6.Services.EmailService: Error: [Email] All delivery attempts failed for patilchaitanya4321@gmail.com | Subject: New Booking Request – Radha Home Stay(Ground Floor) | CodeMind Software Solutions
+
+MailKit.Security.AuthenticationException: 535: 5.7.8 Username and Password not accepted. For more information, go to
+5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-45eb6d5e363sm35150266f8f.28 - gsmtp
+ ---> MailKit.Net.Smtp.SmtpCommandException: 5.7.8 Username and Password not accepted. For more information, go to
+5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-45eb6d5e363sm35150266f8f.28 - gsmtp
+   --- End of inner exception stack trace ---
+   at MailKit.Net.Smtp.SmtpClient.AuthenticateAsync(Encoding encoding, ICredentials credentials, CancellationToken cancellationToken)
+   at Assignment6.Services.EmailService.SendAsync(String to, String subject, String htmlBody) in C:\Users\cpatil\source\repos\Chaitanya-pati\Assignment6\Assignment6\Services\EmailService.cs:line 87
+The thread '.NET TP Worker' (27452) has exited with code 0 (0x0).
