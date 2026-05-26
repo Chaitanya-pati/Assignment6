@@ -1362,6 +1362,28 @@ namespace Assignment6.Controllers
             }
         }
 
+        [HttpPost]
+        public IActionResult RejectBookingRequest(int bookingId)
+        {
+            try
+            {
+                if (bookingId <= 0)
+                    return Json(new { success = false, message = "Invalid booking ID" });
+
+                bool deleted = _bookingService.DeleteBooking(bookingId);
+
+                if (deleted)
+                    return Json(new { success = true, message = "Booking request rejected and removed successfully" });
+                else
+                    return Json(new { success = false, message = "Failed to reject booking request" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error rejecting booking request: {ex.Message}");
+                return Json(new { success = false, message = "An unexpected error occurred" });
+            }
+        }
+
         public IActionResult GetRoomDetailsById(int roomId)
         {
             string name = _bookingService.GetRoomDetailsByRoomId(roomId);

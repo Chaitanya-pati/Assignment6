@@ -2900,7 +2900,7 @@
         let html = '<div class="table-responsive"><table class="table table-hover booking-requests-table mb-0">';
         html += `<thead class="table-light"><tr>
             <th>Guest</th><th>Contact</th><th>Property</th><th>Dates</th>
-            <th>Guests</th><th>Purpose</th><th>Requested Payment</th><th>Price</th><th>Submitted</th><th>Action</th>
+            <th>Guests</th><th>Purpose</th><th>Requested Payment</th><th>Price</th><th>Submitted</th><th style="min-width:160px;">Action</th>
         </tr></thead><tbody>`;
 
         requests.forEach(function (b) {
@@ -2937,16 +2937,52 @@
                 <td><strong>₹${(b.price || 0).toLocaleString('en-IN')}</strong></td>
                 <td><small>${submittedDate}</small></td>
                 <td>
-                    <button class="btn btn-success btn-sm w-100 approve-btn"
-                            onclick="openConfirmBookingModal(${b.id})">
-                        <i class="fas fa-check me-1"></i>Approve
-                    </button>
+                    <div class="d-flex flex-column gap-1">
+                        <button class="btn btn-success btn-sm approve-btn"
+                                onclick="openConfirmBookingModal(${b.id})">
+                            <i class="fas fa-check me-1"></i>Approve
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm reject-btn"
+                                onclick="rejectBookingRequest(${b.id}, '${(b.customerName||'').replace(/'/g,"\\'")}')">
+                            <i class="fas fa-times me-1"></i>Reject
+                        </button>
+                    </div>
                 </td>
             </tr>`;
         });
 
         html += '</tbody></table></div>';
         container.innerHTML = html;
+    }
+
+    function rejectBookingRequest(bookingId, guestName) {
+        if (!confirm(`Reject the booking request from "${guestName}"?\n\nThis will permanently delete the request.`)) return;
+
+        const row = document.querySelector(`button.reject-btn[onclick*="rejectBookingRequest(${bookingId},"]`)?.closest('tr');
+        if (row) {
+            row.style.opacity = '0.4';
+            row.style.pointerEvents = 'none';
+        }
+
+        $.ajax({
+            url: '/Scheduler/RejectBookingRequest',
+            type: 'POST',
+            data: { bookingId: bookingId },
+            success: function (res) {
+                if (res.success) {
+                    showNotification(`Booking request from "${guestName}" has been rejected.`, 'success', 4000);
+                    delete pendingBookingStore[bookingId];
+                    loadPendingRequests();
+                } else {
+                    if (row) { row.style.opacity = ''; row.style.pointerEvents = ''; }
+                    showNotification(res.message || 'Failed to reject request.', 'error', 4000);
+                }
+            },
+            error: function () {
+                if (row) { row.style.opacity = ''; row.style.pointerEvents = ''; }
+                showNotification('Network error while rejecting request.', 'error', 4000);
+            }
+        });
     }
 
     function openConfirmBookingModal(bookingId) {
