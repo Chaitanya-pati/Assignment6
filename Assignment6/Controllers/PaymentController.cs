@@ -2,6 +2,7 @@
 using DbService.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using DbService.Models;
+using Assignment6.Services;
 
 namespace Assignment6.Controllers
 {
@@ -9,11 +10,13 @@ namespace Assignment6.Controllers
     {
         private readonly IPaymentService _paymentService;
         private readonly IBookingService _bookingService;
+        private readonly IEmailService _emailService;
 
-        public PaymentController(IPaymentService paymentService, IBookingService bookingService)
+        public PaymentController(IPaymentService paymentService, IBookingService bookingService, IEmailService emailService)
         {
             _paymentService = paymentService;
             _bookingService = bookingService;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -72,6 +75,13 @@ namespace Assignment6.Controllers
             _bookingService.ApproveBookingRequest(bookingId);
             var booking = _bookingService.GetBookingById(bookingId);
             var payment = _paymentService.GetPaymentByBookingId(bookingId);
+
+            // Send booking-confirmed email to guest/host + notify admin (fire-and-forget)
+            if (booking != null)
+            {
+                _ = _emailService.SendBookingApprovedAsync(booking);
+                _ = _emailService.SendNewWebsiteBookingToAdminAsync(booking);
+            }
 
             ViewBag.Booking = booking;
             ViewBag.Payment = payment;

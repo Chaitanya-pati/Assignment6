@@ -22,6 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Assignment6.twillio;
 using Twilio.TwiML.Messaging;
 using System.Linq;
+using Assignment6.Services;
 namespace Assignment6.Controllers
 {
     public class SchedulerController : Controller
@@ -30,13 +31,15 @@ namespace Assignment6.Controllers
         private readonly IBookingService _bookingService;
         private readonly IWebService _webService;
         private readonly TwilioSmsService _sms;
+        private readonly IEmailService _emailService;
 
-        public SchedulerController(IBookingService bookingService, IWebService webService, TwilioSmsService sms)
+        public SchedulerController(IBookingService bookingService, IWebService webService, TwilioSmsService sms, IEmailService emailService)
         {
             _bookingService = bookingService;
             _webService = webService;
             _httpClient = new HttpClient();
             _sms = sms;
+            _emailService = emailService;
         }
 
         public async void SendWhatsappMsg()
@@ -1096,55 +1099,42 @@ namespace Assignment6.Controllers
         // ADD these methods to your existing SchedulerController class
 
         [HttpPost]
-        public IActionResult CompleteBookingWithInvoice(int bookingId)
+        public IActionResult CompleteBookingWithInvoice(int bookingId, bool sendEmail = false)
         {
             try
             {
                 if (bookingId <= 0)
-                {
                     return Json(new { success = false, message = "Invalid booking ID" });
-                }
 
-                // Get booking details for invoice generation
                 var booking = _bookingService.GetBookingById(bookingId);
-
                 if (booking == null)
-                {
                     return Json(new { success = false, message = "Booking not found" });
-                }
 
-                // Generate invoice (works for past bookings too)
-                string invoiceUrl = null;
+                // Generate invoice HTML (needed for both PDF and email)
+                string invoiceHtml = null;
+                string invoiceUrl  = null;
                 try
                 {
-                    invoiceUrl = GenerateInvoice(bookingId);
+                    invoiceHtml = GenerateInvoiceHtml(booking);
+                    invoiceUrl  = GenerateInvoice(bookingId);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Invoice generation failed: {ex.Message}");
-                    // Continue with completion even if invoice fails
                 }
 
-                // Complete booking (update payment status and delete)
                 bool completed = _bookingService.CompleteBookingWithInvoice(bookingId);
 
                 if (completed)
                 {
-                    return Json(new
-                    {
-                        success = true,
-                        message = "Invoice generated successfully",
-                        invoiceUrl = invoiceUrl
-                    });
+                    // Fire-and-forget email — never blocks the HTTP response
+                    if (sendEmail && invoiceHtml != null)
+                        _ = _emailService.SendInvoiceEmailAsync(booking, invoiceHtml);
+
+                    return Json(new { success = true, message = "Invoice generated successfully", invoiceUrl });
                 }
-                else
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Failed to generate invoice"
-                    });
-                }
+
+                return Json(new { success = false, message = "Failed to generate invoice" });
             }
             catch (Exception ex)
             {
@@ -1366,10 +1356,16 @@ namespace Assignment6.Controllers
                 if (bookingId <= 0)
                     return Json(new { success = false, message = "Invalid booking ID" });
 
+                var booking = _bookingService.GetBookingById(bookingId);
                 bool approved = _bookingService.ApproveBookingRequest(bookingId);
 
                 if (approved)
+                {
+                    if (booking != null)
+                        _ = _emailService.SendBookingApprovedAsync(booking);
+
                     return Json(new { success = true, message = "Booking request approved successfully" });
+                }
                 else
                     return Json(new { success = false, message = "Failed to approve booking request" });
             }

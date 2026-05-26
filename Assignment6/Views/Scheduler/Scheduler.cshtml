@@ -2479,6 +2479,7 @@
 
         // ── Payment management card (non-Airbnb, not fully paid) ──
         const paymentMethods = ['Cash', 'UPI', 'Card', 'Online', 'Bank Transfer', 'Pay Later'];
+        const safeTitle = (props.customerName||'').replace(/'/g,"\\'");
 
         let paymentManageCard = '';
         if (!isAirbnbBooking && !isPaid) {
@@ -2525,11 +2526,34 @@
                             ${remaining===0 ? '✓ Fully paid' : (advancePaid>0 ? `Partial — ₹${remaining.toLocaleString('en-IN')} remaining` : '')}
                         </div>
                     </div>
+
+                    <!-- ── Checkout confirmation + email toggle ───────── -->
+                    <div style="border-top:1px solid #e2e8f0;margin-top:14px;padding-top:12px;">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <input type="checkbox" id="paymentPaidCheck_${event.id}" class="form-check-input mt-0"
+                                   style="width:15px;height:15px;cursor:pointer;flex-shrink:0;">
+                            <label class="form-check-label" for="paymentPaidCheck_${event.id}"
+                                   style="font-size:12px;cursor:pointer;color:#374151;">
+                                Confirm full payment received &amp; check out guest
+                            </label>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <input type="checkbox" id="sendInvoiceEmail_${event.id}" class="form-check-input mt-0"
+                                   style="width:15px;height:15px;cursor:pointer;flex-shrink:0;">
+                            <label class="form-check-label" for="sendInvoiceEmail_${event.id}"
+                                   style="font-size:12px;cursor:pointer;color:#374151;">
+                                <i class="fas fa-envelope me-1" style="color:#2563a8;"></i>Send invoice to customer via email
+                            </label>
+                        </div>
+                        <button class="bdoc-btn w-100" onclick="completeBookingWithInvoice(${event.id},'${safeTitle}')"
+                                style="background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;justify-content:center;gap:6px;">
+                            <i class="fas fa-check-circle"></i>Complete &amp; Generate Invoice
+                        </button>
+                    </div>
                 </div>`;
         }
 
         // ── Actions card ──────────────────────────────────────────
-        const safeTitle = (props.customerName||'').replace(/'/g,"\\'");
         let actionsHtml = '';
         if (!isAirbnbBooking && !isPaid) {
             actionsHtml += `<button class="bdoc-btn bdoc-btn-success" onclick="savePaymentDetails(${event.id},'${safeTitle}',${totalPrice})"><i class="fas fa-save"></i>Save Payment</button>`;
@@ -2676,24 +2700,21 @@
 
     function completeBookingWithInvoice(bookingId, bookingTitle) {
         const checkbox = document.getElementById(`paymentPaidCheck_${bookingId}`);
-        if (!checkbox.checked) {
-            showNotification('Check the checkbox to confirm.', 'error');
+        if (!checkbox || !checkbox.checked) {
+            showNotification('Please check the confirmation checkbox first.', 'error');
             return;
         }
 
-        if (!confirm(`Generate invoice for: ${bookingTitle}?`)) return;
+        const sendEmail = document.getElementById(`sendInvoiceEmail_${bookingId}`)?.checked ?? false;
+
+        if (!confirm(`Complete checkout and generate invoice for: "${bookingTitle}"?`)) return;
 
         showLoading('Marking as paid...');
 
-        // 1) Mark the booking as paid on the server.
-        // 2) Once that succeeds, actually generate the invoice PDF on the client
-        //    (downloadInvoice returns a promise — we MUST await it so the spinner
-        //    stays open until the PDF is built, otherwise the download silently
-        //    fails for the user).
         $.ajax({
             url: '/Scheduler/CompleteBookingWithInvoice',
             type: 'POST',
-            data: { bookingId }
+            data: { bookingId, sendEmail }
         })
         .done(function (response) {
             if (!response || !response.success) {

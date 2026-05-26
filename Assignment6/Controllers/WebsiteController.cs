@@ -4,6 +4,7 @@ using DbService.Models;
 using DbService.SaveModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
+using Assignment6.Services;
 
 namespace Assignment6.Controllers
 {
@@ -11,11 +12,13 @@ namespace Assignment6.Controllers
     {
         private readonly IWebService _webService;
         private readonly IBookingService _bookingService;
+        private readonly IEmailService _emailService;
 
-        public WebsiteController(IWebService webService, IBookingService bookingService)
+        public WebsiteController(IWebService webService, IBookingService bookingService, IEmailService emailService)
         {
             _webService = webService;
             _bookingService = bookingService;
+            _emailService = emailService;
         }
 
         public IActionResult Index()
@@ -129,6 +132,14 @@ namespace Assignment6.Controllers
                             _bookingService.SaveBookingGuests(bookingSaveModel.BookingData.Id, guests);
                     }
                     catch { }
+                }
+
+                // Notify admin of new website booking (fire-and-forget)
+                if (resultSaved)
+                {
+                    var savedBooking = _bookingService.GetBookingById(bookingSaveModel.BookingData.Id);
+                    if (savedBooking != null)
+                        _ = _emailService.SendNewWebsiteBookingToAdminAsync(savedBooking);
                 }
 
                 return Json(new

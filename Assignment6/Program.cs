@@ -1,4 +1,5 @@
 ﻿using Assignment6.Services;
+using Microsoft.Extensions.Options;
 using DbService.SignalR;
 using DbService.Implementation;
 using DbService.Interface;
@@ -48,6 +49,10 @@ builder.Services.AddSingleton<IPaymentService>(provider =>
 
 builder.Services.Configure<WhatsappService>(builder.Configuration.GetSection("Twilio"));
 builder.Services.AddSingleton<TwilioSmsService>();
+
+// Email service
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 // Twilio Init (keep as-is or uncomment if needed)
 var accountSid = builder.Configuration["Twilio:AccountSid"];
