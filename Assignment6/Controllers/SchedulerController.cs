@@ -1133,7 +1133,7 @@ namespace Assignment6.Controllers
         // ADD these methods to your existing SchedulerController class
 
         [HttpPost]
-        public async Task<IActionResult> CompleteBookingWithInvoice(int bookingId, bool sendEmail = false)
+        public IActionResult CompleteBookingWithInvoice(int bookingId, bool sendEmail = false)
         {
             try
             {
@@ -1152,28 +1152,42 @@ namespace Assignment6.Controllers
 
                 string invoiceHtml = null;
                 string invoiceUrl  = null;
-                byte[] pdfBytes   = null;
+                string invoiceFilePath = null;
                 try
                 {
-                    invoiceHtml = GenerateInvoiceHtml(booking);
-                    invoiceUrl  = GenerateInvoice(bookingId);
-                    pdfBytes    = GeneratePdfBytes(invoiceHtml);
+                    invoiceHtml    = GenerateInvoiceHtml(booking);
+                    invoiceUrl     = GenerateInvoice(bookingId);  // saves PDF to disk, returns /invoices/xxx.pdf
+                    if (invoiceUrl != null)
+                        invoiceFilePath = Path.Combine("wwwroot", invoiceUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Invoice generation failed: {ex.Message}");
                 }
 
+                // Fire & forget — respond immediately, send email in background
                 if (sendEmail && invoiceHtml != null)
                 {
-                    try
+                    var emailService  = _emailService;
+                    var bookingSnap   = booking;
+                    var htmlSnap      = invoiceHtml;
+                    var filePathSnap  = invoiceFilePath;
+
+                    _ = Task.Run(async () =>
                     {
-                        await _emailService.SendInvoiceEmailAsync(booking, invoiceHtml, pdfBytes);
-                    }
-                    catch (Exception emailEx)
-                    {
-                        Console.WriteLine($"[Email] Invoice email failed: {emailEx.Message}");
-                    }
+                        try
+                        {
+                            byte[] pdfBytes = null;
+                            if (filePathSnap != null && System.IO.File.Exists(filePathSnap))
+                                pdfBytes = await System.IO.File.ReadAllBytesAsync(filePathSnap);
+
+                            await emailService.SendInvoiceEmailAsync(bookingSnap, htmlSnap, pdfBytes);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[Email] Invoice email failed: {ex.Message}");
+                        }
+                    });
                 }
 
                 return Json(new { success = true, message = "Booking completed and invoice generated successfully", invoiceUrl });
@@ -1305,7 +1319,7 @@ namespace Assignment6.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ConfirmBookingWithPayment([FromBody] BookingConfirmationModel model)
+        public IActionResult ConfirmBookingWithPayment([FromBody] BookingConfirmationModel model)
         {
             try
             {
@@ -1316,15 +1330,16 @@ namespace Assignment6.Controllers
 
                 if (confirmed)
                 {
-                    try
+                    var booking = _bookingService.GetBookingById(model.BookingId);
+                    if (booking != null)
                     {
-                        var booking = _bookingService.GetBookingById(model.BookingId);
-                        if (booking != null)
-                            await _emailService.SendBookingApprovedAsync(booking);
-                    }
-                    catch (Exception emailEx)
-                    {
-                        Console.WriteLine($"[Email] Failed to send confirmation email: {emailEx.Message}");
+                        var emailService = _emailService;
+                        var bookingSnap  = booking;
+                        _ = Task.Run(async () =>
+                        {
+                            try { await emailService.SendBookingApprovedAsync(bookingSnap); }
+                            catch (Exception ex) { Console.WriteLine($"[Email] Confirm email failed: {ex.Message}"); }
+                        });
                     }
                     return Json(new { success = true, message = "Booking confirmed and payment recorded successfully" });
                 }
@@ -1403,7 +1418,7 @@ namespace Assignment6.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ApproveBookingRequest(int bookingId)
+        public IActionResult ApproveBookingRequest(int bookingId)
         {
             try
             {
@@ -1416,8 +1431,15 @@ namespace Assignment6.Controllers
                 if (approved)
                 {
                     if (booking != null)
-                        await _emailService.SendBookingApprovedAsync(booking);
-
+                    {
+                        var emailService = _emailService;
+                        var bookingSnap  = booking;
+                        _ = Task.Run(async () =>
+                        {
+                            try { await emailService.SendBookingApprovedAsync(bookingSnap); }
+                            catch (Exception ex) { Console.WriteLine($"[Email] Approval email failed: {ex.Message}"); }
+                        });
+                    }
                     return Json(new { success = true, message = "Booking request approved successfully" });
                 }
                 else
