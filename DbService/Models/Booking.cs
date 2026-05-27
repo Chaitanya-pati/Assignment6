@@ -73,6 +73,8 @@ public partial class Booking
 
     public string BookedByEmail { get; set; }
 
+    public string AirbnbUid { get; set; }
+
     public virtual ICollection<BookingRoom> BookingRooms { get; set; } = new List<BookingRoom>();
 
     public virtual Home Home { get; set; }

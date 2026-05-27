@@ -68,6 +68,7 @@ public partial class Assignment6Context : DbContext
             entity.Property(e => e.BookedByName).HasMaxLength(100);
             entity.Property(e => e.BookedByPhone).HasMaxLength(20);
             entity.Property(e => e.BookedByEmail).HasMaxLength(100);
+            entity.Property(e => e.AirbnbUid).HasMaxLength(500).IsRequired(false);
 
             entity.HasOne(d => d.Home).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.HomeId)

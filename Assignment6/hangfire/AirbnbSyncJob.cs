@@ -183,9 +183,10 @@ public class AirbnbSyncJob : BackgroundService
                 })
                 .Select(ev => new
                 {
+                    Uid     = ev.Uid ?? "",
                     Summary = ev.Summary ?? "Booking",
-                    Start = ev.Start.Value.Date,
-                    End = ev.End.Value.Date
+                    Start   = ev.Start.Value.Date,
+                    End     = ev.End.Value.Date
                 })
                 .OrderBy(b => b.Start)
                 .ToList();
