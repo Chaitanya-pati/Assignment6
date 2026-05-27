@@ -216,7 +216,7 @@ namespace Assignment6.Controllers
         public async Task<IActionResult> UpdateBookingDetails(
             int bookingId, string phone, long guestNumbers,
             int? totalAdults, int? totalKids, int? maleCount, int? femaleCount,
-            IFormFile document)
+            IFormFile document, string guestsJson)
         {
             try
             {
@@ -241,6 +241,20 @@ namespace Assignment6.Controllers
 
                 if (!success)
                     return Json(new { success = false, message = error });
+
+                // Save individual guest details if provided
+                if (!string.IsNullOrWhiteSpace(guestsJson))
+                {
+                    try
+                    {
+                        var guests = System.Text.Json.JsonSerializer.Deserialize<List<BookingGuest>>(
+                            guestsJson,
+                            new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (guests?.Count > 0)
+                            _bookingService.SaveBookingGuests(bookingId, guests);
+                    }
+                    catch { }
+                }
 
                 var updatedBooking = _bookingService.GetBookingById(bookingId);
                 if (updatedBooking != null)

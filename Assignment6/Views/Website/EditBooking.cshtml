@@ -32,7 +32,7 @@
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(26,58,107,0.10);
             overflow: hidden;
-            max-width: 600px;
+            max-width: 660px;
             margin: 0 auto 60px;
         }
         .card-section-header {
@@ -147,6 +147,53 @@
         .spinner-sm { width: 1rem; height: 1rem; border-width: 2px; }
         .back-link { color: #2563a8; font-size: 0.88rem; text-decoration: none; }
         .back-link:hover { text-decoration: underline; }
+
+        /* Individual guests toggle row */
+        .guest-details-toggle-row {
+            background: #f0f4ff;
+            border: 1.5px solid #c7d7f8;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 20px 0 0;
+        }
+        /* Guest detail cards */
+        .guest-card {
+            background: #f8faff;
+            border: 1.5px solid #dbe7ff;
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .guest-card-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #2563a8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .guest-card-title .guest-num-badge {
+            background: #2563a8;
+            color: #fff;
+            border-radius: 50%;
+            width: 22px; height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        #guestDetailCards { margin-top: 16px; }
+        .section-divider {
+            border: none;
+            border-top: 1.5px solid #dbe7ff;
+            margin: 24px 0;
+        }
     </style>
 </head>
 <body>
@@ -240,7 +287,8 @@
                     <!-- Guest count -->
                     <div class="mb-3">
                         <label class="form-label">Total Number of Guests <span class="text-danger">*</span></label>
-                        <input type="number" id="editGuestNumbers" class="form-control" min="1" max="50" />
+                        <input type="number" id="editGuestNumbers" class="form-control" min="1" max="50"
+                               oninput="onGuestCountChange()" />
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-6">
@@ -261,9 +309,29 @@
                         </div>
                     </div>
 
+                    <!-- Individual guest details toggle -->
+                    <div class="guest-details-toggle-row">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
+                                <input class="form-check-input" type="checkbox" id="toggleGuestDetails" role="switch"
+                                       onchange="toggleIndividualGuests(this.checked)"
+                                       style="width:2.5em;height:1.4em;cursor:pointer;flex-shrink:0;">
+                                <label class="form-check-label fw-semibold" for="toggleGuestDetails" style="cursor:pointer;font-size:0.9rem;">
+                                    <i class="fas fa-users me-1 text-primary"></i>Add details for all guests
+                                </label>
+                            </div>
+                            <small class="text-muted d-none d-md-inline">Name, gender, contact &amp; ID for each guest</small>
+                        </div>
+
+                        <!-- Guest cards container -->
+                        <div id="guestDetailCards" style="display:none;"></div>
+                    </div>
+
+                    <hr class="section-divider" />
+
                     <!-- ID Proof -->
                     <div class="mb-4">
-                        <label class="form-label">ID Proof Document</label>
+                        <label class="form-label">ID Proof Document <small class="text-muted fw-normal">(optional — upload a single file for the group)</small></label>
                         <input type="file" id="editDocument" class="form-control"
                                accept=".jpg,.jpeg,.png,.pdf,.gif,.webp" />
                         <div id="currentDocInfo" class="doc-preview d-none">
@@ -366,10 +434,111 @@
 
             document.getElementById('updateError').classList.add('d-none');
             document.getElementById('editDocument').value = '';
+
+            // Reset individual guest toggle
+            document.getElementById('toggleGuestDetails').checked = false;
+            document.getElementById('guestDetailCards').style.display = 'none';
+            document.getElementById('guestDetailCards').innerHTML = '';
         }
 
+        /* ── Individual guest detail cards ─────────────────────────── */
+
+        function onGuestCountChange() {
+            if (document.getElementById('toggleGuestDetails').checked) {
+                renderGuestCards();
+            }
+        }
+
+        function toggleIndividualGuests(on) {
+            const container = document.getElementById('guestDetailCards');
+            if (on) {
+                renderGuestCards();
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+                container.innerHTML = '';
+            }
+        }
+
+        function renderGuestCards() {
+            const total = parseInt(document.getElementById('editGuestNumbers').value) || 1;
+            const extra = Math.max(0, total - 1); // N-1 (primary guest already registered)
+            const container = document.getElementById('guestDetailCards');
+
+            // Preserve existing values when re-rendering
+            const existing = collectGuestCardData();
+            container.innerHTML = '';
+
+            if (extra === 0) {
+                container.innerHTML = '<p class="text-muted mt-3 mb-0" style="font-size:0.85rem;"><i class="fas fa-info-circle me-1"></i>Only 1 guest — the primary guest is already registered.</p>';
+                return;
+            }
+
+            for (let i = 0; i < extra; i++) {
+                const guestNum = i + 2; // Guest #2, #3, …
+                const prev = existing[i] || {};
+                container.insertAdjacentHTML('beforeend', buildGuestCard(i, guestNum, prev));
+            }
+        }
+
+        function buildGuestCard(idx, guestNum, prev) {
+            const idTypes = ['', 'Aadhar Card', 'Passport', 'Driving License', 'Voter ID', 'PAN Card', 'Other'];
+            const idOptions = idTypes.map(t =>
+                `<option value="${t}" ${prev.idProof === t ? 'selected' : ''}>${t || '-- Select ID Type --'}</option>`
+            ).join('');
+
+            const genders = ['', 'Male', 'Female', 'Other'];
+            const genderOptions = genders.map(g =>
+                `<option value="${g}" ${prev.gender === g ? 'selected' : ''}>${g || '-- Select --'}</option>`
+            ).join('');
+
+            return `
+            <div class="guest-card mt-3" data-guest-idx="${idx}">
+                <div class="guest-card-title">
+                    <span class="guest-num-badge">${guestNum}</span>
+                    Guest #${guestNum}
+                    <span class="text-muted fw-normal ms-1" style="font-size:0.78rem;text-transform:none;letter-spacing:0;">— all fields optional</span>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control form-control-sm gc-name" placeholder="Guest name" value="${prev.guestName || ''}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Gender</label>
+                        <select class="form-select form-select-sm gc-gender">${genderOptions}</select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Contact Number</label>
+                        <input type="tel" class="form-control form-control-sm gc-contact" placeholder="Phone number" value="${prev.contactNumber || ''}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ID Proof Type</label>
+                        <select class="form-select form-select-sm gc-idproof">${idOptions}</select>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function collectGuestCardData() {
+            const cards = document.querySelectorAll('#guestDetailCards .guest-card');
+            const result = [];
+            cards.forEach((card, idx) => {
+                result.push({
+                    guestOrder:    idx + 2,
+                    guestName:     card.querySelector('.gc-name')?.value?.trim()    || '',
+                    gender:        card.querySelector('.gc-gender')?.value           || '',
+                    contactNumber: card.querySelector('.gc-contact')?.value?.trim() || '',
+                    idProof:       card.querySelector('.gc-idproof')?.value          || ''
+                });
+            });
+            return result;
+        }
+
+        /* ── Save ───────────────────────────────────────────────────── */
+
         function saveChanges() {
-            const errBox      = document.getElementById('updateError');
+            const errBox       = document.getElementById('updateError');
             const guestNumbers = parseInt(document.getElementById('editGuestNumbers').value) || 0;
 
             errBox.classList.add('d-none');
@@ -383,13 +552,20 @@
             setSaveLoading(true);
 
             const formData = new FormData();
-            formData.append('bookingId',     verifiedBookingId);
-            formData.append('phone',         verifiedPhone);
-            formData.append('guestNumbers',  guestNumbers);
-            formData.append('totalAdults',   document.getElementById('editTotalAdults').value  || '');
-            formData.append('totalKids',     document.getElementById('editTotalKids').value    || '');
-            formData.append('maleCount',     document.getElementById('editMaleCount').value    || '');
-            formData.append('femaleCount',   document.getElementById('editFemaleCount').value  || '');
+            formData.append('bookingId',    verifiedBookingId);
+            formData.append('phone',        verifiedPhone);
+            formData.append('guestNumbers', guestNumbers);
+            formData.append('totalAdults',  document.getElementById('editTotalAdults').value  || '');
+            formData.append('totalKids',    document.getElementById('editTotalKids').value    || '');
+            formData.append('maleCount',    document.getElementById('editMaleCount').value    || '');
+            formData.append('femaleCount',  document.getElementById('editFemaleCount').value  || '');
+
+            // Include individual guest details if toggle is on
+            if (document.getElementById('toggleGuestDetails').checked) {
+                const guests = collectGuestCardData().filter(g => g.guestName || g.gender || g.contactNumber || g.idProof);
+                if (guests.length > 0)
+                    formData.append('guestsJson', JSON.stringify(guests));
+            }
 
             const docFile = document.getElementById('editDocument').files[0];
             if (docFile) formData.append('document', docFile);
