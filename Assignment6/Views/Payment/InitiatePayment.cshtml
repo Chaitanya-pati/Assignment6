@@ -284,26 +284,34 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
+        // Sanitise phone: keep digits only, take last 10 for Indian numbers
+        function sanitisePhone(phone) {
+            if (!phone) return '';
+            const digits = phone.replace(/\D/g, '');
+            return digits.length > 10 ? digits.slice(-10) : digits;
+        }
+
         const paymentData = {
             bookingId: @Model.BookingId,
-            amount: @Model.Amount,
+            amountPaise: @((long)(Model.Amount * 100)),   // integer paise — avoids float mismatch
             currency: "@Model.Currency",
             orderId: "@Model.RazorpayOrderId",
             keyId: "@Model.RazorpayKeyId",
-            customerName: "@Model.CustomerName",
-            customerEmail: "@Model.CustomerEmail",
-            customerPhone: "@Model.CustomerPhone"
+            customerName: "@Html.Raw(Model.CustomerName?.Replace("\"","\\\"") ?? "")",
+            customerEmail: "@(Model.CustomerEmail ?? "")",
+            customerPhone: sanitisePhone("@(Model.CustomerPhone ?? "")")
         };
 
-        // Flag: set to true only when Razorpay confirms payment — prevents accidental deletion
+        // paymentCompleted  — Razorpay success handler fired
+        // paymentFailed     — Razorpay payment.failed event fired (bank decline / error)
         let paymentCompleted = false;
+        let paymentFailed    = false;
 
         document.getElementById('payButton').addEventListener('click', function () {
             initiatePayment();
         });
 
-        // Safety net: if the user closes the tab or navigates away before completing
-        // payment, delete the pending (unpaid) booking so it does not linger in the DB.
+        // Safety net: tab/browser closed before completing payment → delete pending booking
         window.addEventListener('beforeunload', function () {
             if (!paymentCompleted) {
                 navigator.sendBeacon('/Scheduler/DeleteBooking?bookingId=' + paymentData.bookingId);
@@ -311,47 +319,83 @@
         });
 
         function initiatePayment() {
+            // Reset flags on each attempt
+            paymentFailed = false;
+
             const options = {
                 key: paymentData.keyId,
-                amount: paymentData.amount * 100,
+                amount: paymentData.amountPaise,   // already in paise
                 currency: paymentData.currency,
-                name: "Vernekar HomeStays",
-                description: "Booking Payment",
+                name: "Vernekar's Radha Heritage Home Stay",
+                description: "Advance Booking Payment (50%)",
                 order_id: paymentData.orderId,
                 prefill: {
-                    name: paymentData.customerName,
-                    email: paymentData.customerEmail,
+                    name:    paymentData.customerName,
+                    email:   paymentData.customerEmail,
                     contact: paymentData.customerPhone
                 },
-                theme: {
-                    color: "#667eea"
-                },
+                theme: { color: "#667eea" },
                 handler: function (response) {
-                    // Mark payment as completed BEFORE doing anything else so that
-                    // the beforeunload listener does not delete this booking.
+                    // Payment captured by Razorpay — verify server-side
                     paymentCompleted = true;
                     handlePaymentSuccess(response);
                 },
                 modal: {
                     ondismiss: function () {
-                        // User closed the Razorpay popup without paying.
-                        // Delete the pending booking so it does not remain in the DB.
                         hideLoading();
-                        if (!paymentCompleted) {
-                            deletePendingBookingAndRedirect();
+
+                        if (paymentCompleted) {
+                            // Already handled in handler — do nothing
+                            return;
                         }
+
+                        if (paymentFailed) {
+                            // Bank decline / Razorpay error — show retry option, keep booking alive
+                            showRetryMessage();
+                            return;
+                        }
+
+                        // User manually closed popup without attempting payment — clean up
+                        deletePendingBookingAndRedirect();
                     }
                 }
             };
 
             showLoading();
             const rzp = new Razorpay(options);
+
+            // payment.failed fires when the bank/gateway declines — before ondismiss
+            rzp.on('payment.failed', function (resp) {
+                paymentFailed = true;
+                console.warn('Razorpay payment.failed:', resp.error);
+            });
+
             rzp.open();
             hideLoading();
         }
 
+        function showRetryMessage() {
+            // Show an inline error with a retry button instead of deleting the booking
+            const body = document.querySelector('.payment-body');
+            const existing = document.getElementById('retryBanner');
+            if (existing) existing.remove();
+
+            const banner = document.createElement('div');
+            banner.id = 'retryBanner';
+            banner.style.cssText = 'background:#fff3cd;border:1.5px solid #ffc107;border-radius:10px;padding:16px 20px;margin-bottom:20px;color:#856404;font-size:0.93rem;';
+            banner.innerHTML = `
+                <strong><i class="fas fa-exclamation-triangle me-2"></i>Payment could not be completed.</strong><br>
+                <span style="font-size:0.88rem;">This could be due to a bank decline, network issue, or an incorrect OTP. Your booking is still saved — you can try again.</span>`;
+            body.insertBefore(banner, body.firstChild);
+
+            // Re-enable pay button
+            const btn = document.getElementById('payButton');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-redo"></i> Try Payment Again';
+        }
+
         function deletePendingBookingAndRedirect() {
-            // Remove beforeunload listener first so sendBeacon doesn't also fire
+            // Remove beforeunload listener so sendBeacon doesn't double-fire
             window.onbeforeunload = null;
 
             $.ajax({
@@ -359,7 +403,6 @@
                 type: 'GET',
                 data: { bookingId: paymentData.bookingId },
                 complete: function () {
-                    // Redirect regardless of delete outcome
                     window.location.href = '/Website/Website';
                 }
             });
@@ -370,9 +413,9 @@
 
             const verificationData = {
                 razorpayPaymentId: response.razorpay_payment_id,
-                razorpayOrderId: response.razorpay_order_id,
+                razorpayOrderId:   response.razorpay_order_id,
                 razorpaySignature: response.razorpay_signature,
-                bookingId: paymentData.bookingId
+                bookingId:         paymentData.bookingId
             };
 
             $.ajax({
@@ -383,15 +426,17 @@
                 success: function (result) {
                     hideLoading();
                     if (result.success) {
-                        window.location.href = `/Payment/PaymentSuccess?bookingId=${paymentData.bookingId}`;
+                        window.onbeforeunload = null;
+                        window.location.href = '/Payment/PaymentSuccess?bookingId=' + paymentData.bookingId;
                     } else {
-                        // Verification failed — payment did not go through; delete booking
-                        window.location.href = `/Payment/PaymentFailed?bookingId=${paymentData.bookingId}`;
+                        // Signature mismatch — treat as failed (booking stays for admin review)
+                        window.location.href = '/Payment/PaymentFailed?bookingId=' + paymentData.bookingId;
                     }
                 },
                 error: function () {
                     hideLoading();
-                    window.location.href = `/Payment/PaymentFailed?bookingId=${paymentData.bookingId}`;
+                    // Network error during verification — don't delete booking; redirect to failed
+                    window.location.href = '/Payment/PaymentFailed?bookingId=' + paymentData.bookingId;
                 }
             });
         }

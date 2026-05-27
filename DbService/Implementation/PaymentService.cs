@@ -57,14 +57,18 @@ namespace DbService.Implementation
                 // Get the appropriate Razorpay credentials based on HomeId
                 var (razorpayClient, keyId, keySecret) = GetRazorpayCredentials(booking.HomeId);
 
-                // Charge only 50% as advance payment
+                // Charge only 50% as advance payment (minimum ₹1 = 100 paise)
                 decimal advanceAmount = Math.Round(booking.Price * 0.5m, 2);
+                if (advanceAmount < 1) advanceAmount = 1;
+
+                // Amount in paise (integer, no decimals)
+                long amountInPaise = (long)(advanceAmount * 100);
 
                 // Create Razorpay Order with 50% advance
                 Dictionary<string, object> options = new Dictionary<string, object>();
-                options.Add("amount", (long)(advanceAmount * 100)); // Amount in paise
+                options.Add("amount", amountInPaise);
                 options.Add("currency", "INR");
-                options.Add("receipt", $"booking_{bookingId}_{DateTime.Now:yyyyMMddHHmmss}");
+                options.Add("receipt", $"bkg_{bookingId}_{DateTime.Now:yyyyMMddHHmmss}");
                 options.Add("payment_capture", 1);
 
                 Order order = razorpayClient.Order.Create(options);
