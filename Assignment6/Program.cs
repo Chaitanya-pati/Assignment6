@@ -6,6 +6,7 @@ using DbService.Interface;
 using Hangfire;
 using Hangfire.SqlServer; // ✅ ADDED
 using Newtonsoft.Json;
+using UserManagement.Lib;
 using Assignment6;
 using Twilio;
 using Assignment6.twillio;
@@ -57,6 +58,8 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 var accountSid = builder.Configuration["Twilio:AccountSid"];
 var authToken = builder.Configuration["Twilio:AuthToken"];
 //TwilioClient.Init(accountSid, authToken);
+
+builder.Services.AddUserManagementServices(builder.Configuration);
 
 // ✅ UPDATED HANGFIRE CONFIG (IMPORTANT)
 builder.Services.AddHangfire(cfg =>
