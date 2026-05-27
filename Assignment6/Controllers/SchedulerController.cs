@@ -1364,6 +1364,27 @@ namespace Assignment6.Controllers
                 if (model == null || model.BookingId <= 0)
                     return Json(new { success = false, message = "Invalid request" });
 
+                // Check for date conflicts with already-approved bookings
+                var pendingBooking = _bookingService.GetBookingById(model.BookingId);
+                if (pendingBooking == null)
+                    return Json(new { success = false, message = "Booking not found." });
+
+                bool hasConflict = _bookingService.CheckBookingsAlternative(
+                    pendingBooking.BookingDateFrom,
+                    pendingBooking.BookingDateTo,
+                    pendingBooking.HomeId);
+
+                if (hasConflict)
+                {
+                    string fromStr = pendingBooking.BookingDateFrom.ToString("dd MMM yyyy");
+                    string toStr   = pendingBooking.BookingDateTo.ToString("dd MMM yyyy");
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"Cannot approve: the dates {fromStr} – {toStr} are already booked for this property. Please check the calendar before approving."
+                    });
+                }
+
                 bool confirmed = _bookingService.ConfirmBookingWithPayment(model);
 
                 if (confirmed)

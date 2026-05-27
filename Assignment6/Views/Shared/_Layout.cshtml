@@ -180,53 +180,51 @@
         </main>
     </div>
 
-    <!-- Booking Requests Modal (Global) -->
-    <div class="modal fade" id="bookingRequestsModal" tabindex="-1" aria-labelledby="bookingRequestsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content booking-requests-modal">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bookingRequestsModalLabel">
+    <!-- Pending Booking Requests Modal (Global) -->
+    <div class="modal fade booking-requests-modal" id="globalPendingRequestsModal" tabindex="-1" aria-labelledby="globalPendingRequestsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="globalPendingRequestsModalLabel">
                         <i class="fas fa-bell me-2"></i>Pending Booking Requests
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div id="bookingRequestsContent">
+                <div class="modal-body p-0">
+                    <div id="globalPendingRequestsContent">
                         <div class="text-center p-4">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <div class="mt-2">Loading booking requests...</div>
+                            <div class="spinner-border text-warning" role="status"></div>
+                            <p class="mt-2">Loading pending requests...</p>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="refreshBookingRequests()">
-                        <i class="fas fa-sync me-2"></i>Refresh
+                    <button type="button" class="btn btn-primary" onclick="globalLoadPendingRequests()">
+                        <i class="fas fa-sync me-1"></i>Refresh
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Approve Booking & Record Payment Modal -->
-    <div class="modal fade" id="layoutApproveBookingModal" tabindex="-1" aria-labelledby="layoutApproveBookingLabel" aria-hidden="true">
+    <!-- Approve Booking & Record Payment Modal (Global) -->
+    <div class="modal fade" id="globalConfirmPaymentModal" tabindex="-1" aria-labelledby="globalConfirmPaymentLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="layoutApproveBookingLabel">
+                    <h5 class="modal-title" id="globalConfirmPaymentLabel">
                         <i class="fas fa-check-circle me-2"></i>Approve Booking &amp; Record Payment
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="lab_BookingInfo" class="alert alert-info py-2 mb-3"></div>
-                    <div id="lab_ModalError" class="alert alert-danger py-2 mb-3" style="display:none;"></div>
+                    <div id="gcp_BookingInfo" class="alert alert-info py-2 mb-3"></div>
+                    <div id="gcp_ModalError" class="alert alert-danger py-2 mb-3" style="display:none;"></div>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Payment Method <span class="text-danger">*</span></label>
-                            <select class="form-select" id="lab_PaymentMethod">
+                            <select class="form-select" id="gcp_PaymentMethod">
                                 <option value="">-- Select --</option>
                                 <option value="Cash">Cash</option>
                                 <option value="UPI">UPI</option>
@@ -234,33 +232,33 @@
                                 <option value="Bank Transfer">Bank Transfer</option>
                                 <option value="Online">Online</option>
                             </select>
-                            <div id="lab_MethodError" class="text-danger small mt-1" style="display:none;"></div>
+                            <div id="gcp_MethodError" class="text-danger small mt-1" style="display:none;"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Payment Type</label>
-                            <select class="form-select" id="lab_PaymentStatus">
+                            <select class="form-select" id="gcp_PaymentStatus">
                                 <option value="Partial">Advance / Partial</option>
                                 <option value="Paid">Full Payment</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Amount Received (₹) <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="lab_AmountPaid" placeholder="Enter amount collected" min="0" step="0.01">
-                            <div id="lab_AdvanceSuggestion" class="form-text text-muted small mt-1"></div>
+                            <input type="number" class="form-control" id="gcp_AmountPaid" placeholder="Enter amount collected" min="0" step="0.01">
+                            <div id="gcp_AdvanceSuggestion" class="form-text text-muted small mt-1"></div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Final Booking Price (₹) <small class="text-muted fw-normal">—leave blank to keep original</small></label>
-                            <input type="number" class="form-control" id="lab_FinalRoomPrice" placeholder="e.g. 5000 — updates booking price" min="0" step="0.01">
+                            <label class="form-label fw-semibold">Override Booking Price (₹) <small class="text-muted fw-normal">— leave blank to keep original</small></label>
+                            <input type="number" class="form-control" id="gcp_FinalRoomPrice" placeholder="e.g. 5000 — updates booking price" min="0" step="0.01">
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold">Notes <small class="text-muted fw-normal">(Optional)</small></label>
-                            <textarea class="form-control" id="lab_Notes" rows="2" placeholder="Any notes about this approval..."></textarea>
+                            <textarea class="form-control" id="gcp_Notes" rows="2" placeholder="Any notes about this approval..."></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" id="lab_ApproveBtn" onclick="submitLayoutApproveBooking()">
+                    <button type="button" class="btn btn-success" id="gcp_ConfirmBtn" onclick="globalSubmitConfirmPayment()">
                         <i class="fas fa-check me-1"></i>Approve Booking
                     </button>
                 </div>
@@ -319,105 +317,118 @@
         // Make showNotification globally available
         window.showNotification = showNotification;
 
-        // Booking Requests Functions
+        // ── Pending Booking Requests (Global / Dashboard) ────────────
         let pendingRequestsCount = 0;
+        const globalBookingStore = {};
+        let globalCurrentBookingId = null;
 
         function loadPendingBookingRequests() {
             $.ajax({
                 url: '/Scheduler/GetPendingBookingRequests',
                 type: 'GET',
                 success: function (data) {
-                    pendingRequestsCount = data.length;
+                    pendingRequestsCount = Array.isArray(data) ? data.length : 0;
                     updateNotificationBadge(pendingRequestsCount);
                 },
-                error: function (xhr, status, error) {
-                    console.error("Error loading pending requests:", error);
-                }
+                error: function () {}
             });
         }
 
         function updateNotificationBadge(count) {
             const badge = document.getElementById('notification-badge');
             if (badge) {
-                if (count > 0) {
-                    badge.textContent = count;
-                    badge.classList.remove('d-none');
-                } else {
-                    badge.classList.add('d-none');
-                }
+                if (count > 0) { badge.textContent = count; badge.classList.remove('d-none'); }
+                else           { badge.classList.add('d-none'); }
             }
         }
 
-        // Safe store: booking objects keyed by ID — avoids embedding JSON in onclick attributes
-        const layoutBookingStore = {};
-        let layoutCurrentBookingId = null;
-
+        // Called by the bell icon on non-Scheduler pages (fallback)
         function showBookingRequests() {
-            const container = document.getElementById('bookingRequestsContent');
-            container.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-warning" role="status"></div><p class="mt-2">Loading...</p></div>';
-            $('#bookingRequestsModal').modal('show');
+            new bootstrap.Modal(document.getElementById('globalPendingRequestsModal')).show();
+            globalLoadPendingRequests();
+        }
+
+        function globalLoadPendingRequests() {
+            document.getElementById('globalPendingRequestsContent').innerHTML = `
+                <div class="text-center p-4">
+                    <div class="spinner-border text-warning" role="status"></div>
+                    <p class="mt-2">Loading pending requests...</p>
+                </div>`;
             $.ajax({
                 url: '/Scheduler/GetPendingBookingRequests',
                 type: 'GET',
                 success: function (data) {
-                    pendingRequestsCount = data ? data.length : 0;
+                    pendingRequestsCount = Array.isArray(data) ? data.length : 0;
                     updateNotificationBadge(pendingRequestsCount);
-                    displayBookingRequests(data || []);
+                    globalRenderPendingRequests(data || []);
                 },
                 error: function () {
-                    container.innerHTML = '<div class="alert alert-danger m-3">Failed to load requests. Please try again.</div>';
+                    document.getElementById('globalPendingRequestsContent').innerHTML =
+                        '<div class="alert alert-danger m-3">Failed to load requests. Please try again.</div>';
                 }
             });
         }
 
-        function displayBookingRequests(requests) {
-            const container = document.getElementById('bookingRequestsContent');
-
+        function globalRenderPendingRequests(requests) {
+            const container = document.getElementById('globalPendingRequestsContent');
             if (!requests || requests.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center p-4">
-                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                        <h5>No Pending Requests</h5>
-                        <p class="text-muted">All booking requests have been processed.</p>
+                    <div class="text-center p-4 text-muted">
+                        <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                        <p>No pending booking requests.</p>
                     </div>`;
                 return;
             }
 
-            // Store booking objects by ID so buttons only pass the ID
-            requests.forEach(function (r) { layoutBookingStore[r.id] = r; });
+            requests.forEach(function (r) { globalBookingStore[r.id] = r; });
 
-            let html = `<div class="table-responsive">
-                <table class="table table-hover booking-requests-table mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Guest</th><th>Contact</th><th>Property</th>
-                            <th>Check-in</th><th>Check-out</th><th>Guests</th>
-                            <th>Req. Payment</th><th>Price</th><th>Submitted</th><th>Action</th>
-                        </tr>
-                    </thead><tbody>`;
+            let html = '<div class="table-responsive"><table class="table table-hover booking-requests-table mb-0">';
+            html += `<thead class="table-light"><tr>
+                <th>Guest</th><th>Contact</th><th>Property</th><th>Check-in</th><th>Check-out</th>
+                <th>Guests</th><th>Purpose</th><th>Req. Payment</th><th>Price</th><th>Submitted</th><th style="min-width:160px;">Action</th>
+            </tr></thead><tbody>`;
 
             requests.forEach(function (r) {
-                const checkin   = r.bookingDateFrom ? new Date(r.bookingDateFrom).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-                const checkout  = r.bookingDateTo   ? new Date(r.bookingDateTo).toLocaleDateString('en-IN',   { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-                const submitted = r.createdAt       ? new Date(r.createdAt).toLocaleDateString('en-IN',       { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-                const property  = r.homeId === 1 ? 'Ground Floor Classic' : r.homeId === 2 ? '1st Floor Heritage' : 'Property ' + r.homeId;
-                const bizInfo   = r.businessName ? `<br><small class="text-muted">${r.businessName}${r.gstNumber ? ' · GST: ' + r.gstNumber : ''}</small>` : '';
+                const guestBreakdown = [
+                    r.totalAdults ? `Adults: ${r.totalAdults}` : '',
+                    r.totalKids   ? `Kids: ${r.totalKids}`     : '',
+                    r.maleCount   ? `M: ${r.maleCount}`        : '',
+                    r.femaleCount ? `F: ${r.femaleCount}`      : ''
+                ].filter(Boolean).join(', ');
 
-                html += `<tr id="request-row-${r.id}">
+                const purposeDisplay = (r.purposeOfVisit === 'Other' && r.purposeOfVisitOther)
+                    ? r.purposeOfVisitOther : (r.purposeOfVisit || '—');
+
+                const bizInfo = r.businessName
+                    ? `<br><small class="text-muted">${r.businessName}${r.gstNumber ? ' · GST: ' + r.gstNumber : ''}</small>` : '';
+
+                const property = r.homeId === 1 ? 'Ground Floor Classic'
+                               : r.homeId === 2 ? '1st Floor Heritage'
+                               : 'Property ' + r.homeId;
+
+                const submitted = r.createdAt
+                    ? new Date(r.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+
+                html += `<tr>
                     <td><strong>${r.customerName || '—'}</strong>${bizInfo}</td>
-                    <td><small><i class="fas fa-envelope me-1"></i>${r.customerEmail || ''}<br>
-                               <i class="fas fa-phone me-1"></i>${r.customerPhone || ''}</small></td>
+                    <td><small>${r.customerEmail || ''}<br>${r.customerPhone || ''}</small></td>
                     <td><small>${property}</small></td>
-                    <td><small>${checkin}</small></td>
-                    <td><small>${checkout}</small></td>
-                    <td>${r.guestNumbers || '—'}</td>
+                    <td><small>${r.bookingDateFrom}</small></td>
+                    <td><small>${r.bookingDateTo}</small></td>
+                    <td>${r.guestNumbers || '—'}${guestBreakdown ? '<br><small class="text-muted">' + guestBreakdown + '</small>' : ''}</td>
+                    <td><small>${purposeDisplay}</small></td>
                     <td><span class="badge bg-secondary">${r.paymentMethod || r.paymentStatus || '—'}</span></td>
                     <td><strong>₹${(r.price || 0).toLocaleString('en-IN')}</strong></td>
                     <td><small>${submitted}</small></td>
                     <td>
-                        <button class="approve-btn" onclick="openLayoutApproveModal(${r.id})">
-                            <i class="fas fa-check me-1"></i>Approve
-                        </button>
+                        <div class="d-flex flex-column gap-1">
+                            <button class="btn btn-success btn-sm" onclick="globalOpenConfirmModal(${r.id})">
+                                <i class="fas fa-check me-1"></i>Approve
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="globalRejectBooking(${r.id}, '${(r.customerName||'').replace(/'/g,"\\'")}')">
+                                <i class="fas fa-times me-1"></i>Reject
+                            </button>
+                        </div>
                     </td>
                 </tr>`;
             });
@@ -426,85 +437,93 @@
             container.innerHTML = html;
         }
 
-        function openLayoutApproveModal(bookingId) {
-            const b = layoutBookingStore[bookingId];
+        function globalRejectBooking(bookingId, guestName) {
+            if (!confirm(`Reject the booking request from "${guestName}"?\n\nThis will permanently delete the request.`)) return;
+            $.ajax({
+                url: '/Scheduler/RejectBookingRequest',
+                type: 'POST',
+                data: { bookingId: bookingId },
+                success: function (res) {
+                    if (res.success) {
+                        showNotification(`Booking request from "${guestName}" has been rejected.`, 'success', 4000);
+                        delete globalBookingStore[bookingId];
+                        globalLoadPendingRequests();
+                    } else {
+                        showNotification(res.message || 'Failed to reject request.', 'error', 4000);
+                    }
+                },
+                error: function () { showNotification('Network error while rejecting request.', 'error', 4000); }
+            });
+        }
+
+        function globalOpenConfirmModal(bookingId) {
+            const b = globalBookingStore[bookingId];
             if (!b) { showNotification('Booking data not found. Please refresh.', 'error'); return; }
 
-            layoutCurrentBookingId = bookingId;
-
+            globalCurrentBookingId = bookingId;
             const advance = Math.round((b.price || 0) / 2);
 
-            // Fill booking summary
-            document.getElementById('lab_BookingInfo').innerHTML = `
+            document.getElementById('gcp_BookingInfo').innerHTML = `
                 <div class="d-flex flex-wrap gap-3 align-items-center">
                     <span><i class="fas fa-user me-1"></i><strong>${b.customerName || '—'}</strong></span>
-                    <span><i class="fas fa-calendar me-1"></i>${b.bookingDateFrom || ''} → ${b.bookingDateTo || ''}</span>
+                    <span><i class="fas fa-calendar me-1"></i>${b.bookingDateFrom} → ${b.bookingDateTo}</span>
                     <span><i class="fas fa-users me-1"></i>Guests: ${b.guestNumbers || '—'}</span>
-                    <span class="ms-auto"><strong>Total: ₹${(b.price || 0).toLocaleString('en-IN')}</strong></span>
+                    <span class="ms-auto"><i class="fas fa-rupee-sign me-1"></i><strong>Total: ₹${(b.price || 0).toLocaleString('en-IN')}</strong></span>
                 </div>`;
 
-            // Pre-fill fields
-            document.getElementById('lab_AmountPaid').value     = advance;
-            document.getElementById('lab_FinalRoomPrice').value = '';
-            document.getElementById('lab_Notes').value          = '';
-            document.getElementById('lab_PaymentStatus').value  = 'Partial';
-            document.getElementById('lab_AdvanceSuggestion').textContent =
+            document.getElementById('gcp_AmountPaid').value     = advance;
+            document.getElementById('gcp_FinalRoomPrice').value = '';
+            document.getElementById('gcp_Notes').value          = '';
+            document.getElementById('gcp_PaymentStatus').value  = 'Partial';
+            document.getElementById('gcp_AdvanceSuggestion').textContent =
                 `Suggested 50% advance: ₹${advance.toLocaleString('en-IN')} · Full: ₹${(b.price || 0).toLocaleString('en-IN')}`;
 
-            // Pre-select payment method if already specified by guest
             const knownMethods = ['Cash', 'UPI', 'Card', 'Bank Transfer', 'Online'];
-            document.getElementById('lab_PaymentMethod').value =
+            document.getElementById('gcp_PaymentMethod').value =
                 (b.paymentMethod && knownMethods.includes(b.paymentMethod)) ? b.paymentMethod : '';
 
-            // Clear previous errors and reset button
-            document.getElementById('lab_MethodError').style.display = 'none';
-            document.getElementById('lab_ModalError').style.display  = 'none';
-            const btn = document.getElementById('lab_ApproveBtn');
+            document.getElementById('gcp_MethodError').style.display = 'none';
+            document.getElementById('gcp_ModalError').style.display  = 'none';
+            const btn = document.getElementById('gcp_ConfirmBtn');
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check me-1"></i>Approve Booking';
 
-            // Close list modal, then open payment modal
-            const listModal = bootstrap.Modal.getInstance(document.getElementById('bookingRequestsModal'));
+            const listModal = bootstrap.Modal.getInstance(document.getElementById('globalPendingRequestsModal'));
             if (listModal) {
                 listModal.hide();
-                document.getElementById('bookingRequestsModal').addEventListener('hidden.bs.modal', function onHidden() {
-                    document.getElementById('bookingRequestsModal').removeEventListener('hidden.bs.modal', onHidden);
-                    new bootstrap.Modal(document.getElementById('layoutApproveBookingModal')).show();
+                document.getElementById('globalPendingRequestsModal').addEventListener('hidden.bs.modal', function onHidden() {
+                    document.getElementById('globalPendingRequestsModal').removeEventListener('hidden.bs.modal', onHidden);
+                    new bootstrap.Modal(document.getElementById('globalConfirmPaymentModal')).show();
                 }, { once: true });
             } else {
-                new bootstrap.Modal(document.getElementById('layoutApproveBookingModal')).show();
+                new bootstrap.Modal(document.getElementById('globalConfirmPaymentModal')).show();
             }
         }
 
-        function submitLayoutApproveBooking() {
-            if (!layoutCurrentBookingId) return;
+        function globalSubmitConfirmPayment() {
+            if (!globalCurrentBookingId) return;
 
-            const paymentMethod = document.getElementById('lab_PaymentMethod').value;
-            const methodErr     = document.getElementById('lab_MethodError');
+            const paymentMethod = document.getElementById('gcp_PaymentMethod').value;
+            const methodErr     = document.getElementById('gcp_MethodError');
             if (!paymentMethod) {
                 methodErr.textContent = 'Please select a payment method.';
                 methodErr.style.display = 'block';
-                document.getElementById('lab_PaymentMethod').focus();
+                document.getElementById('gcp_PaymentMethod').focus();
                 return;
             }
             methodErr.style.display = 'none';
-            document.getElementById('lab_ModalError').style.display = 'none';
-
-            const amountPaid     = parseFloat(document.getElementById('lab_AmountPaid').value)     || 0;
-            const finalRoomPrice = parseFloat(document.getElementById('lab_FinalRoomPrice').value) || null;
-            const paymentStatus  = document.getElementById('lab_PaymentStatus').value;
-            const notes          = document.getElementById('lab_Notes').value.trim();
+            document.getElementById('gcp_ModalError').style.display = 'none';
 
             const payload = {
-                BookingId:        layoutCurrentBookingId,
-                PaymentMethod:    paymentMethod,
-                AmountPaid:       amountPaid,
-                FinalRoomPrice:   finalRoomPrice,
-                IsAdvancePayment: paymentStatus === 'Partial',
-                Notes:            notes
+                BookingId:        globalCurrentBookingId,
+                PaymentMethod:    document.getElementById('gcp_PaymentMethod').value,
+                AmountPaid:       parseFloat(document.getElementById('gcp_AmountPaid').value)     || 0,
+                FinalRoomPrice:   parseFloat(document.getElementById('gcp_FinalRoomPrice').value) || null,
+                IsAdvancePayment: document.getElementById('gcp_PaymentStatus').value === 'Partial',
+                Notes:            document.getElementById('gcp_Notes').value.trim()
             };
 
-            const btn = document.getElementById('lab_ApproveBtn');
+            const btn = document.getElementById('gcp_ConfirmBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Approving...';
 
@@ -517,29 +536,25 @@
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-check me-1"></i>Approve Booking';
                     if (result.success) {
-                        bootstrap.Modal.getInstance(document.getElementById('layoutApproveBookingModal'))?.hide();
+                        bootstrap.Modal.getInstance(document.getElementById('globalConfirmPaymentModal'))?.hide();
                         showNotification('Booking approved and payment recorded!', 'success');
-                        delete layoutBookingStore[layoutCurrentBookingId];
-                        layoutCurrentBookingId = null;
+                        delete globalBookingStore[globalCurrentBookingId];
+                        globalCurrentBookingId = null;
                         pendingRequestsCount = Math.max(0, pendingRequestsCount - 1);
                         updateNotificationBadge(pendingRequestsCount);
                         if (typeof loadInitialBookings === 'function') { loadInitialBookings(); }
                     } else {
-                        document.getElementById('lab_ModalError').textContent = result.message || 'Failed to approve booking.';
-                        document.getElementById('lab_ModalError').style.display = 'block';
+                        document.getElementById('gcp_ModalError').textContent = result.message || 'Failed to approve booking.';
+                        document.getElementById('gcp_ModalError').style.display = 'block';
                     }
                 },
                 error: function () {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-check me-1"></i>Approve Booking';
-                    document.getElementById('lab_ModalError').textContent = 'A server error occurred. Please try again.';
-                    document.getElementById('lab_ModalError').style.display = 'block';
+                    document.getElementById('gcp_ModalError').textContent = 'A server error occurred. Please try again.';
+                    document.getElementById('gcp_ModalError').style.display = 'block';
                 }
             });
-        }
-
-        function refreshBookingRequests() {
-            showBookingRequests();
         }
 
         // Simple toggle function
