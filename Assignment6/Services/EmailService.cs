@@ -21,7 +21,7 @@ public class EmailSettings
 public interface IEmailService
 {
     Task SendBookingApprovedAsync(Booking booking);
-    Task SendInvoiceEmailAsync(Booking booking, string invoiceHtml);
+    Task SendInvoiceEmailAsync(Booking booking, string invoiceHtml, byte[] pdfBytes = null);
     Task SendNewWebsiteBookingToAdminAsync(Booking booking);
     Task<(bool success, string message)> SendTestEmailAsync(string toAddress);
 }
@@ -37,7 +37,7 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
-    private async Task SendAsync(string to, string subject, string htmlBody)
+    private async Task SendAsync(string to, string subject, string htmlBody, byte[] pdfAttachment = null, string pdfFileName = null)
     {
         if (string.IsNullOrWhiteSpace(to))
         {
@@ -59,7 +59,28 @@ public class EmailService : IEmailService
             message.From.Add(new MailboxAddress(_cfg.DisplayName, _cfg.FromAddress));
             message.To.Add(MailboxAddress.Parse(to));
             message.Subject = subject;
-            message.Body = new TextPart("html") { Text = htmlBody };
+
+            var bodyPart = new TextPart("html") { Text = htmlBody };
+
+            if (pdfAttachment != null && pdfAttachment.Length > 0)
+            {
+                var multipart = new MimeKit.Multipart("mixed");
+                multipart.Add(bodyPart);
+
+                var attachment = new MimePart("application", "pdf")
+                {
+                    Content            = new MimeContent(new MemoryStream(pdfAttachment)),
+                    ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                    ContentTransferEncoding = ContentEncoding.Base64,
+                    FileName           = pdfFileName ?? "Invoice.pdf"
+                };
+                multipart.Add(attachment);
+                message.Body = multipart;
+            }
+            else
+            {
+                message.Body = bodyPart;
+            }
 
             using var smtp = new SmtpClient();
             await smtp.ConnectAsync(_cfg.SmtpHost, _cfg.SmtpPort, SecureSocketOptions.StartTls);
@@ -89,17 +110,18 @@ public class EmailService : IEmailService
             await SendAsync(r, subject, body);
     }
 
-    public async Task SendInvoiceEmailAsync(Booking booking, string invoiceHtml)
+    public async Task SendInvoiceEmailAsync(Booking booking, string invoiceHtml, byte[] pdfBytes = null)
     {
-        var subject = $"Your Invoice – Booking #{booking.Id} | {_cfg.DisplayName}";
-        var body    = InvoiceEmailWrapper(invoiceHtml, booking);
+        var subject  = $"Your Invoice – Booking #{booking.Id} | {_cfg.DisplayName}";
+        var body     = InvoiceEmailWrapper(invoiceHtml, booking);
+        var fileName = $"Invoice_Booking_{booking.Id}.pdf";
 
         var recipients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (!string.IsNullOrWhiteSpace(booking.CustomerEmail)) recipients.Add(booking.CustomerEmail);
         if (!string.IsNullOrWhiteSpace(booking.BookedByEmail)) recipients.Add(booking.BookedByEmail);
 
         foreach (var r in recipients)
-            await SendAsync(r, subject, body);
+            await SendAsync(r, subject, body, pdfBytes, fileName);
     }
 
     public async Task<(bool success, string message)> SendTestEmailAsync(string toAddress)

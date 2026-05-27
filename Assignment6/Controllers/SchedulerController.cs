@@ -987,16 +987,16 @@ namespace Assignment6.Controllers
                 converter.Options.PdfPageSize = PdfPageSize.A4;
                 converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
 
-                converter.Options.MarginTop = 0;    // We handle padding in HTML
+                converter.Options.MarginTop = 0;
                 converter.Options.MarginBottom = 0;
                 converter.Options.MarginLeft = 0;
                 converter.Options.MarginRight = 0;
 
-                converter.Options.WebPageWidth = 1200;  // wider so layout doesn't collapse
+                converter.Options.WebPageWidth = 1200;
                 converter.Options.WebPageHeight = 0;
 
                 converter.Options.JavaScriptEnabled = false;
-                converter.Options.CssMediaType = HtmlToPdfCssMediaType.Screen; // NOT Print
+                converter.Options.CssMediaType = HtmlToPdfCssMediaType.Screen;
                 converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.ShrinkOnly;
                 converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.NoAdjustment;
 
@@ -1005,12 +1005,46 @@ namespace Assignment6.Controllers
                 doc.Close();
 
                 Console.WriteLine($"PDF generated at: {filePath}");
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"SelectPdf Error: {ex.Message}");
                 CreateHtmlFallback(htmlContent, filePath);
+            }
+        }
+
+        private byte[] GeneratePdfBytes(string htmlContent)
+        {
+            try
+            {
+                HtmlToPdf converter = new HtmlToPdf();
+
+                converter.Options.PdfPageSize = PdfPageSize.A4;
+                converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+
+                converter.Options.MarginTop = 0;
+                converter.Options.MarginBottom = 0;
+                converter.Options.MarginLeft = 0;
+                converter.Options.MarginRight = 0;
+
+                converter.Options.WebPageWidth = 1200;
+                converter.Options.WebPageHeight = 0;
+
+                converter.Options.JavaScriptEnabled = false;
+                converter.Options.CssMediaType = HtmlToPdfCssMediaType.Screen;
+                converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.ShrinkOnly;
+                converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.NoAdjustment;
+
+                PdfDocument doc = converter.ConvertHtmlString(htmlContent);
+                using var ms = new MemoryStream();
+                doc.Save(ms);
+                doc.Close();
+                return ms.ToArray();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[PDF] GeneratePdfBytes failed: {ex.Message}");
+                return null;
             }
         }
 
@@ -1118,10 +1152,12 @@ namespace Assignment6.Controllers
 
                 string invoiceHtml = null;
                 string invoiceUrl  = null;
+                byte[] pdfBytes   = null;
                 try
                 {
                     invoiceHtml = GenerateInvoiceHtml(booking);
                     invoiceUrl  = GenerateInvoice(bookingId);
+                    pdfBytes    = GeneratePdfBytes(invoiceHtml);
                 }
                 catch (Exception ex)
                 {
@@ -1132,7 +1168,7 @@ namespace Assignment6.Controllers
                 {
                     try
                     {
-                        await _emailService.SendInvoiceEmailAsync(booking, invoiceHtml);
+                        await _emailService.SendInvoiceEmailAsync(booking, invoiceHtml, pdfBytes);
                     }
                     catch (Exception emailEx)
                     {
