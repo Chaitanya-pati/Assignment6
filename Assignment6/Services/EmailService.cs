@@ -24,6 +24,8 @@ public interface IEmailService
     Task SendInvoiceEmailAsync(Booking booking, string invoiceHtml, byte[] pdfBytes = null);
     Task SendNewWebsiteBookingToAdminAsync(Booking booking);
     Task<(bool success, string message)> SendTestEmailAsync(string toAddress);
+    Task SendBookingRequestConfirmationAsync(Booking booking);
+    Task SendGuestDetailsUpdatedAsync(Booking booking);
 }
 
 public class EmailService : IEmailService
@@ -173,6 +175,27 @@ public class EmailService : IEmailService
         await SendAsync(_cfg.AdminEmail, subject, AdminNotificationHtml(booking));
     }
 
+    public async Task SendBookingRequestConfirmationAsync(Booking booking)
+    {
+        if (string.IsNullOrWhiteSpace(booking.CustomerEmail)) return;
+        var subject = $"Booking Request Received – #{booking.Id} | {_cfg.DisplayName}";
+        await SendAsync(booking.CustomerEmail, subject, BookingRequestConfirmationHtml(booking));
+    }
+
+    public async Task SendGuestDetailsUpdatedAsync(Booking booking)
+    {
+        if (!string.IsNullOrWhiteSpace(booking.CustomerEmail))
+        {
+            var subject = $"Booking Updated – #{booking.Id} | {_cfg.DisplayName}";
+            await SendAsync(booking.CustomerEmail, subject, GuestDetailsUpdatedHtml(booking));
+        }
+        if (!string.IsNullOrWhiteSpace(_cfg.AdminEmail))
+        {
+            var subject = $"Guest Updated Booking #{booking.Id} | {_cfg.DisplayName}";
+            await SendAsync(_cfg.AdminEmail, subject, AdminGuestUpdateNotificationHtml(booking));
+        }
+    }
+
     private string BookingApprovedHtml(Booking b)
     {
         var nights  = (b.BookingDateTo - b.BookingDateFrom).Days;
@@ -263,6 +286,165 @@ public class EmailService : IEmailService
 </td></tr></table>
 </body></html>";
     }
+
+    private string BookingRequestConfirmationHtml(Booking b) => $@"<!DOCTYPE html>
+<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'></head>
+<body style='margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif;'>
+<table width='100%' cellpadding='0' cellspacing='0' style='background:#f4f6fb;padding:32px 0;'>
+<tr><td align='center'>
+<table width='600' cellpadding='0' cellspacing='0'
+       style='background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:600px;'>
+
+  <tr><td style='background:linear-gradient(135deg,#1a3a6b 0%,#2563a8 100%);padding:32px 40px;text-align:center;'>
+    <div style='font-size:26px;font-weight:700;color:#fff;letter-spacing:1px;'>{_cfg.DisplayName}</div>
+    <div style='font-size:12px;color:#a8c4e8;margin-top:6px;letter-spacing:2px;text-transform:uppercase;'>Booking Request Received</div>
+  </td></tr>
+
+  <tr><td style='background:#fffbeb;padding:18px 40px;border-bottom:2px solid #fde68a;text-align:center;'>
+    <span style='color:#92400e;font-size:14px;font-weight:700;'>&#9203;&nbsp; Your request is under review. We will contact you shortly!</span>
+  </td></tr>
+
+  <tr><td style='padding:32px 40px;'>
+    <p style='font-size:15px;color:#374151;margin:0 0 8px;'>Dear <strong>{b.CustomerName}</strong>,</p>
+    <p style='font-size:14px;color:#6b7a8d;margin:0 0 24px;'>
+      Thank you for choosing <strong>{_cfg.DisplayName}</strong>. We have received your booking request
+      and our team will review and confirm it soon.
+    </p>
+
+    <div style='background:#f0f7ff;border:2px solid #3b82f6;border-radius:10px;padding:20px 24px;margin-bottom:24px;text-align:center;'>
+      <div style='font-size:12px;font-weight:700;color:#1e40af;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;'>
+        Your Login Details for Editing Booking
+      </div>
+      <table width='100%' cellpadding='0' cellspacing='0'>
+        <tr>
+          <td width='49%' style='background:#fff;border:1.5px solid #bfdbfe;border-radius:8px;padding:14px;text-align:center;'>
+            <div style='font-size:10px;color:#6b7a8d;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;'>Booking ID</div>
+            <div style='font-size:28px;font-weight:700;color:#1a3a6b;'>#{b.Id}</div>
+          </td>
+          <td width='2%'></td>
+          <td width='49%' style='background:#fff;border:1.5px solid #bfdbfe;border-radius:8px;padding:14px;text-align:center;'>
+            <div style='font-size:10px;color:#6b7a8d;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;'>Registered Phone</div>
+            <div style='font-size:18px;font-weight:700;color:#1a3a6b;'>{b.CustomerPhone}</div>
+          </td>
+        </tr>
+      </table>
+      <p style='font-size:12px;color:#6b7a8d;margin:12px 0 0;'>
+        Use these details to update your guest count or ID proof anytime before check-in.
+      </p>
+    </div>
+
+    <table width='100%' cellpadding='0' cellspacing='0'
+           style='margin-bottom:20px;border:1.5px solid #dbe7ff;border-radius:8px;overflow:hidden;'>
+      <tr><td style='background:#f8faff;padding:10px 16px;border-bottom:1px solid #dbe7ff;'>
+        <div style='font-size:10px;font-weight:700;color:#6b7a8d;text-transform:uppercase;letter-spacing:.8px;'>Booking Summary</div>
+      </td></tr>
+      <tr><td style='padding:14px 16px;'>
+        <table width='100%' cellpadding='4' cellspacing='0' style='font-size:13px;'>
+          <tr><td style='color:#6b7a8d;width:40%;'>Property</td><td style='font-weight:600;color:#1a3a6b;'>{b.Home?.Name ?? "N/A"}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Check-in</td><td style='font-weight:600;color:#1a3a6b;'>{b.BookingDateFrom:dd MMM yyyy}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Check-out</td><td style='font-weight:600;color:#1a3a6b;'>{b.BookingDateTo:dd MMM yyyy}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Total Guests</td><td style='font-weight:600;color:#1a3a6b;'>{b.GuestNumbers}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Estimated Total</td><td style='font-size:14px;font-weight:700;color:#2563a8;'>&#8377;{b.Price:N0}</td></tr>
+        </table>
+      </td></tr>
+    </table>
+
+    <p style='font-size:13px;color:#6b7a8d;margin:0;'>
+      If you have any questions, please contact us directly. We look forward to welcoming you!
+    </p>
+  </td></tr>
+
+  <tr><td style='background:#1a3a6b;padding:18px 40px;text-align:center;'>
+    <div style='font-size:12px;color:#a8c4e8;'>{_cfg.DisplayName}</div>
+    <div style='font-size:11px;color:#5a7aaa;margin-top:4px;'>This is an automated message. Please do not reply directly.</div>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>";
+
+    private string GuestDetailsUpdatedHtml(Booking b) => $@"<!DOCTYPE html>
+<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'></head>
+<body style='margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif;'>
+<table width='100%' cellpadding='0' cellspacing='0' style='background:#f4f6fb;padding:32px 0;'>
+<tr><td align='center'>
+<table width='600' cellpadding='0' cellspacing='0'
+       style='background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:600px;'>
+
+  <tr><td style='background:linear-gradient(135deg,#1a3a6b 0%,#2563a8 100%);padding:28px 40px;text-align:center;'>
+    <div style='font-size:24px;font-weight:700;color:#fff;'>{_cfg.DisplayName}</div>
+    <div style='font-size:11px;color:#a8c4e8;margin-top:6px;letter-spacing:2px;text-transform:uppercase;'>Booking Details Updated</div>
+  </td></tr>
+
+  <tr><td style='background:#f0fdf4;padding:14px 40px;border-bottom:2px solid #bbf7d0;text-align:center;'>
+    <span style='color:#15803d;font-size:14px;font-weight:700;'>&#10003;&nbsp; Your booking details have been updated successfully</span>
+  </td></tr>
+
+  <tr><td style='padding:28px 40px;'>
+    <p style='font-size:15px;color:#374151;margin:0 0 8px;'>Dear <strong>{b.CustomerName}</strong>,</p>
+    <p style='font-size:14px;color:#6b7a8d;margin:0 0 24px;'>
+      Your booking <strong>#{b.Id}</strong> has been updated with the latest guest information.
+    </p>
+    <table width='100%' cellpadding='0' cellspacing='0'
+           style='border:1.5px solid #dbe7ff;border-radius:8px;overflow:hidden;margin-bottom:20px;'>
+      <tr><td style='background:#f8faff;padding:10px 16px;border-bottom:1px solid #dbe7ff;'>
+        <div style='font-size:10px;font-weight:700;color:#6b7a8d;text-transform:uppercase;letter-spacing:.8px;'>Updated Guest Details</div>
+      </td></tr>
+      <tr><td style='padding:14px 16px;'>
+        <table width='100%' cellpadding='4' cellspacing='0' style='font-size:13px;'>
+          <tr><td style='color:#6b7a8d;width:45%;'>Total Guests</td><td style='font-weight:600;color:#1a3a6b;'>{b.GuestNumbers}</td></tr>
+          {(b.TotalAdults.HasValue ? $"<tr><td style='color:#6b7a8d;'>Adults</td><td style='font-weight:600;color:#1a3a6b;'>{b.TotalAdults}</td></tr>" : "")}
+          {(b.TotalKids.HasValue ? $"<tr><td style='color:#6b7a8d;'>Children</td><td style='font-weight:600;color:#1a3a6b;'>{b.TotalKids}</td></tr>" : "")}
+          {(!string.IsNullOrWhiteSpace(b.Document) ? "<tr><td style='color:#6b7a8d;'>ID Proof</td><td style='font-weight:600;color:#16a34a;'>Updated &#10003;</td></tr>" : "")}
+        </table>
+      </td></tr>
+    </table>
+    <p style='font-size:13px;color:#6b7a8d;margin:0;'>If you did not make this change, please contact us immediately.</p>
+  </td></tr>
+
+  <tr><td style='background:#1a3a6b;padding:16px 40px;text-align:center;'>
+    <div style='font-size:11px;color:#a8c4e8;'>{_cfg.DisplayName} &middot; Automated message.</div>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>";
+
+    private string AdminGuestUpdateNotificationHtml(Booking b) => $@"<!DOCTYPE html>
+<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'></head>
+<body style='margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif;'>
+<table width='100%' cellpadding='0' cellspacing='0' style='background:#f4f6fb;padding:32px 0;'>
+<tr><td align='center'>
+<table width='600' cellpadding='0' cellspacing='0'
+       style='background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:600px;'>
+
+  <tr><td style='background:linear-gradient(135deg,#1a3a6b 0%,#2563a8 100%);padding:24px 40px;text-align:center;'>
+    <div style='font-size:22px;font-weight:700;color:#fff;'>{_cfg.DisplayName}</div>
+    <div style='font-size:11px;color:#a8c4e8;margin-top:5px;letter-spacing:2px;text-transform:uppercase;'>Guest Self-Update Notification</div>
+  </td></tr>
+
+  <tr><td style='background:#fffbeb;padding:12px 40px;border-bottom:2px solid #fde68a;text-align:center;'>
+    <div style='font-size:13px;font-weight:700;color:#92400e;'>A guest has updated their booking details</div>
+  </td></tr>
+
+  <tr><td style='padding:24px 40px;'>
+    <table width='100%' cellpadding='4' cellspacing='0' style='font-size:13px;border:1.5px solid #dbe7ff;border-radius:8px;overflow:hidden;'>
+      <tr><td style='background:#f8faff;padding:10px 16px;border-bottom:1px solid #dbe7ff;' colspan='2'>
+        <div style='font-size:10px;font-weight:700;color:#6b7a8d;text-transform:uppercase;letter-spacing:.8px;'>Booking #{b.Id}</div>
+      </td></tr>
+      <tr><td style='padding:5px 16px;color:#6b7a8d;width:40%;'>Guest</td><td style='font-weight:600;color:#1a3a6b;padding:5px 4px;'>{b.CustomerName}</td></tr>
+      <tr><td style='padding:5px 16px;color:#6b7a8d;'>Phone</td><td style='font-weight:600;color:#1a3a6b;padding:5px 4px;'>{b.CustomerPhone}</td></tr>
+      <tr><td style='padding:5px 16px;color:#6b7a8d;'>Total Guests</td><td style='font-weight:700;color:#2563a8;padding:5px 4px;'>{b.GuestNumbers}</td></tr>
+      {(b.TotalAdults.HasValue ? $"<tr><td style='padding:5px 16px;color:#6b7a8d;'>Adults</td><td style='font-weight:600;color:#1a3a6b;padding:5px 4px;'>{b.TotalAdults}</td></tr>" : "")}
+      {(b.TotalKids.HasValue ? $"<tr><td style='padding:5px 16px;color:#6b7a8d;'>Kids</td><td style='font-weight:600;color:#1a3a6b;padding:5px 4px;'>{b.TotalKids}</td></tr>" : "")}
+      {(!string.IsNullOrWhiteSpace(b.Document) ? "<tr><td style='padding:5px 16px;color:#6b7a8d;'>ID Proof</td><td style='font-weight:600;color:#16a34a;padding:5px 4px;'>Updated</td></tr>" : "")}
+    </table>
+  </td></tr>
+
+  <tr><td style='background:#1a3a6b;padding:14px 40px;text-align:center;'>
+    <div style='font-size:11px;color:#a8c4e8;'>{_cfg.DisplayName} &middot; Admin Notification</div>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>";
 
     private string AdminNotificationHtml(Booking b)
     {

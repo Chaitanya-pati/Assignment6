@@ -42,6 +42,9 @@ namespace DbService.Interface
         bool CaptureRemainingPayment(int bookingId, string finalPaymentMethod);
         bool SavePaymentDetails(int bookingId, long advanceAmount, string advancePaymentMethod, long? finalAmount, string finalPaymentMethod);
         bool SaveBookingGuests(int bookingId, List<BookingGuest> guests);
+        (bool success, string error) UpdateGuestDetails(int bookingId, string verifyPhone, long guestNumbers,
+            int? totalAdults, int? totalKids, int? maleCount, int? femaleCount, string documentPath);
+        Booking LookupBookingByIdAndPhone(int bookingId, string phone);
     }
 
 }

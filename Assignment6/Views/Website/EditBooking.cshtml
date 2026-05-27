@@ -1,0 +1,443 @@
+@{
+    ViewData["Title"] = "Edit My Booking";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit My Booking – Vernekar's Radha Heritage Home Stay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .page-header {
+            background: linear-gradient(135deg, #1a3a6b 0%, #2563a8 100%);
+            color: #fff;
+            padding: 28px 0 24px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 16px rgba(26,58,107,0.18);
+        }
+        .page-header h1 { font-size: 1.7rem; font-weight: 700; margin: 0; }
+        .page-header p  { font-size: 0.9rem; color: #a8c4e8; margin: 6px 0 0; }
+        .card-main {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(26,58,107,0.10);
+            overflow: hidden;
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+        .card-section-header {
+            background: #f8faff;
+            border-bottom: 2px solid #dbe7ff;
+            padding: 16px 28px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #6b7a8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .card-body-inner { padding: 28px; }
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #2563a8;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .step-label {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a3a6b;
+            margin-bottom: 20px;
+        }
+        .booking-summary-box {
+            background: #f0f7ff;
+            border: 1.5px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 24px;
+        }
+        .booking-summary-box .label { color: #6b7a8d; font-size: 0.82rem; }
+        .booking-summary-box .value { color: #1a3a6b; font-weight: 600; font-size: 0.92rem; }
+        .booking-id-badge {
+            background: #1a3a6b;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .form-label { font-weight: 600; color: #374151; font-size: 0.88rem; }
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1.5px solid #d1d5db;
+            padding: 10px 14px;
+            font-size: 0.92rem;
+            transition: border-color .2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #2563a8;
+            box-shadow: 0 0 0 3px rgba(37,99,168,0.12);
+        }
+        .btn-lookup {
+            background: linear-gradient(135deg, #1a3a6b, #2563a8);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 32px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: opacity .2s;
+        }
+        .btn-lookup:hover { opacity: 0.9; color: #fff; }
+        .btn-save {
+            background: linear-gradient(135deg, #15803d, #16a34a);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 32px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: opacity .2s;
+        }
+        .btn-save:hover { opacity: 0.9; color: #fff; }
+        .alert-styled {
+            border-radius: 10px;
+            font-size: 0.9rem;
+            padding: 12px 18px;
+        }
+        .doc-preview {
+            background: #f8faff;
+            border: 1.5px dashed #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            color: #6b7a8d;
+            margin-top: 8px;
+        }
+        .success-panel {
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 28px;
+            text-align: center;
+        }
+        #step2Panel { display: none; }
+        #successPanel { display: none; }
+        .spinner-sm { width: 1rem; height: 1rem; border-width: 2px; }
+        .back-link { color: #2563a8; font-size: 0.88rem; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1><i class="fas fa-edit me-2"></i>Edit My Booking</h1>
+        <p>Update your guest count or ID proof — anytime before check-in</p>
+    </div>
+
+    <div class="container">
+        <div class="card-main">
+
+            <!-- Step 1: Lookup -->
+            <div id="step1Panel">
+                <div class="card-section-header">
+                    <i class="fas fa-search me-2"></i>Step 1 — Find Your Booking
+                </div>
+                <div class="card-body-inner">
+                    <div class="step-label">
+                        <span class="step-badge">1</span>
+                        Enter your Booking ID and registered phone number
+                    </div>
+
+                    <div id="lookupError" class="alert alert-danger alert-styled d-none"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Booking ID <span class="text-danger">*</span></label>
+                        <input type="number" id="inputBookingId" class="form-control" placeholder="e.g. 42" min="1" />
+                        <div class="form-text">You received this in your booking confirmation email.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Registered Phone Number <span class="text-danger">*</span></label>
+                        <input type="tel" id="inputPhone" class="form-control" placeholder="e.g. 9876543210" />
+                        <div class="form-text">The phone number you used when booking.</div>
+                    </div>
+
+                    <button class="btn btn-lookup" onclick="lookupBooking()">
+                        <span id="lookupSpinner" class="spinner-border spinner-sm me-2 d-none" role="status"></span>
+                        <i class="fas fa-search me-2" id="lookupIcon"></i>Find My Booking
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Edit -->
+            <div id="step2Panel">
+                <div class="card-section-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-pen me-2"></i>Step 2 — Update Your Details</span>
+                    <a href="javascript:void(0)" class="back-link" onclick="resetToStep1()">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                </div>
+                <div class="card-body-inner">
+                    <div class="step-label">
+                        <span class="step-badge">2</span>
+                        Edit the fields below and save
+                    </div>
+
+                    <!-- Booking summary -->
+                    <div class="booking-summary-box mb-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <div class="label">Booking</div>
+                                <span class="booking-id-badge" id="summaryBookingId">#--</span>
+                            </div>
+                            <div class="text-end">
+                                <div class="label">Property</div>
+                                <div class="value" id="summaryHome">--</div>
+                            </div>
+                        </div>
+                        <div class="row g-2 mt-1">
+                            <div class="col-6">
+                                <div class="label">Check-in</div>
+                                <div class="value" id="summaryCheckIn">--</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="label">Check-out</div>
+                                <div class="value" id="summaryCheckOut">--</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="label">Guest Name</div>
+                                <div class="value" id="summaryName">--</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="label">Status</div>
+                                <div class="value" id="summaryStatus">--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="updateError" class="alert alert-danger alert-styled d-none"></div>
+
+                    <!-- Guest count -->
+                    <div class="mb-3">
+                        <label class="form-label">Total Number of Guests <span class="text-danger">*</span></label>
+                        <input type="number" id="editGuestNumbers" class="form-control" min="1" max="50" />
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Adults</label>
+                            <input type="number" id="editTotalAdults" class="form-control" min="0" max="50" placeholder="0" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Children</label>
+                            <input type="number" id="editTotalKids" class="form-control" min="0" max="50" placeholder="0" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Male</label>
+                            <input type="number" id="editMaleCount" class="form-control" min="0" max="50" placeholder="0" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Female</label>
+                            <input type="number" id="editFemaleCount" class="form-control" min="0" max="50" placeholder="0" />
+                        </div>
+                    </div>
+
+                    <!-- ID Proof -->
+                    <div class="mb-4">
+                        <label class="form-label">ID Proof Document</label>
+                        <input type="file" id="editDocument" class="form-control"
+                               accept=".jpg,.jpeg,.png,.pdf,.gif,.webp" />
+                        <div id="currentDocInfo" class="doc-preview d-none">
+                            <i class="fas fa-paperclip me-1"></i>
+                            Current document on file — upload a new file only if you want to replace it.
+                        </div>
+                    </div>
+
+                    <button class="btn btn-save" onclick="saveChanges()">
+                        <span id="saveSpinner" class="spinner-border spinner-sm me-2 d-none" role="status"></span>
+                        <i class="fas fa-save me-2" id="saveIcon"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success -->
+            <div id="successPanel">
+                <div class="card-body-inner">
+                    <div class="success-panel">
+                        <div style="font-size:3rem;margin-bottom:12px;">&#10003;</div>
+                        <h4 style="color:#15803d;font-weight:700;margin-bottom:8px;">Changes Saved!</h4>
+                        <p style="color:#374151;font-size:0.92rem;margin-bottom:20px;">
+                            Your booking details have been updated successfully.<br>
+                            A confirmation email has been sent to your registered email address.
+                        </p>
+                        <button class="btn btn-outline-primary" onclick="resetToStep1()" style="border-radius:8px;">
+                            <i class="fas fa-edit me-2"></i>Edit Another Booking
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let verifiedBookingId = null;
+        let verifiedPhone = null;
+
+        function lookupBooking() {
+            const bookingId = document.getElementById('inputBookingId').value.trim();
+            const phone     = document.getElementById('inputPhone').value.trim();
+            const errBox    = document.getElementById('lookupError');
+
+            errBox.classList.add('d-none');
+
+            if (!bookingId || !phone) {
+                errBox.textContent = 'Please enter both Booking ID and phone number.';
+                errBox.classList.remove('d-none');
+                return;
+            }
+
+            setLookupLoading(true);
+
+            fetch('/Website/LookupBooking', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bookingId: parseInt(bookingId), phone })
+            })
+            .then(r => r.json())
+            .then(data => {
+                setLookupLoading(false);
+                if (!data.success) {
+                    errBox.textContent = data.message || 'Booking not found. Please check your details.';
+                    errBox.classList.remove('d-none');
+                    return;
+                }
+                verifiedBookingId = data.bookingId;
+                verifiedPhone     = phone;
+                populateStep2(data);
+                document.getElementById('step1Panel').style.display = 'none';
+                document.getElementById('step2Panel').style.display = 'block';
+                document.getElementById('successPanel').style.display = 'none';
+            })
+            .catch(() => {
+                setLookupLoading(false);
+                errBox.textContent = 'Something went wrong. Please try again.';
+                errBox.classList.remove('d-none');
+            });
+        }
+
+        function populateStep2(data) {
+            document.getElementById('summaryBookingId').textContent = '#' + data.bookingId;
+            document.getElementById('summaryHome').textContent      = data.homeName || '--';
+            document.getElementById('summaryCheckIn').textContent   = data.checkIn  || '--';
+            document.getElementById('summaryCheckOut').textContent  = data.checkOut || '--';
+            document.getElementById('summaryName').textContent      = data.customerName || '--';
+            document.getElementById('summaryStatus').textContent    = data.isBooked ? 'Approved' : 'Pending';
+
+            document.getElementById('editGuestNumbers').value  = data.guestNumbers  || 1;
+            document.getElementById('editTotalAdults').value   = data.totalAdults    || '';
+            document.getElementById('editTotalKids').value     = data.totalKids      || '';
+            document.getElementById('editMaleCount').value     = data.maleCount      || '';
+            document.getElementById('editFemaleCount').value   = data.femaleCount    || '';
+
+            const docInfo = document.getElementById('currentDocInfo');
+            if (data.hasDocument) docInfo.classList.remove('d-none');
+            else                  docInfo.classList.add('d-none');
+
+            document.getElementById('updateError').classList.add('d-none');
+            document.getElementById('editDocument').value = '';
+        }
+
+        function saveChanges() {
+            const errBox      = document.getElementById('updateError');
+            const guestNumbers = parseInt(document.getElementById('editGuestNumbers').value) || 0;
+
+            errBox.classList.add('d-none');
+
+            if (!guestNumbers || guestNumbers < 1) {
+                errBox.textContent = 'Total guests must be at least 1.';
+                errBox.classList.remove('d-none');
+                return;
+            }
+
+            setSaveLoading(true);
+
+            const formData = new FormData();
+            formData.append('bookingId',     verifiedBookingId);
+            formData.append('phone',         verifiedPhone);
+            formData.append('guestNumbers',  guestNumbers);
+            formData.append('totalAdults',   document.getElementById('editTotalAdults').value  || '');
+            formData.append('totalKids',     document.getElementById('editTotalKids').value    || '');
+            formData.append('maleCount',     document.getElementById('editMaleCount').value    || '');
+            formData.append('femaleCount',   document.getElementById('editFemaleCount').value  || '');
+
+            const docFile = document.getElementById('editDocument').files[0];
+            if (docFile) formData.append('document', docFile);
+
+            fetch('/Website/UpdateBookingDetails', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                setSaveLoading(false);
+                if (!data.success) {
+                    errBox.textContent = data.message || 'Failed to save. Please try again.';
+                    errBox.classList.remove('d-none');
+                    return;
+                }
+                document.getElementById('step2Panel').style.display = 'none';
+                document.getElementById('successPanel').style.display = 'block';
+            })
+            .catch(() => {
+                setSaveLoading(false);
+                errBox.textContent = 'Something went wrong. Please try again.';
+                errBox.classList.remove('d-none');
+            });
+        }
+
+        function resetToStep1() {
+            verifiedBookingId = null;
+            verifiedPhone     = null;
+            document.getElementById('lookupError').classList.add('d-none');
+            document.getElementById('step1Panel').style.display = 'block';
+            document.getElementById('step2Panel').style.display = 'none';
+            document.getElementById('successPanel').style.display = 'none';
+        }
+
+        function setLookupLoading(on) {
+            document.getElementById('lookupSpinner').classList.toggle('d-none', !on);
+            document.getElementById('lookupIcon').classList.toggle('d-none', on);
+        }
+
+        function setSaveLoading(on) {
+            document.getElementById('saveSpinner').classList.toggle('d-none', !on);
+            document.getElementById('saveIcon').classList.toggle('d-none', on);
+        }
+
+        document.getElementById('inputPhone').addEventListener('keydown', e => {
+            if (e.key === 'Enter') lookupBooking();
+        });
+        document.getElementById('inputBookingId').addEventListener('keydown', e => {
+            if (e.key === 'Enter') lookupBooking();
+        });
+    </script>
+</body>
+</html>

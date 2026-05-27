@@ -957,5 +957,71 @@ namespace DbService.Implementation
                 return false;
             }
         }
+
+        public Booking LookupBookingByIdAndPhone(int bookingId, string phone)
+        {
+            try
+            {
+                using var db = new Assignment6Context(_dbconnection);
+                var booking = db.Bookings
+                    .Include(b => b.Home)
+                    .FirstOrDefault(b => b.Id == bookingId);
+
+                if (booking == null) return null;
+
+                var normalised = NormalisePhone(phone);
+                if (NormalisePhone(booking.CustomerPhone) != normalised) return null;
+
+                return booking;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in LookupBookingByIdAndPhone: {ex.Message}");
+                return null;
+            }
+        }
+
+        public (bool success, string error) UpdateGuestDetails(int bookingId, string verifyPhone,
+            long guestNumbers, int? totalAdults, int? totalKids, int? maleCount, int? femaleCount,
+            string documentPath)
+        {
+            try
+            {
+                using var db = new Assignment6Context(_dbconnection);
+                var booking = db.Bookings.FirstOrDefault(b => b.Id == bookingId);
+
+                if (booking == null)
+                    return (false, "Booking not found.");
+
+                if (NormalisePhone(booking.CustomerPhone) != NormalisePhone(verifyPhone))
+                    return (false, "Phone number does not match our records.");
+
+                if (booking.CheckOut)
+                    return (false, "This booking has already been checked out and cannot be edited.");
+
+                booking.GuestNumbers = guestNumbers;
+                booking.TotalAdults  = totalAdults;
+                booking.TotalKids    = totalKids;
+                booking.MaleCount    = maleCount;
+                booking.FemaleCount  = femaleCount;
+
+                if (!string.IsNullOrWhiteSpace(documentPath))
+                    booking.Document = documentPath;
+
+                db.SaveChanges();
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UpdateGuestDetails: {ex.Message}");
+                return (false, "An error occurred while saving. Please try again.");
+            }
+        }
+
+        private static string NormalisePhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone)) return string.Empty;
+            return new string(phone.Where(char.IsDigit).ToArray());
+        }
     }
 }

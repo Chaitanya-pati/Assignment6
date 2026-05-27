@@ -8,6 +8,12 @@ using Assignment6.Services;
 
 namespace Assignment6.Controllers
 {
+    public class LookupRequest
+    {
+        public int BookingId { get; set; }
+        public string Phone { get; set; }
+    }
+
     public class WebsiteController : Controller
     {
         private readonly IWebService _webService;
@@ -134,22 +140,118 @@ namespace Assignment6.Controllers
                     catch { }
                 }
 
-                // Notify admin of new website booking
+                // Notify admin and send confirmation to guest
                 if (resultSaved)
                 {
                     var savedBooking = _bookingService.GetBookingById(bookingSaveModel.BookingData.Id);
                     if (savedBooking != null)
-                        await _emailService.SendNewWebsiteBookingToAdminAsync(savedBooking);
+                    {
+                        _ = Task.Run(async () =>
+                        {
+                            try { await _emailService.SendNewWebsiteBookingToAdminAsync(savedBooking); } catch { }
+                            try { await _emailService.SendBookingRequestConfirmationAsync(savedBooking); } catch { }
+                        });
+                    }
                 }
 
                 return Json(new
                 {
                     success = resultSaved,
                     message = resultSaved
-                        ? "Your booking request has been submitted! Our team will contact you shortly to confirm."
+                        ? "Your booking request has been submitted! A confirmation email with your Booking ID has been sent to your email address."
                         : "Failed to submit booking request. Please try again.",
                     bookingId = bookingSaveModel.BookingData.Id
                 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        public IActionResult EditBooking()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult LookupBooking([FromBody] LookupRequest req)
+        {
+            try
+            {
+                if (req == null || req.BookingId <= 0 || string.IsNullOrWhiteSpace(req.Phone))
+                    return Json(new { success = false, message = "Please provide a valid Booking ID and phone number." });
+
+                var booking = _bookingService.LookupBookingByIdAndPhone(req.BookingId, req.Phone);
+                if (booking == null)
+                    return Json(new { success = false, message = "No booking found matching that ID and phone number. Please check your details." });
+
+                if (booking.CheckOut)
+                    return Json(new { success = false, message = "This booking has already been checked out and cannot be edited." });
+
+                return Json(new
+                {
+                    success      = true,
+                    bookingId    = booking.Id,
+                    customerName = booking.CustomerName,
+                    homeName     = booking.Home?.Name ?? "N/A",
+                    checkIn      = booking.BookingDateFrom.ToString("dd MMM yyyy"),
+                    checkOut     = booking.BookingDateTo.ToString("dd MMM yyyy"),
+                    isBooked     = booking.IsBooked,
+                    guestNumbers = booking.GuestNumbers,
+                    totalAdults  = booking.TotalAdults,
+                    totalKids    = booking.TotalKids,
+                    maleCount    = booking.MaleCount,
+                    femaleCount  = booking.FemaleCount,
+                    hasDocument  = !string.IsNullOrWhiteSpace(booking.Document)
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateBookingDetails(
+            int bookingId, string phone, long guestNumbers,
+            int? totalAdults, int? totalKids, int? maleCount, int? femaleCount,
+            IFormFile document)
+        {
+            try
+            {
+                if (bookingId <= 0 || string.IsNullOrWhiteSpace(phone) || guestNumbers < 1)
+                    return Json(new { success = false, message = "Invalid request data." });
+
+                string documentPath = null;
+                if (document != null && document.Length > 0)
+                {
+                    string uploadsFolder = Path.Combine("wwwroot", "uploads", "bookings");
+                    Directory.CreateDirectory(uploadsFolder);
+                    string uniqueFileName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{Path.GetFileName(document.FileName)}";
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                        await document.CopyToAsync(stream);
+                    documentPath = $"/uploads/bookings/{uniqueFileName}";
+                }
+
+                var (success, error) = _bookingService.UpdateGuestDetails(
+                    bookingId, phone, guestNumbers,
+                    totalAdults, totalKids, maleCount, femaleCount, documentPath);
+
+                if (!success)
+                    return Json(new { success = false, message = error });
+
+                var updatedBooking = _bookingService.GetBookingById(bookingId);
+                if (updatedBooking != null)
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        try { await _emailService.SendGuestDetailsUpdatedAsync(updatedBooking); } catch { }
+                    });
+                }
+
+                return Json(new { success = true, message = "Your booking details have been updated successfully." });
             }
             catch (Exception ex)
             {
