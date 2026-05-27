@@ -3007,12 +3007,17 @@
                 ? new Date(b.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })
                 : '—';
 
+            const checkIn = b.bookingDateFrom
+                ? new Date(b.bookingDateFrom).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+            const checkOut = b.bookingDateTo
+                ? new Date(b.bookingDateTo).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+
             html += `<tr>
                 <td><strong>${b.customerName || '—'}</strong>${businessInfo}</td>
                 <td><small>${b.customerEmail || ''}<br>${b.customerPhone || ''}</small></td>
                 <td><small>${propertyName}</small></td>
-                <td><small>${b.bookingDateFrom}</small></td>
-                <td><small>${b.bookingDateTo}</small></td>
+                <td><small>${checkIn}</small></td>
+                <td><small>${checkOut}</small></td>
                 <td>${b.guestNumbers || '—'}${guestBreakdown ? '<br><small class="text-muted">' + guestBreakdown + '</small>' : ''}</td>
                 <td><small>${purposeDisplay}</small></td>
                 <td><span class="badge bg-secondary">${b.paymentMethod || b.paymentStatus || '—'}</span></td>

@@ -409,12 +409,17 @@
                 const submitted = r.createdAt
                     ? new Date(r.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—';
 
+                const checkIn = r.bookingDateFrom
+                    ? new Date(r.bookingDateFrom).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+                const checkOut = r.bookingDateTo
+                    ? new Date(r.bookingDateTo).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+
                 html += `<tr>
                     <td><strong>${r.customerName || '—'}</strong>${bizInfo}</td>
                     <td><small>${r.customerEmail || ''}<br>${r.customerPhone || ''}</small></td>
                     <td><small>${property}</small></td>
-                    <td><small>${r.bookingDateFrom}</small></td>
-                    <td><small>${r.bookingDateTo}</small></td>
+                    <td><small>${checkIn}</small></td>
+                    <td><small>${checkOut}</small></td>
                     <td>${r.guestNumbers || '—'}${guestBreakdown ? '<br><small class="text-muted">' + guestBreakdown + '</small>' : ''}</td>
                     <td><small>${purposeDisplay}</small></td>
                     <td><span class="badge bg-secondary">${r.paymentMethod || r.paymentStatus || '—'}</span></td>
