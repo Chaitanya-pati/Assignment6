@@ -1165,13 +1165,14 @@ namespace Assignment6.Controllers
                     Console.WriteLine($"Invoice generation failed: {ex.Message}");
                 }
 
-                // Fire & forget — respond immediately, send email in background
+                // Fire & forget — respond immediately, send email in background then clean up the file
+                var filePathSnap = invoiceFilePath;
+
                 if (sendEmail && invoiceHtml != null)
                 {
-                    var emailService  = _emailService;
-                    var bookingSnap   = booking;
-                    var htmlSnap      = invoiceHtml;
-                    var filePathSnap  = invoiceFilePath;
+                    var emailService = _emailService;
+                    var bookingSnap  = booking;
+                    var htmlSnap     = invoiceHtml;
 
                     _ = Task.Run(async () =>
                     {
@@ -1186,6 +1187,43 @@ namespace Assignment6.Controllers
                         catch (Exception ex)
                         {
                             Console.WriteLine($"[Email] Invoice email failed: {ex.Message}");
+                        }
+                        finally
+                        {
+                            // Delete the invoice file 5 seconds after the email task finishes
+                            await Task.Delay(5000);
+                            try
+                            {
+                                if (filePathSnap != null && System.IO.File.Exists(filePathSnap))
+                                {
+                                    System.IO.File.Delete(filePathSnap);
+                                    Console.WriteLine($"[Cleanup] Deleted invoice file: {filePathSnap}");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"[Cleanup] Failed to delete invoice file: {ex.Message}");
+                            }
+                        }
+                    });
+                }
+                else if (filePathSnap != null)
+                {
+                    // No email — still delete the file after 5 seconds
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(5000);
+                        try
+                        {
+                            if (System.IO.File.Exists(filePathSnap))
+                            {
+                                System.IO.File.Delete(filePathSnap);
+                                Console.WriteLine($"[Cleanup] Deleted invoice file: {filePathSnap}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[Cleanup] Failed to delete invoice file: {ex.Message}");
                         }
                     });
                 }
