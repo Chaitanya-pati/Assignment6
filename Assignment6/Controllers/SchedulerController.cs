@@ -1178,9 +1178,9 @@ namespace Assignment6.Controllers
                     {
                         try
                         {
-                            byte[] pdfBytes = null;
-                            if (filePathSnap != null && System.IO.File.Exists(filePathSnap))
-                                pdfBytes = await System.IO.File.ReadAllBytesAsync(filePathSnap);
+                            // Generate PDF bytes directly in memory — avoids reading a potentially
+                            // corrupt fallback HTML file that was renamed to .pdf on disk.
+                            byte[] pdfBytes = GeneratePdfBytes(htmlSnap);
 
                             await emailService.SendInvoiceEmailAsync(bookingSnap, htmlSnap, pdfBytes);
                         }
@@ -1190,7 +1190,7 @@ namespace Assignment6.Controllers
                         }
                         finally
                         {
-                            // Delete the invoice file 5 seconds after the email task finishes
+                            // Delete the invoice file after the email task finishes
                             await Task.Delay(5000);
                             try
                             {

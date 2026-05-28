@@ -2917,13 +2917,11 @@
         .withUrl("/signalR")
         .build();
 
-    connection.on("BindBookingFromAirbnb", function (Bookings) {
+    connection.on("BindBookingFromAirbnb", function () {
         try {
-            allBookingsData = Bookings;
-            Object.values(calendars).forEach(cal => cal && cal.removeAllEvents());
-            loadInitialBookings();
+            refreshCalendarData();
         } catch (error) {
-            console.error('SignalR error:', error);
+            console.error('SignalR Airbnb refresh error:', error);
         }
     });
 
