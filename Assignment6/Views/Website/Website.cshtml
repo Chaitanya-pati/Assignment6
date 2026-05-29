@@ -967,10 +967,6 @@
 <!-- Inline Razor Data -->
  <script>
     $(document).ready(function () {
-        if (localStorage.getItem('IsLoggedIn') == "true") {
-            window.location.href = "/Login/Login";
-        }
-        
         // Initialize validation
         initializeWebsiteValidation();
         initializeNavigation();
@@ -2297,7 +2293,7 @@
         }
 
         let html = '';
-        for (let i = 1; i <= count; i++) {
+        for (let i = 2; i <= count; i++) {
             html += `
             <div class="rounded p-2 mb-2" style="background:#fff;border:1px solid #e2e8f0;">
                 <div class="small fw-semibold mb-2" style="color:#2563a8;">

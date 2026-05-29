@@ -4,9 +4,6 @@
    ============================================ */
 
 $(document).ready(function () {
-    if (localStorage.getItem('IsLoggedIn') == "true") {
-        window.location.href = "/Login/Login";
-    }
 
     // Initialize all functionality
     initializeNavigation();
