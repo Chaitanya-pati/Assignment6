@@ -12,5 +12,6 @@ namespace DbService.SaveModels
         public Booking BookingData { get; set; }
         public List<Room> Rooms { get; set; }
         public string GuestsJson { get; set; }
+        public long? FinalPriceOverride { get; set; }
     }
 }

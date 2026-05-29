@@ -440,6 +440,12 @@ namespace Assignment6.Controllers
                     }
                 }
 
+                // Apply admin price override if explicitly provided
+                if (bookingSaveModel.FinalPriceOverride.HasValue && bookingSaveModel.FinalPriceOverride.Value > 0)
+                {
+                    bookingSaveModel.BookingData.Price = bookingSaveModel.FinalPriceOverride.Value;
+                }
+
                 bool resultSaved = _bookingService.SaveBookingAlternative(bookingSaveModel.BookingData, bookingSaveModel.Rooms);
 
                 if (resultSaved && !string.IsNullOrWhiteSpace(bookingSaveModel.GuestsJson))
