@@ -114,16 +114,25 @@ public class EmailService : IEmailService
 
     public async Task SendInvoiceEmailAsync(Booking booking, string invoiceHtml, byte[] pdfBytes = null)
     {
-        var subject  = $"Your Invoice – Booking #{booking.Id} | {_cfg.DisplayName}";
-        var body     = InvoiceEmailWrapper(invoiceHtml, booking);
-        var fileName = $"Invoice_Booking_{booking.Id}.pdf";
+        bool hasPdf    = pdfBytes != null && pdfBytes.Length > 0;
+        var subject    = $"Invoice #{booking.Id:D6} – {booking.Home?.Name ?? _cfg.DisplayName}";
+        var body       = BuildInvoiceNotificationEmail(booking, hasPdf);
+        var fileName   = $"Invoice_Booking_{booking.Id}.pdf";
 
         var recipients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (!string.IsNullOrWhiteSpace(booking.CustomerEmail)) recipients.Add(booking.CustomerEmail);
         if (!string.IsNullOrWhiteSpace(booking.BookedByEmail)) recipients.Add(booking.BookedByEmail);
 
+        if (recipients.Count == 0)
+        {
+            _logger.LogWarning("[Email] Invoice email skipped — no recipient address on booking #{BookingId}", booking.Id);
+            return;
+        }
+
         foreach (var r in recipients)
-            await SendAsync(r, subject, body, pdfBytes, fileName);
+            await SendAsync(r, subject, body, hasPdf ? pdfBytes : null, fileName);
+
+        _logger.LogInformation("[Email] Invoice email dispatched for booking #{BookingId} — PDF attached: {HasPdf}", booking.Id, hasPdf);
     }
 
     public async Task<(bool success, string message)> SendTestEmailAsync(string toAddress)
@@ -518,23 +527,112 @@ public class EmailService : IEmailService
 </body></html>";
     }
 
-    private string InvoiceEmailWrapper(string invoiceHtml, Booking b) => $@"<!DOCTYPE html>
-<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'></head>
+    private string BuildInvoiceNotificationEmail(Booking b, bool pdfAttached)
+    {
+        int nights      = (b.BookingDateTo - b.BookingDateFrom).Days;
+        long advance    = b.AdvancePrice ?? 0;
+        long finalPaid  = b.FinalPaymentAmount ?? 0;
+        long totalPaid  = advance + finalPaid;
+        long balance    = Math.Max(0, b.Price - totalPaid);
+        bool fullPaid   = balance == 0;
+
+        string paymentRows = "";
+        if (advance > 0)
+            paymentRows += $"<tr><td style='color:#6b7a8d;padding:5px 0;width:55%;'>Advance paid{(!string.IsNullOrWhiteSpace(b.PaymentMethod) ? $" ({b.PaymentMethod})" : "")}</td><td style='font-weight:600;color:#16a34a;text-align:right;padding:5px 0;'>&#8377;{advance:N0}</td></tr>";
+        if (finalPaid > 0)
+            paymentRows += $"<tr><td style='color:#6b7a8d;padding:5px 0;'>Final paid{(!string.IsNullOrWhiteSpace(b.FinalPaymentMethod) ? $" ({b.FinalPaymentMethod})" : "")}</td><td style='font-weight:600;color:#16a34a;text-align:right;padding:5px 0;'>&#8377;{finalPaid:N0}</td></tr>";
+        if (balance > 0)
+            paymentRows += $"<tr><td style='color:#b45309;padding:5px 0;font-weight:600;'>Balance due</td><td style='font-weight:700;color:#b45309;text-align:right;padding:5px 0;'>&#8377;{balance:N0}</td></tr>";
+        if (fullPaid)
+            paymentRows += "<tr><td colspan='2' style='padding:8px 0;'><span style='background:#dcfce7;color:#15803d;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;display:inline-block;'>&#10003; Fully Paid</span></td></tr>";
+
+        string attachNote = pdfAttached
+            ? "<div style='background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;padding:14px 18px;text-align:center;'><span style='font-size:13px;color:#15803d;font-weight:600;'>&#128206; Your invoice is attached as a PDF file.</span><div style='font-size:11px;color:#6b7a8d;margin-top:4px;'>Please save or print it for your records.</div></div>"
+            : "<div style='background:#fef9c3;border:1.5px solid #fde047;border-radius:8px;padding:14px 18px;text-align:center;'><span style='font-size:13px;color:#854d0e;font-weight:600;'>&#9888; Invoice PDF could not be generated. Please contact us for a copy.</span></div>";
+
+        return $@"<!DOCTYPE html>
+<html lang='en'>
+<head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'></head>
 <body style='margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif;'>
-<table width='100%' cellpadding='0' cellspacing='0' style='background:#f4f6fb;padding:24px 0;'>
+<table width='100%' cellpadding='0' cellspacing='0' style='background:#f4f6fb;padding:32px 0;'>
 <tr><td align='center'>
-  <table width='700' cellpadding='0' cellspacing='0' style='max-width:700px;'>
-    <tr><td style='padding:0 0 12px;text-align:center;'>
-      <div style='font-size:14px;color:#6b7a8d;'>Invoice for Booking <strong>#{b.Id}</strong> from <strong>{_cfg.DisplayName}</strong>.</div>
-      <div style='font-size:12px;color:#9ca3af;margin-top:4px;'>Please save or print this email for your records.</div>
-    </td></tr>
-    <tr><td>{invoiceHtml}</td></tr>
-    <tr><td style='padding:12px 0;text-align:center;'>
-      <div style='font-size:11px;color:#9ca3af;'>{_cfg.DisplayName} &middot; Automated message.</div>
-    </td></tr>
-  </table>
+<table width='600' cellpadding='0' cellspacing='0'
+       style='background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:600px;'>
+
+  <!-- Header -->
+  <tr><td style='background:linear-gradient(135deg,#1a3a6b 0%,#2563a8 100%);padding:28px 40px;'>
+    <div style='font-size:22px;font-weight:700;color:#fff;letter-spacing:1px;'>{_cfg.DisplayName}</div>
+    <div style='font-size:11px;color:#a8c4e8;margin-top:5px;letter-spacing:2px;text-transform:uppercase;'>Invoice &amp; Checkout Confirmation</div>
+  </td></tr>
+
+  <!-- Invoice badge -->
+  <tr><td style='background:#f0fdf4;padding:14px 40px;border-bottom:2px solid #bbf7d0;text-align:center;'>
+    <span style='background:#15803d;color:#fff;font-size:14px;font-weight:700;padding:7px 22px;border-radius:50px;display:inline-block;'>
+      &#10003;&nbsp; Checkout Complete — Invoice #{b.Id:D6}
+    </span>
+  </td></tr>
+
+  <!-- Body -->
+  <tr><td style='padding:28px 40px;'>
+    <p style='font-size:15px;color:#374151;margin:0 0 6px;'>Dear <strong>{b.CustomerName}</strong>,</p>
+    <p style='font-size:14px;color:#6b7a8d;margin:0 0 24px;'>
+      Thank you for staying with us at <strong>{b.Home?.Name ?? _cfg.DisplayName}</strong>.
+      Your invoice is ready and summarised below.
+    </p>
+
+    <!-- Attachment notice -->
+    {attachNote}
+
+    <!-- Booking summary -->
+    <table width='100%' cellpadding='0' cellspacing='0'
+           style='margin-top:20px;border:1.5px solid #dbe7ff;border-radius:8px;overflow:hidden;'>
+      <tr><td style='background:#f8faff;padding:10px 16px;border-bottom:1px solid #dbe7ff;'>
+        <div style='font-size:10px;font-weight:700;color:#6b7a8d;text-transform:uppercase;letter-spacing:.8px;'>Booking Summary</div>
+      </td></tr>
+      <tr><td style='padding:14px 16px;'>
+        <table width='100%' cellpadding='4' cellspacing='0' style='font-size:13px;'>
+          <tr><td style='color:#6b7a8d;width:45%;'>Invoice No</td><td style='font-weight:700;color:#1a3a6b;'>#{b.Id:D6}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Invoice Date</td><td style='font-weight:600;color:#1a3a6b;'>{DateTime.Now:dd MMM yyyy}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Property</td><td style='font-weight:600;color:#1a3a6b;'>{b.Home?.Name ?? "N/A"}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Check-in</td><td style='font-weight:600;color:#1a3a6b;'>{b.BookingDateFrom:dd MMM yyyy}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Check-out</td><td style='font-weight:600;color:#1a3a6b;'>{b.BookingDateTo:dd MMM yyyy}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Duration</td><td style='font-weight:600;color:#1a3a6b;'>{nights} {(nights == 1 ? "night" : "nights")}</td></tr>
+          <tr><td style='color:#6b7a8d;'>Total Guests</td><td style='font-weight:600;color:#1a3a6b;'>{b.GuestNumbers}</td></tr>
+        </table>
+      </td></tr>
+    </table>
+
+    <!-- Payment summary -->
+    <table width='100%' cellpadding='0' cellspacing='0'
+           style='margin-top:12px;border:1.5px solid #dbe7ff;border-radius:8px;overflow:hidden;'>
+      <tr><td style='background:#f8faff;padding:10px 16px;border-bottom:1px solid #dbe7ff;'>
+        <div style='font-size:10px;font-weight:700;color:#6b7a8d;text-transform:uppercase;letter-spacing:.8px;'>Payment Summary</div>
+      </td></tr>
+      <tr><td style='padding:14px 16px;'>
+        <table width='100%' cellpadding='0' cellspacing='0' style='font-size:13px;border-bottom:1px solid #e5e7eb;margin-bottom:8px;padding-bottom:8px;'>
+          <tr><td style='color:#6b7a8d;padding:5px 0;'>Booking Total</td><td style='font-size:15px;font-weight:700;color:#1a3a6b;text-align:right;padding:5px 0;'>&#8377;{b.Price:N0}</td></tr>
+        </table>
+        <table width='100%' cellpadding='0' cellspacing='0' style='font-size:13px;'>
+          {paymentRows}
+        </table>
+      </td></tr>
+    </table>
+
+    <p style='font-size:13px;color:#6b7a8d;margin:20px 0 0;'>
+      We hope you had a wonderful stay. Please feel free to reach out if you have any questions about this invoice.
+    </p>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style='background:#1a3a6b;padding:18px 40px;text-align:center;'>
+    <div style='font-size:12px;color:#a8c4e8;'>{_cfg.DisplayName}</div>
+    <div style='font-size:11px;color:#5a7aaa;margin-top:4px;'>This is an automated message. Please do not reply directly.</div>
+  </td></tr>
+
+</table>
 </td></tr></table>
 </body></html>";
+    }
 
     private static string Row(string label, string value) =>
         string.IsNullOrWhiteSpace(value) ? "" :
