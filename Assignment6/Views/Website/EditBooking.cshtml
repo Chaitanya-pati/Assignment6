@@ -482,11 +482,6 @@
         }
 
         function buildGuestCard(idx, guestNum, prev) {
-            const idTypes = ['', 'Aadhar Card', 'Passport', 'Driving License', 'Voter ID', 'PAN Card', 'Other'];
-            const idOptions = idTypes.map(t =>
-                `<option value="${t}" ${prev.idProof === t ? 'selected' : ''}>${t || '-- Select ID Type --'}</option>`
-            ).join('');
-
             const genders = ['', 'Male', 'Female', 'Other'];
             const genderOptions = genders.map(g =>
                 `<option value="${g}" ${prev.gender === g ? 'selected' : ''}>${g || '-- Select --'}</option>`
@@ -513,8 +508,8 @@
                         <input type="tel" class="form-control form-control-sm gc-contact" placeholder="Phone number" value="${prev.contactNumber || ''}">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">ID Proof Type</label>
-                        <select class="form-select form-select-sm gc-idproof">${idOptions}</select>
+                        <label class="form-label">ID Number</label>
+                        <input type="text" class="form-control form-control-sm gc-idproof" placeholder="e.g. Aadhar / Passport No." value="${prev.idProof || ''}">
                     </div>
                 </div>
             </div>`;

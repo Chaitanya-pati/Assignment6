@@ -569,6 +569,13 @@ namespace Assignment6.Controllers
                     {
                         roomId = br.RoomId,
                         bookingId = br.BookingId
+                    }).ToList(),
+                    bookingGuests = b.BookingGuests?.Select(g => new
+                    {
+                        guestName     = g.GuestName,
+                        gender        = g.Gender,
+                        contactNumber = g.ContactNumber,
+                        idProof       = g.IdProof
                     }).ToList()
                 });
 

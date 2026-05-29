@@ -2554,6 +2554,43 @@
                 </div>`;
         }
 
+        // ── Other Guest Details card (collapsed by default) ───────
+        let otherGuestsCard = '';
+        if (props.bookingGuests && props.bookingGuests.length > 0) {
+            const guestRows = props.bookingGuests.map((g, i) => {
+                const fields = [
+                    g.guestName     ? `<span><span style="color:#6b7a8d;">Name:</span> <strong>${g.guestName}</strong></span>` : '',
+                    g.gender        ? `<span><span style="color:#6b7a8d;">Gender:</span> <strong>${g.gender}</strong></span>` : '',
+                    g.contactNumber ? `<span><span style="color:#6b7a8d;">Contact:</span> <strong>${g.contactNumber}</strong></span>` : '',
+                    g.idProof       ? `<span><span style="color:#6b7a8d;">ID No:</span> <strong>${g.idProof}</strong></span>` : ''
+                ].filter(Boolean).join('');
+                return `
+                <div style="padding:8px 0;${i > 0 ? 'border-top:1px solid #e8f0fb;' : ''}">
+                    <div style="font-size:10px;font-weight:700;color:#2563a8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">
+                        <i class="fas fa-user me-1"></i>Guest #${i + 2}
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:5px 18px;font-size:12px;color:#374151;">
+                        ${fields || '<span style="color:#9ca3af;font-style:italic;">No details provided</span>'}
+                    </div>
+                </div>`;
+            }).join('');
+
+            otherGuestsCard = `
+            <div class="bdoc-card" style="padding:0;overflow:hidden;">
+                <div onclick="(function(btn){var body=btn.parentElement.querySelector('.og-body');var icon=btn.querySelector('.og-icon');body.classList.toggle('d-none');icon.classList.toggle('fa-chevron-down');icon.classList.toggle('fa-chevron-up');})(this)"
+                     style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;user-select:none;background:#f8faff;">
+                    <div class="bdoc-card-title" style="margin:0;font-size:11px;">
+                        <i class="fas fa-users me-1"></i>Other Guest Details
+                        <span style="font-size:10px;font-weight:400;color:#8896a6;margin-left:4px;">(${props.bookingGuests.length} guest${props.bookingGuests.length > 1 ? 's' : ''})</span>
+                    </div>
+                    <i class="fas fa-chevron-down og-icon" style="font-size:11px;color:#6b7a8d;transition:transform .2s;"></i>
+                </div>
+                <div class="og-body d-none" style="padding:2px 12px 10px;">
+                    ${guestRows}
+                </div>
+            </div>`;
+        }
+
         // ── Actions card ──────────────────────────────────────────
         let actionsHtml = '';
         if (!isAirbnbBooking && actualRemaining > 0) {
@@ -2565,7 +2602,7 @@
         const actionsCard = `<div class="bdoc-actions">${actionsHtml}</div>`;
 
         // ── Assemble & open offcanvas ─────────────────────────────
-        document.getElementById('bdoc_Content').innerHTML = infoCard + paymentSummaryCard + paymentManageCard + actionsCard;
+        document.getElementById('bdoc_Content').innerHTML = infoCard + otherGuestsCard + paymentSummaryCard + paymentManageCard + actionsCard;
 
         // Initialize live summary with current values
         _bdocSummary(event.id, totalPrice);

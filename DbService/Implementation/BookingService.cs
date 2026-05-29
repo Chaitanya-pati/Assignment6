@@ -567,6 +567,7 @@ namespace DbService.Implementation
                         .Include(b => b.BookingRooms)
                             .ThenInclude(br => br.Room)
                         .Include(b => b.Home)
+                        .Include(b => b.BookingGuests)
                         .AsQueryable();
 
                     // Apply date range filter if both dates are provided (for 6-month chunks)
